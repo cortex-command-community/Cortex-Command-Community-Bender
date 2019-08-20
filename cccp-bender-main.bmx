@@ -39,7 +39,7 @@ Type TAppOutput
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
-	Global ZOOM:Int = 2
+	Global ZOOM:Int = 1
 	Global FRAMES:Int = 7
 	Global BACKGROUND_RED:Int = 50
 	Global BACKGROUND_GREEN:Int = 170
@@ -58,8 +58,8 @@ Type TAppOutput
 	Global angB:Float
 	Global angC:Float
 	
-	'Create bone tiles from source image
-	Function FCreateBoneImage()
+	'Create limb part tiles from source image
+	Function FCreateLimbTiles()
 		Local b:Int, i:Int
 		For b = 0 To BONES-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
 			boneImage[b] = CreateImage(TILESIZE,TILESIZE,1,MASKEDIMAGE)
@@ -83,7 +83,7 @@ Type TAppOutput
 		SetMaskColor(255,0,255)
 		'DrawImage(sourceImage,0,0)
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
-		FCreateBoneImage()
+		FCreateLimbTiles()
 		FLimbBend()
 		Flip(1)
 		'FOutputDraw()
@@ -163,7 +163,7 @@ Type TAppOutput
 			SetColor(255,255,255)
 			DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
 			If redoBoneImage Then
-				FCreateBoneImage()
+				FCreateLimbTiles()
 				redoBoneImage = False
 			EndIf
 			FLimbBend()
@@ -352,7 +352,12 @@ While True
 					'Saving
 					Case TAppGUI.editSaveButton
 						exportedFile = RequestFile("Save graphic file",fileFilers,True)
-			
+						'Foolproofing
+						If exportedFile <> Null Then
+							'Writing new file
+							 Local tempOutputImage:TPixmap = GrabPixmap(0,0,640,480)
+      						 SavePixmapPNG(tempOutputImage,exportedFile)
+						EndIf
 					'Settings textbox inputs
 					'Scale
 					Case TAppGUI.editSettingsZoomTextbox
