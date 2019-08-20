@@ -34,7 +34,9 @@ Type TAppOutput
 	Global outputWindow:TGraphics
 	'Draw Bools
 	Global doDraw:Int = False
-	Global redoBoneImage:Int = False
+	Global redoLimbTiles:Int = False
+	Global prepForSave:Int = False
+	Global rdyForSave:Int = False
 	'Constants
 	Const BONES:Int = 8
 	Const LIMBS:Int = BONES/2
@@ -68,22 +70,22 @@ Type TAppOutput
 	Function FCreateLimbTiles()
 		Local b:Int, i:Int
 		For b = 0 To BONES-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
-			boneImage[b] = CreateImage(TILESIZE,TILESIZE,1,MASKEDIMAGE)
+			boneImage[b] = CreateImage(TILESIZE,TILESIZE,1,DYNAMICIMAGE|MASKEDIMAGE)
 			GrabImage(boneImage[b],b*TILESIZE,0)
 		Next
 		'Set up default bone sizes
 		For i = 0 To BONES-1
 			jointX[i] = TILESIZE/2
-			jointY[i] = TILESIZE/3.6
-			boneLength[i] = ((TILESIZE/2-jointY[i])*2)
-			SetImageHandle(boneImage[i],jointX[i],jointY[i])
+			jointY[i] = TILESIZE/3.3 '3.6
+			boneLength[i] = (TILESIZE/2-jointY[i])*2
+			SetImageHandle(boneImage[i],jointX[i]/ZOOM,jointY[i]/ZOOM)
 		Next
 	EndFunction
 	
 	'Create output window and draw assets
 	Function FOutputBoot()
 		'SetGraphicsDriver GLGraphicsDriver()
-		outputWindow = Graphics(640,480,0,0,0)
+		outputWindow = Graphics(768,480,0,0,0)
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
@@ -91,29 +93,42 @@ Type TAppOutput
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
 		FCreateLimbTiles()
 		FLimbBend()
-		'Flip(1)
 		doDraw = True
 	EndFunction
-		
-	'Sprite rotation
+	
+	'Set Joint Marker
+	Function FSetJointMarker()
+		Local xm:Int = MouseX()
+		Local ym:Int = MouseY()
+		If ym < (TILESIZE/2-2) And ym > 0 And xm > 0 And xm < TILESIZE*BONES Then
+			Local b:Int = xm/TILESIZE
+			jointX[b] = TILESIZE/2 		'X is always at center, so kinda pointless to even bother - at the moment
+			jointY[b] = ym			'Determines length
+			boneLength[b] = (TILESIZE/2 -ym)*2
+			SetImageHandle(boneImage[b],jointX[b]/ZOOM,jointY[b]/ZOOM) 'Rotation handle.
+		EndIf
+	EndFunction
+	
+	'Rotation Calc
 	Function FLawOfCosines(ab:Float,bc:Float,ca:Float)
 		angA = ACos((ca^2+ab^2-bc^2)/(2*ca*ab))
 		angB = ACos((bc^2+ab^2-ca^2)/(2*bc*ab))
 		angC = (180-(angA+angB))
 	EndFunction
 	
+	'Bending
 	Function FLimbBend()
-		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider)
-		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider)
+		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider) -- maybe not, because large number of frames can be rendered and you can just take the ones you need
+		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider) -- maybe not, because large number of frames can be rendered and you can just take the ones you need
 		Local stepSize:Float = (maxExtend-minExtend)/(FRAMES-1) ' -1 to make inclusive of last value (full range)
 		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float 
 		For l = 0 To LIMBS-1
 			For f = 0 To FRAMES-1 
 				b = l*2
-				x = f * TILESIZE + 96
-				y = l * TILESIZE * 1.5 + 200
-				upperLength = boneLength[b]		'e.g. upper leg
-				lowerLength = boneLength[b+1]	'e.g. lower leg
+				x = (f * 32) + 80 						'Drawing position X
+				y = ((l * 32) * 1.5 ) + 144				'Drawing position Y
+				upperLength = boneLength[b]/ZOOM		'e.g. upper leg
+				lowerLength = boneLength[b+1]/ZOOM		'e.g. lower leg
 				airLength = (stepSize * f + minExtend) * (upperLength + lowerLength)	'Sum of the two bones * step scaler for frame (hip-ankle)
 				FLawOfCosines(airLength,upperLength,lowerLength)
 				angle[b,f] = angB
@@ -127,20 +142,7 @@ Type TAppOutput
 			Next
 		Next
 	EndFunction
-	
-	'Set Joint Marker
-	Function FSetJointMarker()
-		Local xm:Int = MouseX()
-		Local ym:Int = MouseY()
-		If ym < (TILESIZE/2-2) And ym > 0 And xm > 0 And xm < TILESIZE*BONES Then
-			Local b:Int = xm/TILESIZE
-			jointX[b] = TILESIZE/2 		'X is always at center, so kinda pointless to even bother - at the moment
-			jointY[b] = ym				'Determines length
-			boneLength[b] = (TILESIZE/2 -ym)*2
-			SetImageHandle(boneImage[b],jointX[b],jointY[b]) 'Rotation handle.
-		EndIf
-	EndFunction
-	
+
 	'Create Joint Markers
 	Function FCreateJointMarker(x:Float,y:Float)
 		SetRotation(0)
@@ -163,12 +165,16 @@ Type TAppOutput
 		EndIf
 		If doDraw
 			Cls
-			SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
+			If Not prepForSave
+				SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
+			ElseIf prepForSave
+				SetClsColor(255,0,255)
+			EndIf
 			SetColor(255,255,255)
 			DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
-			If redoBoneImage Then
+			If redoLimbTiles Then
 				FCreateLimbTiles()
-				redoBoneImage = False
+				redoLimbTiles = False
 			EndIf
 			FLimbBend()
 			'Footer image and text
@@ -186,20 +192,22 @@ Type TAppOutput
 			Local f:Int, b:Int
 			For f = 0 To FRAMES-1
 				'These might be in a specific draw-order for joint overlapping purposes
-				b = 0 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f]) 'DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 1 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 2 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 3 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 4 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 5 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 6 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
-				b = 7 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
 			Next
 			SetRotation(0)
-			Flip(1)	
-			doDraw = False
-		'Else
-			'Delay(20)
+			Flip(0)
+			If Not prepForSave
+				doDraw = False
+			ElseIf prepForSave
+				rdyForSave = True
+			EndIf
 		EndIf
 	EndFunction
 EndType
@@ -242,7 +250,7 @@ Type TAppGUI
 	'Workspace Window Instructions
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
-	
+	'Textboxes content
 	Global aboutTextboxContent:String[8]
 	Global helpTextboxContent:String[]
 	
@@ -269,7 +277,7 @@ Type TAppGUI
 	
 	'Create Editor Window
 	Function FAppEditor()
-		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-640,DesktopHeight()/2-240,300,430,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
+		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-700,DesktopHeight()/2-240,300,430,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
 		editWindowButtonPanel = CreatePanel(10,7,280,57,editWindow,PANEL_GROUP)	
 		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
@@ -293,20 +301,21 @@ Type TAppGUI
 		SetGadgetText(editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
 		SetGadgetText(editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
 		SetGadgetText(editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE)
+		'Instructions textbox content
 		SetGadgetText(TAppGUI.editHelpTextbox,"TBA");
 		'Delete no longer used MainWindow
 		FreeGadget(mainWindow)
 	EndFunction
+	
+	'Transition between windows
+	Function FAppUpdate()
+		If Not mainToEdit And importedFile <> Null Then
+			FAppEditor()
+			TAppOutput.FOutputBoot()
+			mainToEdit = True
+		EndIf
+	EndFunction
 EndType
-
-'Transition between windows
-Function FAppUpdate()
-	If Not TAppGUI.mainToEdit And importedFile <> Null Then
-		TAppGUI.FAppEditor()
-		TAppOutput.FOutputBoot()
-		TAppGUI.mainToEdit = True
-	EndIf
-EndFunction
 
 'Everything set up, run app
 New TAppGUI
@@ -315,13 +324,15 @@ TAppGUI.FAppMain()
 
 While True
 	If Not TAppGUI.mainToEdit Then
-		FAppUpdate()
+		TAppGUI.FAppUpdate()
 	Else
 		TAppOutput.FOutputUpdate()
 	EndIf
 
 	WaitEvent
-	Print CurrentEvent.ToString()
+	'Print CurrentEvent.ToString()
+	'Print "prep "+TAppOutput.prepForSave
+	'Print "rdy "+TAppOutput.rdyForSave
 
 	'Event Responses	
 	'In Main Window
@@ -342,7 +353,7 @@ While True
 				EndSelect
 		EndSelect
 	'In Editor Window	
-	ElseIf TAppGUI.mainToEdit Then
+	ElseIf TAppGUI.mainToEdit Then	
 		Select EventID()
 			Case EVENT_APPRESUME
 				ActivateWindow(TAppGUI.editWindow)
@@ -365,17 +376,27 @@ While True
 							TAppOutput.sourceImage = TAppOutput.sourceImage
 						Else
 							TAppOutput.sourceImage = LoadImage(importedFile,0)
-							TAppOutput.redoBoneImage = True
+							TAppOutput.redoLimbTiles = True
 							TAppOutput.doDraw = True
 						EndIf
 					'Saving
 					Case TAppGUI.editSaveButton
-						exportedFile = RequestFile("Save graphic file",fileFilers,True)
-						'Foolproofing
-						If exportedFile <> Null Then
-							'Writing new file
-							Local tempOutputImage:TPixmap = GrabPixmap(0,0,640,480)
-      						SavePixmapPNG(tempOutputImage,exportedFile)
+						'Prepare for saving
+						TAppOutput.prepForSave = True
+						TAppOutput.doDraw = True
+						If TAppOutput.rdyForSave = True Then
+							TAppOutput.doDraw = True
+							Delay(100)
+							exportedFile = RequestFile("Save graphic file",fileFilers,True)
+							'Foolproofing
+							If exportedFile <> Null Then
+								'Writing new file
+								Local tempOutputImage:TPixmap = GrabPixmap(0,0,768,480)
+	      						SavePixmapPNG(tempOutputImage,exportedFile)
+							EndIf
+							TAppOutput.prepForSave = False
+							TAppOutput.rdyForSave = False
+							TAppOutput.doDraw = True
 						EndIf
 					'Settings textbox inputs
 					'Scale
@@ -391,7 +412,7 @@ While True
 						EndIf
 						SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.ZOOM)
 						TAppOutput.TILESIZE = 24 * TAppOutput.ZOOM
-						TAppOutput.redoBoneImage = True
+						TAppOutput.redoLimbTiles = True
 						TAppOutput.doDraw = True
 					'Frames
 					Case TAppGUI.editSettingsFramesTextbox
