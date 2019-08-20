@@ -56,9 +56,9 @@ Type TAppOutput
 	Global boneLength:Float[BONES]
 	'Precalc for drawing
 	Global TILESIZE:Int = 24
-	Global angle:Int[BONES,FRAMES]
-	Global xBone:Int[BONES,FRAMES]
-	Global yBone:Int[BONES,FRAMES]
+	Global angle:Int[BONES,20]
+	Global xBone:Int[BONES,20]
+	Global yBone:Int[BONES,20]
 	'Variables
 	Global angA:Float
 	Global angB:Float
@@ -94,7 +94,7 @@ Type TAppOutput
 		'Flip(1)
 		doDraw = True
 	EndFunction
-	
+		
 	'Sprite rotation
 	Function FLawOfCosines(ab:Float,bc:Float,ca:Float)
 		angA = ACos((ca^2+ab^2-bc^2)/(2*ca*ab))
@@ -121,7 +121,7 @@ Type TAppOutput
 				yBone[b,f] = y
 				x:-Sin(angle[b,f])*upperLength		'Position of knee
 				y:+Cos(angle[b,f])*upperLength		'Could just use another angle of the triangle though, but I (arne) didn't
-				angle[b+1,f] = angC + angB + 180 	'It looks correct on screen so I'm just gonna leave it at that!
+				angle[b+1,f] = angC + angB + 180	'It looks correct on screen so i'm (arne) just gonna leave it at that!
 				xBone[b+1,f] = x
 				yBone[b+1,f] = y
 			Next
@@ -397,8 +397,8 @@ While True
 					Case TAppGUI.editSettingsFramesTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsFramesTextbox).ToInt()
 						'Foolproofing
-						If userInputValue > 7 Then
-							TAppOutput.FRAMES = 7
+						If userInputValue > 20 Then
+							TAppOutput.FRAMES = 20
 						ElseIf userInputValue <= 0 Then
 							TAppOutput.FRAMES = 1
 						Else
