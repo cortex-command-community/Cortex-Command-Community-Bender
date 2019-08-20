@@ -15,6 +15,7 @@ Import BRL.PNGLoader
 
 'Version
 Global appVersion:String = "0.1"
+Global appVersionDate:String = "17 Aug 2019"
 
 'Output Window Title
 AppTitle = "CCCP Bender v"+appVersion+" - Output"
@@ -40,6 +41,7 @@ Type TAppOutput
 	Const UPPER_BONE:Int = 0
 	Const LOWER_BONE:Int = 1
 	'Graphic Assets
+	Global logoImage:TImage = LoadImage("assets/logo-image.png",MASKEDIMAGE)
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
@@ -85,7 +87,7 @@ Type TAppOutput
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
-		'DrawImage(sourceImage,0,0)
+		DrawImage(logoImage,0,480-ImageHeight(logoImage))
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
 		FCreateLimbTiles()
 		FLimbBend()
@@ -169,9 +171,10 @@ Type TAppOutput
 				redoBoneImage = False
 			EndIf
 			FLimbBend()
-			'Footer text
+			'Footer image and text
+			DrawImage(logoImage,0,480-ImageHeight(logoImage))
 			SetColor(255,230,80)
-			DrawText("TBA",0,480-15)
+			DrawText("TBA",ImageWidth(logoImage)+7,480-18)
 			'Draw the joint markers
 			Local i:Int
 			For i = 0 To BONES-1
@@ -240,6 +243,9 @@ Type TAppGUI
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
 	
+	Global aboutTextboxContent:String[8]
+	Global helpTextboxContent:String[]
+	
 	'Create Main App Window
 	Function FAppMain()
 		mainWindow = CreateWindow("CCCP Bender v"+appVersion,DesktopWidth()/2-150,DesktopHeight()/2-180,300,340,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
@@ -248,8 +254,17 @@ Type TAppGUI
 		mainQuitButton = CreateButton("Quit",GadgetWidth(mainWindowButtonPanel)/2-69,40,130,30,mainWindowButtonPanel,BUTTON_PUSH)
 		mainAboutPanel = CreatePanel(GadgetWidth(mainWindow)/2-140,GadgetHeight(mainWindowButtonPanel)+15,280,200,mainWindow,PANEL_GROUP,"  About :  ")
 		mainAboutTextbox = CreateTextArea(7,3,GadgetWidth(mainAboutPanel)-21,GadgetHeight(mainAboutPanel)-30,mainAboutPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
-			SetGadgetText(mainAboutTextbox,"Welcome to the CCCP Bender utility!~n~nIt's purpose is to make the life of modders easier by automagically generating bent limb frames.~n~nThe CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.~nThe CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience For the modder (hopefully).~n~nThis tool utilizes Arne's original limb bend code, but also allows loading and saving sprites, along with other settings.~n~nCreated by MaximDude using BlitzMax MaxIDE 1.52~nCCCP Bender version 0.1 - 17 Aug 2019")
 		mainWindowFooterLabel = CreateLabel("CCCP Bender v"+appVersion+" by MaximDude",10,GadgetHeight(mainWindow)-20,GadgetWidth(mainWindow),15,mainWindow,LABEL_LEFT)
+		'About textbox Content
+		aboutTextboxContent[0] = "Welcome to the CCCP Bender utility!~n~n"
+		aboutTextboxContent[1] = "It's purpose is to make the life of modders easier by automagically generating bent limb frames.~n~n"
+		aboutTextboxContent[2] = "The CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.~n"
+		aboutTextboxContent[3] = "The CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience for the modder (hopefully).~n~n"
+		aboutTextboxContent[4] = "Arne's original bend code was used as base for this utility, and has been modified and improved to enable the new features.~n~n"
+		aboutTextboxContent[5] = "Created by MaximDude using BlitzMax MaxIDE 1.52~n"
+		aboutTextboxContent[6] = "Bender logo image by Arne Jansson - Edited by MaximDude"
+		aboutTextboxContent[7] = "CCCP Bender version "+appVersion+" - "+appVersionDate
+		SetGadgetText(mainAboutTextbox,aboutTextboxContent[0]+aboutTextboxContent[1]+aboutTextboxContent[2]+aboutTextboxContent[3]+aboutTextboxContent[4]+aboutTextboxContent[5]+aboutTextboxContent[6]+aboutTextboxContent[7])
 	EndFunction
 	
 	'Create Editor Window
