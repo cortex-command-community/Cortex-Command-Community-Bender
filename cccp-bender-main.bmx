@@ -5,11 +5,13 @@ Rem
 		TBA
 EndRem
 
-Strict
+SuperStrict
 
 'Import dependencies into build
 Import MaxGUI.Drivers
-Import BRL.FileSystem
+Import BRL.Max2D
+Import BRL.Pixmap
+Import BRL.PNGLoader
 
 'Version
 Global appVersion:String = "0.1"
@@ -27,6 +29,8 @@ Global quitResult:Int = False
 
 'App Output Elements
 Type TAppOutput
+	'Output Window
+	Global outputWindow:TGraphics
 	'Draw Bools
 	Global doDraw:Int = False
 	Global redoBoneImage:Int = False
@@ -65,8 +69,8 @@ Type TAppOutput
 			boneImage[b] = CreateImage(TILESIZE,TILESIZE,1,MASKEDIMAGE)
 			GrabImage(boneImage[b],b*TILESIZE,0)
 		Next
-		'Set up default bone sizes.
-		For i = 0 To BONES-1		
+		'Set up default bone sizes
+		For i = 0 To BONES-1
 			jointX[i] = TILESIZE/2
 			jointY[i] = TILESIZE/3.6
 			boneLength[i] = ((TILESIZE/2-jointY[i])*2)
@@ -77,7 +81,7 @@ Type TAppOutput
 	'Create output window and draw assets
 	Function FOutputBoot()
 		'SetGraphicsDriver GLGraphicsDriver()
-		Graphics(640,480,0,0,0)
+		outputWindow = Graphics(640,480,0,0,0)
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
@@ -85,9 +89,7 @@ Type TAppOutput
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
 		FCreateLimbTiles()
 		FLimbBend()
-		Flip(1)
-		'FOutputDraw()
-		'Cls
+		'Flip(1)
 		doDraw = True
 	EndFunction
 	
@@ -131,9 +133,9 @@ Type TAppOutput
 		If ym < (TILESIZE/2-2) And ym > 0 And xm > 0 And xm < TILESIZE*BONES Then
 			Local b:Int = xm/TILESIZE
 			jointX[b] = TILESIZE/2 		'X is always at center, so kinda pointless to even bother - at the moment
-			jointY[b] = ym					'Determines length
+			jointY[b] = ym				'Determines length
 			boneLength[b] = (TILESIZE/2 -ym)*2
-			SetImageHandle(boneImage[b],jointX[b],jointY[b])	'Rotation handle.
+			SetImageHandle(boneImage[b],jointX[b],jointY[b]) 'Rotation handle.
 		EndIf
 	EndFunction
 	
@@ -181,14 +183,14 @@ Type TAppOutput
 			Local f:Int, b:Int
 			For f = 0 To FRAMES-1
 				'These might be in a specific draw-order for joint overlapping purposes
-				b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM) 'DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 0 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f]) 'DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+				b = 1 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 2 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 3 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 4 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 5 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 6 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
+				b = 7 SetRotation(angle[b,f]) DrawImage(boneImage[b],xBone[b,f],yBone[b,f])
 			Next
 			SetRotation(0)
 			Flip(1)	
@@ -205,8 +207,8 @@ Type TAppGUI
 	Global mainToEdit:Int = False
 	'Main Window
 	Global mainWindow:TGadget
-	'Main Window Label
-	'Global mainWindowLabel:TGadget
+	'Footer Label
+	Global mainWindowFooterLabel:TGadget
 	'Main Window Buttons
 	Global mainWindowButtonPanel:TGadget
 	Global mainLoadButton:TGadget
@@ -214,7 +216,6 @@ Type TAppGUI
 	'Main Window About
 	Global mainAboutPanel:TGadget
 	Global mainAboutTextbox:TGadget
-
 	'Editor Window
 	Global editWindow:TGadget
 	'Editor Window Buttons
@@ -228,7 +229,7 @@ Type TAppGUI
 	Global editSettingsFramesTextbox:TGadget
 	Global editSettingsColorRTextbox:TGadget
 	Global editSettingsColorGTextbox:TGadget
-	Global editSettingsColorBTextbox:TGadget	
+	Global editSettingsColorBTextbox:TGadget
 	Global editSettingsZoomLabel:TGadget
 	Global editSettingsFramesLabel:TGadget
 	Global editSettingsColorLabel:TGadget
@@ -241,23 +242,23 @@ Type TAppGUI
 	
 	'Create Main App Window
 	Function FAppMain()
-		mainWindow = CreateWindow("CCCP Bender v"+appVersion,DesktopWidth()/2-150,DesktopHeight()/2-180,300,360,Null,WINDOW_TITLEBAR)
-		'mainWindowLabel = CreateLabel("",0,0,GadgetWidth(mainWindow),100,TAppGUI.mainWindow,LABEL_LEFT)
-		mainWindowButtonPanel = CreatePanel(GadgetWidth(mainWindow)/2-80,10,150,97,mainWindow,PANEL_GROUP)
-		mainLoadButton = CreateButton("Load Sprite",GadgetWidth(mainWindowButtonPanel)/2-70,0,130,30,mainWindowButtonPanel,BUTTON_PUSH)
-		mainQuitButton = CreateButton("Quit",GadgetWidth(mainWindowButtonPanel)/2-70,40,130,30,mainWindowButtonPanel,BUTTON_PUSH)
-		mainAboutPanel = CreatePanel(GadgetWidth(mainWindow)/2-143,125,280,200,mainWindow,PANEL_GROUP,"  About :  ")
-		mainAboutTextbox = CreateTextArea(5,5,GadgetWidth(mainAboutPanel)-20,GadgetHeight(mainAboutPanel)-30,mainAboutPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
-		SetGadgetText(mainAboutTextbox,"Welcome to the CCCP Bender utility!~n~nIt's purpose is to make the life of modders easier by automagically generating bent limb frames.~n~nThe CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.~nThe CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience For the modder (hopefully).~n~nThis tool utilizes Arne's original limb bend code, but also allows loading and saving sprites, along with other settings.~n~nCreated by MaximDude using BlitzMax MaxIDE 1.52~nCCCP Bender version 0.1 - 17 Aug 2019")
-	EndFunction	
+		mainWindow = CreateWindow("CCCP Bender v"+appVersion,DesktopWidth()/2-150,DesktopHeight()/2-180,300,340,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
+		mainWindowButtonPanel = CreatePanel(GadgetWidth(mainWindow)/2-80,5,150,97,mainWindow,PANEL_GROUP)
+		mainLoadButton = CreateButton("Load Sprite",GadgetWidth(mainWindowButtonPanel)/2-69,0,130,30,mainWindowButtonPanel,BUTTON_PUSH)
+		mainQuitButton = CreateButton("Quit",GadgetWidth(mainWindowButtonPanel)/2-69,40,130,30,mainWindowButtonPanel,BUTTON_PUSH)
+		mainAboutPanel = CreatePanel(GadgetWidth(mainWindow)/2-140,GadgetHeight(mainWindowButtonPanel)+15,280,200,mainWindow,PANEL_GROUP,"  About :  ")
+		mainAboutTextbox = CreateTextArea(7,3,GadgetWidth(mainAboutPanel)-21,GadgetHeight(mainAboutPanel)-30,mainAboutPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
+			SetGadgetText(mainAboutTextbox,"Welcome to the CCCP Bender utility!~n~nIt's purpose is to make the life of modders easier by automagically generating bent limb frames.~n~nThe CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.~nThe CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience For the modder (hopefully).~n~nThis tool utilizes Arne's original limb bend code, but also allows loading and saving sprites, along with other settings.~n~nCreated by MaximDude using BlitzMax MaxIDE 1.52~nCCCP Bender version 0.1 - 17 Aug 2019")
+		mainWindowFooterLabel = CreateLabel("CCCP Bender v"+appVersion+" by MaximDude",10,GadgetHeight(mainWindow)-20,GadgetWidth(mainWindow),15,mainWindow,LABEL_LEFT)
+	EndFunction
 	
 	'Create Editor Window
 	Function FAppEditor()
-		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-640,DesktopHeight()/2-240,305,455,Null,WINDOW_TITLEBAR)
+		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-640,DesktopHeight()/2-240,300,430,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
 		editWindowButtonPanel = CreatePanel(10,7,280,57,editWindow,PANEL_GROUP)	
-		editLoadButton = CreateButton("Load",5,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
-		editSaveButton = CreateButton("Save",95,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
-		editQuitButton = CreateButton("Quit",185,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
+		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
+		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
+		editQuitButton = CreateButton("Quit",186,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSettingsPalel = CreatePanel(10,73,280,87,editWindow,PANEL_GROUP,"  Settings :  ")
 		editSettingsZoomTextbox = CreateTextField(80,12,30,20,editSettingsPalel)
 		editSettingsFramesTextbox = CreateTextField(190,12,30,20,editSettingsPalel)
@@ -270,8 +271,8 @@ Type TAppGUI
 		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPalel,LABEL_LEFT)
 		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPalel,LABEL_LEFT)
 		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editHelpPanel = CreatePanel(10,170,280,247,editWindow,PANEL_GROUP,"  Instructions :  ")
-		editHelpTextbox = CreateTextArea(5,5,GadgetWidth(editHelpPanel)-20,GadgetHeight(editHelpPanel)-30,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
+		editHelpPanel = CreatePanel(10,170,280,250,editWindow,PANEL_GROUP,"  Instructions :  ")
+		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
 		SetGadgetText(editSettingsZoomTextbox,TAppOutput.ZOOM)
 		SetGadgetText(editSettingsFramesTextbox,TAppOutput.FRAMES)
 		SetGadgetText(editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
@@ -323,16 +324,19 @@ While True
 					Case TAppGUI.mainLoadButton
 						importedFile = RequestFile("Select graphic file to open",fileFilers)
 						TAppOutput.sourceImage = LoadImage(importedFile,0)
-						'Print (importedFile)
 				EndSelect
 		EndSelect
 	'In Editor Window	
 	ElseIf TAppGUI.mainToEdit Then
 		Select EventID()
+			Case EVENT_APPRESUME
+				ActivateWindow(TAppGUI.editWindow)
+				TAppOutput.doDraw = True
+			Case EVENT_GADGETSELECT
+				'ActivateGadget(TAppOutput.outputWindow)
 			'Quitting confirm
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				quitResult = Confirm("Quit program?")
-				
+				quitResult = Confirm("Quit program?")	
 			Case EVENT_GADGETACTION
 				Select EventSource()
 					'Quitting confirm
@@ -355,8 +359,8 @@ While True
 						'Foolproofing
 						If exportedFile <> Null Then
 							'Writing new file
-							 Local tempOutputImage:TPixmap = GrabPixmap(0,0,640,480)
-      						 SavePixmapPNG(tempOutputImage,exportedFile)
+							Local tempOutputImage:TPixmap = GrabPixmap(0,0,640,480)
+      						SavePixmapPNG(tempOutputImage,exportedFile)
 						EndIf
 					'Settings textbox inputs
 					'Scale
@@ -374,7 +378,7 @@ While True
 						TAppOutput.TILESIZE = 24 * TAppOutput.ZOOM
 						TAppOutput.redoBoneImage = True
 						TAppOutput.doDraw = True
-					'Frames		
+					'Frames
 					Case TAppGUI.editSettingsFramesTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsFramesTextbox).ToInt()
 						'Foolproofing
@@ -387,7 +391,7 @@ While True
 						EndIf
 						SetGadgetText(TAppGUI.editSettingsFramesTextbox,TAppOutput.FRAMES)
 						TAppOutput.doDraw = True
-					'Bacground Color	
+					'Bacground Color
 					'Red
 					Case TAppGUI.editSettingsColorRTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorRTextbox).ToInt()
