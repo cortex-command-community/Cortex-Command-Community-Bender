@@ -20,23 +20,79 @@ Global appVersionDate:String = "17 Aug 2019"
 'Output Window Title
 AppTitle = "CCCP Bender v"+appVersion+" - Output"
 
-'File IO
-Global fileFilers:String = "Image Files:png,jpg,bmp"
+'Bools
+Global quitResult:Int = False
+
+'Filepaths
 Global importedFile:String = Null
 Global exportedFile:String = Null
 
-'Bools
-Global quitResult:Int = False
+'File IO
+Type TAppFileIO
+	'Save Bools
+	Global prepForSave:Int = False
+	Global rdyForSave:Int = False
+	Global runOnce:Int = False
+	'File Filters
+	Global fileFilers:String = "Image Files:png,jpg,bmp"
+	
+	'Load Source Image
+	Function FLoadFile()
+		Local oldImportedFile:String = importedFile
+		importedFile = RequestFile("Select graphic file to open",fileFilers)
+		'Foolproofing
+		If importedFile = Null Then
+			importedFile = oldImportedFile
+			TAppOutput.sourceImage = TAppOutput.sourceImage
+		Else
+			TAppOutput.sourceImage = LoadImage(importedFile,0)
+			TAppOutput.redoLimbTiles = True
+		EndIf
+	EndFunction
+	
+	'Prep Output For Saving
+	Function FPrepForSave()
+		If prepForSave Then
+			If Not runOnce Then
+				runOnce = True
+				TAppOutput.FOutputUpdate()
+			Else
+				FSaveFile()
+			EndIf
+		EndIf
+	EndFunction
+	
+	Function FRevertPrep()
+		prepForSave = False
+		rdyForSave = False
+		runOnce = False
+		TAppOutput.FOutputUpdate()
+	EndFunction
+	
+	'Save Output Content To File
+	Function FSaveFile()
+		Local tempOutputImage:TPixmap = GrabPixmap(0,96,768,384)
+		exportedFile = RequestFile("Save graphic file",fileFilers,True)
+		'Foolproofing
+		If exportedFile = importedFile Then
+			Notify("Can't overwrite source image!",True)	
+		ElseIf exportedFile <> importedFile Then
+			'Writing new file
+	      	SavePixmapPNG(tempOutputImage,exportedFile)
+			FRevertPrep()	
+		Else
+			'On Cancel
+			FRevertPrep()
+		EndIf
+	EndFunction
+EndType
 
 'App Output Elements
 Type TAppOutput
 	'Output Window
 	Global outputWindow:TGraphics
 	'Draw Bools
-	Global doDraw:Int = False
 	Global redoLimbTiles:Int = False
-	Global prepForSave:Int = False
-	Global rdyForSave:Int = False
 	'Constants
 	Const BONES:Int = 8
 	Const LIMBS:Int = BONES/2
@@ -66,12 +122,21 @@ Type TAppOutput
 	Global angB:Float
 	Global angC:Float
 	
+	'Rotation Calc
+	Function FLawOfCosines(ab:Float,bc:Float,ca:Float)
+		angA = ACos((ca^2+ab^2-bc^2)/(2*ca*ab))
+		angB = ACos((bc^2+ab^2-ca^2)/(2*bc*ab))
+		angC = (180-(angA+angB))
+	EndFunction
+	
 	'Create limb part tiles from source image
 	Function FCreateLimbTiles()
 		Local b:Int, i:Int
 		For b = 0 To BONES-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
 			boneImage[b] = CreateImage(TILESIZE,TILESIZE,1,DYNAMICIMAGE|MASKEDIMAGE)
 			GrabImage(boneImage[b],b*TILESIZE,0)
+			SetColor(120,0,120)
+			DrawLine(i*TILESIZE,0,i*TILESIZE,TILESIZE-1,True)
 		Next
 		'Set up default bone sizes
 		For i = 0 To BONES-1
@@ -80,20 +145,6 @@ Type TAppOutput
 			boneLength[i] = (TILESIZE/2-jointY[i])*2
 			SetImageHandle(boneImage[i],jointX[i]/ZOOM,jointY[i]/ZOOM)
 		Next
-	EndFunction
-	
-	'Create output window and draw assets
-	Function FOutputBoot()
-		'SetGraphicsDriver GLGraphicsDriver()
-		outputWindow = Graphics(768,480,0,0,0)
-		'Window background color
-		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
-		SetMaskColor(255,0,255)
-		DrawImage(logoImage,0,480-ImageHeight(logoImage))
-		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
-		FCreateLimbTiles()
-		FLimbBend()
-		doDraw = True
 	EndFunction
 	
 	'Set Joint Marker
@@ -107,13 +158,6 @@ Type TAppOutput
 			boneLength[b] = (TILESIZE/2 -ym)*2
 			SetImageHandle(boneImage[b],jointX[b]/ZOOM,jointY[b]/ZOOM) 'Rotation handle.
 		EndIf
-	EndFunction
-	
-	'Rotation Calc
-	Function FLawOfCosines(ab:Float,bc:Float,ca:Float)
-		angA = ACos((ca^2+ab^2-bc^2)/(2*ca*ab))
-		angB = ACos((bc^2+ab^2-ca^2)/(2*bc*ab))
-		angC = (180-(angA+angB))
 	EndFunction
 	
 	'Bending
@@ -148,67 +192,82 @@ Type TAppOutput
 		SetRotation(0)
 		SetColor(0,0,80)
 		x:+1 y:+1 'Add a shade for clarity on bright colours
-		DrawLine(x-2,y,x+2,y)
-		DrawLine(x,y-2,x,y+2)
+		DrawLine(x-1-ZOOM,y,x+1+ZOOM,y)
+		DrawLine(x,y-1-ZOOM,x,y+1+ZOOM)
 		x:-1 y:-1 'Cross
 		SetColor(255,230,80)
-		DrawLine(x-2,y,x+2,y)
-		DrawLine(x,y-2,x,y+2)
+		DrawLine(x-1-ZOOM,y,x+1+ZOOM,y)
+		DrawLine(x,y-1-ZOOM,x,y+1+ZOOM)
+		SetColor(255,255,255)
 	End Function
 
 	'Update Output Window
 	Function FOutputUpdate()
-		'Left mouse to adjust bone spots, click or hold and drag
+		Local i:Int, f:Int, b:Int
+		Cls
+		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
 			FSetJointMarker()
-			doDraw = True
 		EndIf
-		If doDraw
-			Cls
-			If Not prepForSave
-				SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
-			ElseIf prepForSave
-				SetClsColor(255,0,255)
-			EndIf
-			SetColor(255,255,255)
-			DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
-			If redoLimbTiles Then
-				FCreateLimbTiles()
-				redoLimbTiles = False
-			EndIf
-			FLimbBend()
-			'Footer image and text
-			DrawImage(logoImage,0,480-ImageHeight(logoImage))
-			SetColor(255,230,80)
-			DrawText("TBA",ImageWidth(logoImage)+7,480-18)
+		'Drawing Output	
+		'Set background color
+		If TAppFileIO.prepForSave
+			SetClsColor(255,0,255)
+		Else
+			SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
+		EndIf
+		'Draw source image
+		SetColor(255,255,255)
+		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
+		If redoLimbTiles Then
+			FCreateLimbTiles()
+			redoLimbTiles = False
+		EndIf
+		For i = 0 To BONES-1
+			'Draw limb tile dividers
+			SetColor(120,0,120)
+			DrawLine(i*TILESIZE,0,i*TILESIZE,TILESIZE-1,True)
 			'Draw the joint markers
-			Local i:Int
-			For i = 0 To BONES-1
-				FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i])
-				FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i]+boneLength[i])
-			Next	
-			'Draw bent limbs
-			SetColor(255,255,255)
-			Local f:Int, b:Int
-			For f = 0 To FRAMES-1
-				'These might be in a specific draw-order for joint overlapping purposes
-				b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-				b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			Next
-			SetRotation(0)
-			Flip(0)
-			If Not prepForSave
-				doDraw = False
-			ElseIf prepForSave
-				rdyForSave = True
-			EndIf
+			FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i])
+			FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i]+boneLength[i])
+		Next	
+		'Draw footer image and text
+		DrawImage(logoImage,0,480-ImageHeight(logoImage))
+		SetColor(255,230,80)
+		DrawText("TBA",ImageWidth(logoImage)+7,480-18)
+		'Draw bent limbs
+		FLimbBend()
+		SetColor(255,255,255)
+		For f = 0 To FRAMES-1
+			'These might be in a specific draw-order for joint overlapping purposes
+			b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+		Next
+		SetRotation(0)
+		Flip(1)
+		If TAppFileIO.prepForSave
+			TAppFileIO.FPrepForSave()
 		EndIf
+	EndFunction
+	
+	'Create output window and draw assets
+	Function FOutputBoot()
+		SetGraphicsDriver GLMax2DDriver()
+		outputWindow = Graphics(768,480,0,0,0)
+		'Window background color
+		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
+		SetMaskColor(255,0,255)
+		DrawImage(logoImage,0,480-ImageHeight(logoImage))
+		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
+		FCreateLimbTiles()
+		FLimbBend()
+		FOutputUpdate()
 	EndFunction
 EndType
 
@@ -320,6 +379,7 @@ EndType
 'Everything set up, run app
 New TAppGUI
 New TAppOutput
+New TAppFileIO
 TAppGUI.FAppMain()
 
 While True
@@ -330,17 +390,12 @@ While True
 	EndIf
 
 	WaitEvent
-	'Print CurrentEvent.ToString()
-	'Print "prep "+TAppOutput.prepForSave
-	'Print "rdy "+TAppOutput.rdyForSave
+	Print CurrentEvent.ToString()
 
 	'Event Responses	
 	'In Main Window
 	If Not TAppGUI.mainToEdit Then
 		Select EventID()
-			'Quitting
-			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				End
 			Case EVENT_GADGETACTION
 				Select EventSource()
 					'Quitting
@@ -348,21 +403,22 @@ While True
 						Exit
 					'Loading
 					Case TAppGUI.mainLoadButton
-						importedFile = RequestFile("Select graphic file to open",fileFilers)
-						TAppOutput.sourceImage = LoadImage(importedFile,0)
+						TAppFileIO.FLoadFile()
 				EndSelect
+			'Quitting
+			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
+				Exit	
 		EndSelect
 	'In Editor Window	
-	ElseIf TAppGUI.mainToEdit Then	
+	ElseIf TAppGUI.mainToEdit Then
 		Select EventID()
 			Case EVENT_APPRESUME
 				ActivateWindow(TAppGUI.editWindow)
-				TAppOutput.doDraw = True
-			Case EVENT_GADGETSELECT
-				'ActivateGadget(TAppOutput.outputWindow)
-			'Quitting confirm
-			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				quitResult = Confirm("Quit program?")	
+				TAppOutput.FOutputUpdate()
+			Case EVENT_WINDOWACTIVATE
+				TAppOutput.FOutputUpdate()
+			Case EVENT_GADGETLOSTFOCUS
+				TAppOutput.FOutputUpdate()	
 			Case EVENT_GADGETACTION
 				Select EventSource()
 					'Quitting confirm
@@ -370,34 +426,12 @@ While True
 						quitResult = Confirm("Quit program?")
 					'Loading
 					Case TAppGUI.editLoadButton
-						importedFile = RequestFile("Select graphic file to open",fileFilers)
-						'Foolproofing
-						If importedFile = Null Then
-							TAppOutput.sourceImage = TAppOutput.sourceImage
-						Else
-							TAppOutput.sourceImage = LoadImage(importedFile,0)
-							TAppOutput.redoLimbTiles = True
-							TAppOutput.doDraw = True
-						EndIf
+						TAppFileIO.FLoadFile()
+						TAppOutput.FOutputUpdate()
 					'Saving
 					Case TAppGUI.editSaveButton
-						'Prepare for saving
-						TAppOutput.prepForSave = True
-						TAppOutput.doDraw = True
-						If TAppOutput.rdyForSave = True Then
-							TAppOutput.doDraw = True
-							Delay(100)
-							exportedFile = RequestFile("Save graphic file",fileFilers,True)
-							'Foolproofing
-							If exportedFile <> Null Then
-								'Writing new file
-								Local tempOutputImage:TPixmap = GrabPixmap(0,0,768,480)
-	      						SavePixmapPNG(tempOutputImage,exportedFile)
-							EndIf
-							TAppOutput.prepForSave = False
-							TAppOutput.rdyForSave = False
-							TAppOutput.doDraw = True
-						EndIf
+						TAppFileIO.prepForSave = True
+						TAppOutput.FOutputUpdate()
 					'Settings textbox inputs
 					'Scale
 					Case TAppGUI.editSettingsZoomTextbox
@@ -413,7 +447,7 @@ While True
 						SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.ZOOM)
 						TAppOutput.TILESIZE = 24 * TAppOutput.ZOOM
 						TAppOutput.redoLimbTiles = True
-						TAppOutput.doDraw = True
+						TAppOutput.FOutputUpdate()
 					'Frames
 					Case TAppGUI.editSettingsFramesTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsFramesTextbox).ToInt()
@@ -426,7 +460,7 @@ While True
 							TAppOutput.FRAMES = userInputValue
 						EndIf
 						SetGadgetText(TAppGUI.editSettingsFramesTextbox,TAppOutput.FRAMES)
-						TAppOutput.doDraw = True
+						TAppOutput.FOutputUpdate()
 					'Bacground Color
 					'Red
 					Case TAppGUI.editSettingsColorRTextbox
@@ -440,7 +474,7 @@ While True
 							TAppOutput.BACKGROUND_RED = userInputValue
 						EndIf
 						SetGadgetText(TAppGUI.editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
-						TAppOutput.doDraw = True
+						TAppOutput.FOutputUpdate()
 					'Green
 					Case TAppGUI.editSettingsColorGTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorGTextbox).ToInt()
@@ -453,7 +487,7 @@ While True
 							TAppOutput.BACKGROUND_GREEN = userInputValue
 						EndIf
 						SetGadgetText(TAppGUI.editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
-						TAppOutput.doDraw = True
+						TAppOutput.FOutputUpdate()
 					'Blue
 					Case TAppGUI.editSettingsColorBTextbox
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorBTextbox).ToInt()
@@ -465,9 +499,12 @@ While True
 						Else
 							TAppOutput.BACKGROUND_BLUE = userInputValue
 						EndIf
-						SetGadgetText(TAppGUI.editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE )
-						TAppOutput.doDraw = True
+						SetGadgetText(TAppGUI.editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE)
+						TAppOutput.FOutputUpdate()
 				EndSelect
+			'Quitting confirm
+			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
+				quitResult = Confirm("Quit program?")
 		EndSelect
 		'Quitting
 		If quitResult Then Exit
