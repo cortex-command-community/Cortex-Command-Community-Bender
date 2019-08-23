@@ -1,8 +1,5 @@
 Rem
-	---------------------------------------------------------------
-			CORTEX COMMAND COMMUNITY PROJECT BENDER v0.1 :
-	---------------------------------------------------------------
-		TBA
+------- CORTEX COMMAND COMMUNITY PROJECT BENDER -----------------------------------------------------------------------
 EndRem
 
 SuperStrict
@@ -17,17 +14,14 @@ Import BRL.PNGLoader
 Global appVersion:String = "0.1"
 Global appVersionDate:String = "17 Aug 2019"
 
-'Output Window Title
-AppTitle = "CCCP Bender v"+appVersion+" - Output"
-
-'Bools
-Global quitResult:Int = False
+Rem
+------- FILE IO -------------------------------------------------------------------------------------------------------
+EndRem
 
 'Filepaths
 Global importedFile:String = Null
 Global exportedFile:String = Null
 
-'File IO
 Type TAppFileIO
 	'Save Bools
 	Global prepForSave:Int = False
@@ -35,6 +29,8 @@ Type TAppFileIO
 	Global runOnce:Int = False
 	'File Filters
 	Global fileFilers:String = "Image Files:png,jpg,bmp"
+	'Output copy for saving
+	Global tempOutputImage:TPixmap
 	
 	'Load Source Image
 	Function FLoadFile()
@@ -71,15 +67,14 @@ Type TAppFileIO
 	
 	'Save Output Content To File
 	Function FSaveFile()
-		Local tempOutputImage:TPixmap = GrabPixmap(0,96,768,384)
-		exportedFile = RequestFile("Save graphic file",fileFilers,True)
+		exportedFile = RequestFile("Save graphic output",fileFilers,True)
 		'Foolproofing
 		If exportedFile = importedFile Then
-			Notify("Can't overwrite source image!",True)	
+			Notify("Cannot overwrite source image!",True)
 		ElseIf exportedFile <> importedFile Then
 			'Writing new file
 	      	SavePixmapPNG(tempOutputImage,exportedFile)
-			FRevertPrep()	
+			FRevertPrep()
 		Else
 			'On Cancel
 			FRevertPrep()
@@ -87,7 +82,13 @@ Type TAppFileIO
 	EndFunction
 EndType
 
-'App Output Elements
+Rem
+------- OUTPUT ELEMENTS -----------------------------------------------------------------------------------------------
+EndRem
+
+'Output Window Title
+AppTitle = "CCCP Bender v"+appVersion+" - Output"
+
 Type TAppOutput
 	'Output Window
 	Global outputWindow:TGraphics
@@ -154,7 +155,7 @@ Type TAppOutput
 		If ym < (TILESIZE/2-2) And ym > 0 And xm > 0 And xm < TILESIZE*BONES Then
 			Local b:Int = xm/TILESIZE
 			jointX[b] = TILESIZE/2 		'X is always at center, so kinda pointless to even bother - at the moment
-			jointY[b] = ym			'Determines length
+			jointY[b] = ym				'Determines length
 			boneLength[b] = (TILESIZE/2 -ym)*2
 			SetImageHandle(boneImage[b],jointX[b]/ZOOM,jointY[b]/ZOOM) 'Rotation handle.
 		EndIf
@@ -162,8 +163,8 @@ Type TAppOutput
 	
 	'Bending
 	Function FLimbBend()
-		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider) -- maybe not, because large number of frames can be rendered and you can just take the ones you need
-		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider) -- maybe not, because large number of frames can be rendered and you can just take the ones you need
+		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider)
+		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider)
 		Local stepSize:Float = (maxExtend-minExtend)/(FRAMES-1) ' -1 to make inclusive of last value (full range)
 		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float 
 		For l = 0 To LIMBS-1
@@ -171,8 +172,8 @@ Type TAppOutput
 				b = l*2
 				x = (f * 32) + 80 						'Drawing position X
 				y = ((l * 32) * 1.5 ) + 144				'Drawing position Y
-				upperLength = boneLength[b]/ZOOM		'e.g. upper leg
-				lowerLength = boneLength[b+1]/ZOOM		'e.g. lower leg
+				upperLength = boneLength[b]/ZOOM
+				lowerLength = boneLength[b+1]/ZOOM
 				airLength = (stepSize * f + minExtend) * (upperLength + lowerLength)	'Sum of the two bones * step scaler for frame (hip-ankle)
 				FLawOfCosines(airLength,upperLength,lowerLength)
 				angle[b,f] = angB
@@ -233,8 +234,8 @@ Type TAppOutput
 		Next	
 		'Draw footer image and text
 		DrawImage(logoImage,0,480-ImageHeight(logoImage))
-		SetColor(255,230,80)
-		DrawText("TBA",ImageWidth(logoImage)+7,480-18)
+		'SetColor(255,230,80)
+		'DrawText("TBA",ImageWidth(logoImage)+7,480-18)
 		'Draw bent limbs
 		FLimbBend()
 		SetColor(255,255,255)
@@ -250,6 +251,8 @@ Type TAppOutput
 			b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
 		Next
 		SetRotation(0)
+		'Output copy for saving
+		TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
 		Flip(1)
 		If TAppFileIO.prepForSave
 			TAppFileIO.FPrepForSave()
@@ -258,7 +261,7 @@ Type TAppOutput
 	
 	'Create output window and draw assets
 	Function FOutputBoot()
-		SetGraphicsDriver GLMax2DDriver()
+		'SetGraphicsDriver GLMax2DDriver()
 		outputWindow = Graphics(768,480,0,0,0)
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
@@ -271,13 +274,19 @@ Type TAppOutput
 	EndFunction
 EndType
 
-'GUI Elements
+Rem
+------- GUI ELEMENTS --------------------------------------------------------------------------------------------------
+EndRem
+
+'Bool For Quitting
+Global quitResult:Int = False
+
 Type TAppGUI
 	'Window Transition Bool
 	Global mainToEdit:Int = False
 	'Main Window
 	Global mainWindow:TGadget
-	'Footer Label
+	'Main Window Footer Label
 	Global mainWindowFooterLabel:TGadget
 	'Main Window Buttons
 	Global mainWindowButtonPanel:TGadget
@@ -306,12 +315,12 @@ Type TAppGUI
 	Global editSettingsColorRLabel:TGadget
 	Global editSettingsColorGLabel:TGadget
 	Global editSettingsColorBLabel:TGadget
-	'Workspace Window Instructions
+	'Editor Window Help
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
 	'Textboxes content
-	Global aboutTextboxContent:String[8]
-	Global helpTextboxContent:String[]
+	Global aboutTextboxContent:String[7]
+	Global helpTextboxContent:String[15]
 	
 	'Create Main App Window
 	Function FAppMain()
@@ -321,17 +330,16 @@ Type TAppGUI
 		mainQuitButton = CreateButton("Quit",GadgetWidth(mainWindowButtonPanel)/2-69,40,130,30,mainWindowButtonPanel,BUTTON_PUSH)
 		mainAboutPanel = CreatePanel(GadgetWidth(mainWindow)/2-140,GadgetHeight(mainWindowButtonPanel)+15,280,200,mainWindow,PANEL_GROUP,"  About :  ")
 		mainAboutTextbox = CreateTextArea(7,3,GadgetWidth(mainAboutPanel)-21,GadgetHeight(mainAboutPanel)-30,mainAboutPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
-		mainWindowFooterLabel = CreateLabel("CCCP Bender v"+appVersion+" by MaximDude",10,GadgetHeight(mainWindow)-20,GadgetWidth(mainWindow),15,mainWindow,LABEL_LEFT)
+		mainWindowFooterLabel = CreateLabel("CCCP Bender v"+appVersion+" - "+appVersionDate,10,GadgetHeight(mainWindow)-20,GadgetWidth(mainWindow),15,mainWindow,LABEL_LEFT)
 		'About textbox Content
-		aboutTextboxContent[0] = "Welcome to the CCCP Bender utility!~n~n"
-		aboutTextboxContent[1] = "It's purpose is to make the life of modders easier by automagically generating bent limb frames.~n~n"
-		aboutTextboxContent[2] = "The CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.~n"
-		aboutTextboxContent[3] = "The CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience for the modder (hopefully).~n~n"
-		aboutTextboxContent[4] = "Arne's original bend code was used as base for this utility, and has been modified and improved to enable the new features.~n~n"
-		aboutTextboxContent[5] = "Created by MaximDude using BlitzMax MaxIDE 1.52~n"
-		aboutTextboxContent[6] = "Bender logo image by Arne Jansson - Edited by MaximDude"
-		aboutTextboxContent[7] = "CCCP Bender version "+appVersion+" - "+appVersionDate
-		SetGadgetText(mainAboutTextbox,aboutTextboxContent[0]+aboutTextboxContent[1]+aboutTextboxContent[2]+aboutTextboxContent[3]+aboutTextboxContent[4]+aboutTextboxContent[5]+aboutTextboxContent[6]+aboutTextboxContent[7])
+		aboutTextboxContent[0] = "Welcome to the CCCP Bender utility! ~n~n"
+		aboutTextboxContent[1] = "It's purpose is to make the life of modders easier by automagically generating bent limb frames. ~n~n"
+		aboutTextboxContent[2] = "The CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork. ~n"
+		aboutTextboxContent[3] = "The CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience for the modder (hopefully). ~n~n"
+		aboutTextboxContent[4] = "Arne's original bend code was used as base for this utility, and has been modified and improved to enable the new features. ~n~n"
+		aboutTextboxContent[5] = "Created by MaximDude using BlitzMax 0.105.3.35 and MaxIDE 1.52 ~n"
+		aboutTextboxContent[6] = "Bender logo image by Arne Jansson - Edited by MaximDude ~n"
+		SetGadgetText(mainAboutTextbox,aboutTextboxContent[0]+aboutTextboxContent[1]+aboutTextboxContent[2]+aboutTextboxContent[3]+aboutTextboxContent[4]+aboutTextboxContent[5]+aboutTextboxContent[6])
 	EndFunction
 	
 	'Create Editor Window
@@ -353,15 +361,30 @@ Type TAppGUI
 		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPalel,LABEL_LEFT)
 		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPalel,LABEL_LEFT)
 		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editHelpPanel = CreatePanel(10,170,280,250,editWindow,PANEL_GROUP,"  Instructions :  ")
+		editHelpPanel = CreatePanel(10,170,280,250,editWindow,PANEL_GROUP,"  Help :  ")
 		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
 		SetGadgetText(editSettingsZoomTextbox,TAppOutput.ZOOM)
 		SetGadgetText(editSettingsFramesTextbox,TAppOutput.FRAMES)
 		SetGadgetText(editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
 		SetGadgetText(editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
 		SetGadgetText(editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE)
-		'Instructions textbox content
-		SetGadgetText(TAppGUI.editHelpTextbox,"TBA");
+		'Help textbox content
+		helpTextboxContent[0] = "-------------------------- GUI -------------------------- ~n~n"
+		helpTextboxContent[1] = "LOAD: ~nThis loads an image file and starts bending. Supported formats are bmp, png and jpg. ~n~n"
+		helpTextboxContent[2] = "- Note: ~nThe loaded file is being cut to 24x24px tiles internally. For best results, use provided template to create correct input files. ~n~n"
+		helpTextboxContent[3] = "SAVE: ~nThis saves the bended limbs into a file or creates a new file with specified name. ~n~n"
+		helpTextboxContent[4] = "- Note: ~nFiles are saved in .png format, typing in the extension is not needed. Currently loaded file cannot be overwritten. ~n~n"
+		helpTextboxContent[5] = "----------------- ADJUSTING JOINTS ---------------- ~n~n"
+		helpTextboxContent[6] = "To adjust the joint positing on a limb part, click the upper joint marker on and drag it up/down, or click at desired point to set it there. Output will update automatically as you adjust the markers.~n~n"
+		helpTextboxContent[7] = "- Note: Joint markers cannot be adjusted on the X axis, and will adjust equally on the Y axis. For best results, please position the limb parts as close to dead center as possible for each tile in the input file. ~n~n"
+		helpTextboxContent[8] = "---------------------- SETTINGS ----------------------- ~n~n"
+		helpTextboxContent[9] = "ZOOM : ~nThis magnifies the source image For easier placement of joint markers. Zooming does Not magnify the output. ~n~nAccepts values from 1 To 4. ~n~n"
+		helpTextboxContent[10] = "- Warning : ~nChanging zoom level will reset the joint markers to initial positions. Zoom first, adjust markers later. ~n~n"		
+		helpTextboxContent[11] = "FRAMES: ~nThis sets the amount of frames output will generate. ~n~nAccepts values from 1 to 20. ~n~n"
+		helpTextboxContent[12] = "- Note : ~nLimb bending will automatically adjust to number of frames. ~n~n"
+		helpTextboxContent[13] = "BG COLOR R,G,B: ~nThis changes the background color of the output. ~n~nAccepts values from 0 to 255. ~n~n"	
+		helpTextboxContent[14] = "- Note : ~nWhen saving file, the output will automatically set background to magenta, so no manual setting before saving is needed."
+		SetGadgetText(TAppGUI.editHelpTextbox,helpTextboxContent[0]+helpTextboxContent[1]+helpTextboxContent[2]+helpTextboxContent[3]+helpTextboxContent[4]+helpTextboxContent[5]+helpTextboxContent[6]+helpTextboxContent[7]+helpTextboxContent[8]+helpTextboxContent[9]+helpTextboxContent[10]+helpTextboxContent[11]+helpTextboxContent[12]+helpTextboxContent[13]+helpTextboxContent[14]);
 		'Delete no longer used MainWindow
 		FreeGadget(mainWindow)
 	EndFunction
@@ -376,11 +399,18 @@ Type TAppGUI
 	EndFunction
 EndType
 
-'Everything set up, run app
+Rem
+------- BOOT ----------------------------------------------------------------------------------------------------------
+EndRem
+
 New TAppGUI
 New TAppOutput
 New TAppFileIO
 TAppGUI.FAppMain()
+
+Rem
+------- EVENT HANDLING ------------------------------------------------------------------------------------------------
+EndRem
 
 While True
 	If Not TAppGUI.mainToEdit Then
@@ -390,7 +420,7 @@ While True
 	EndIf
 
 	WaitEvent
-	Print CurrentEvent.ToString()
+	'Print CurrentEvent.ToString()
 
 	'Event Responses	
 	'In Main Window
