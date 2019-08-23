@@ -11,8 +11,8 @@ Import BRL.Pixmap
 Import BRL.PNGLoader
 
 'Version
-Global appVersion:String = "0.1"
-Global appVersionDate:String = "17 Aug 2019"
+Global appVersion:String = "1.0"
+Global appVersionDate:String = "23 Aug 2019"
 
 Rem
 ------- FILE IO -------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ Type TAppOutput
 	Const UPPER_BONE:Int = 0
 	Const LOWER_BONE:Int = 1
 	'Graphic Assets
-	Global logoImage:TImage = LoadImage("assets/logo-image.png",MASKEDIMAGE)
+	Global logoImage:TImage = LoadImage("assets/logo-image",MASKEDIMAGE)
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
