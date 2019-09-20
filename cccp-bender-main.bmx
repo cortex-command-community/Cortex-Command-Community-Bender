@@ -11,8 +11,8 @@ Import BRL.Pixmap
 Import BRL.PNGLoader
 
 'Version
-Global appVersion:String = "1.0"
-Global appVersionDate:String = "23 Aug 2019"
+Global appVersion:String = "1.1"
+Global appVersionDate:String = "20 Sep 2019"
 
 Rem
 ------- FILE IO -------------------------------------------------------------------------------------------------------
