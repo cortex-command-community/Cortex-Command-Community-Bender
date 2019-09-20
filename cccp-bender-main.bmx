@@ -262,10 +262,7 @@ Type TAppOutput
 	'Create output window and draw assets
 	Function FOutputBoot()
 		SetGraphicsDriver GLMax2DDriver()
-		'outputWindow = Graphics(768,480,0,0,0)
-		
 		SetGraphics CanvasGraphics(TAppGUI.editCanvas)
-		
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
@@ -300,6 +297,8 @@ Type TAppGUI
 	Global mainAboutTextbox:TGadget
 	'Editor Window
 	Global editWindow:TGadget
+	'Editor Window Canvas Graphics
+	Global editCanvas:TGadget
 	'Editor Window Buttons
 	Global editWindowButtonPanel:TGadget
 	Global editLoadButton:TGadget
@@ -324,8 +323,6 @@ Type TAppGUI
 	'Textboxes content
 	Global aboutTextboxContent:String[7]
 	Global helpTextboxContent:String[15]
-
-	Global editCanvas:TGadget
 	
 	'Create Main App Window
 	Function FAppMain()
@@ -349,10 +346,9 @@ Type TAppGUI
 	
 	'Create Editor Window
 	Function FAppEditor()
+		EnablePolledInput()
 		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-700,DesktopHeight()/2-240,300+768,430+50,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
-		
 		editCanvas = CreateCanvas(300,0,768,480,editWindow)
-		
 		editWindowButtonPanel = CreatePanel(10,7,280,57,editWindow,PANEL_GROUP)	
 		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
@@ -420,7 +416,7 @@ Rem
 ------- EVENT HANDLING ------------------------------------------------------------------------------------------------
 EndRem
 
-While True
+While True	
 	If Not TAppGUI.mainToEdit Then
 		TAppGUI.FAppUpdate()
 	Else
@@ -428,7 +424,7 @@ While True
 	EndIf
 
 	WaitEvent
-	Print CurrentEvent.ToString()
+	'Print CurrentEvent.ToString()
 
 	'Event Responses	
 	'In Main Window
