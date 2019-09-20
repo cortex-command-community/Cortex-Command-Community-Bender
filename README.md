@@ -37,12 +37,15 @@ Arne's original bend code was used as base and has been modified and improved to
 7. Slice the saved image into frames and apply palette.
 	- Manually touch-up the exported frames if needed.
 
-## Current issues
+## Current Issues
 
 - Joint adjustment is only on Y axis and adjusts upper/lower marker equally.
 - Works only with input files that are 24x24px tiled (for each limb part. Max input image size is 192x24px for 8 limb parts (4 limbs)).
 - Does not save files in .bmp format.
-- Editor window and output window are separate.
+
+## Changelog
+
+https://github.com/cortex-command-community/Cortex-Command-Community-Project-Bender/wiki/Changelog
 
 ## Credits
 
