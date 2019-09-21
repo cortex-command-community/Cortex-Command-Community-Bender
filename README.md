@@ -43,7 +43,6 @@ Arne's original bend code was used as base and has been modified and improved to
 
 - Joint adjustment is only on Y axis and adjusts upper/lower marker equally.
 - Works only with input files that are 24x24px tiled (for each limb part. Max input image size is 192x24px for 8 limb parts (4 limbs)).
-- Files saved as Indexed BMPs have messed up thumbnails and do not open correctly in Photoshop. Tested to open correctly with MS Paint XP.
 
 ## Changelog
 

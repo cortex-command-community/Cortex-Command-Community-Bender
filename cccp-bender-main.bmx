@@ -13,8 +13,8 @@ Import BRL.Stream
 Import BRL.EndianStream
 
 'Version
-Global appVersion:String = "1.2"
-Global appVersionDate:String = "21 Sep 2019"
+Global appVersion:String = "1.2.1"
+Global appVersionDate:String = "22 Sep 2019"
 
 Rem
 ------- INDEXING ------------------------------------------------------------------------------------------------------
