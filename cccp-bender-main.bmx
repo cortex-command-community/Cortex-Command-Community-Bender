@@ -440,7 +440,7 @@ Type TAppGUI
 	Global editSaveButton:TGadget
 	Global editQuitButton:TGadget
 	'Editor Window Settings
-	Global editSettingsPalel:TGadget
+	Global editSettingsPanel:TGadget
 	Global editSettingsZoomTextbox:TGadget
 	Global editSettingsFramesTextbox:TGadget
 	Global editSettingsColorRTextbox:TGadget
@@ -452,6 +452,8 @@ Type TAppGUI
 	Global editSettingsColorRLabel:TGadget
 	Global editSettingsColorGLabel:TGadget
 	Global editSettingsColorBLabel:TGadget
+	Global editSettingsIndexedLabel:TGadget
+	Global editSettingsIndexedCheckbox:TGadget
 	'Editor Window Help
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
@@ -488,19 +490,21 @@ Type TAppGUI
 		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editQuitButton = CreateButton("Quit",186,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
-		editSettingsPalel = CreatePanel(10,73,280,87,editWindow,PANEL_GROUP,"  Settings :  ")
-		editSettingsZoomTextbox = CreateTextField(80,12,30,20,editSettingsPalel)
-		editSettingsFramesTextbox = CreateTextField(190,12,30,20,editSettingsPalel)
-		editSettingsColorRTextbox = CreateTextField(80,42,30,20,editSettingsPalel)
-		editSettingsColorGTextbox = CreateTextField(135,42,30,20,editSettingsPalel)
-		editSettingsColorBTextbox = CreateTextField(190,42,30,20,editSettingsPalel)
-		editSettingsZoomLabel = CreateLabel("Zoom:",10,15,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsFramesLabel = CreateLabel("Frames:",120,15,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorLabel = CreateLabel("BG Color:",10,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editHelpPanel = CreatePanel(10,170,280,250,editWindow,PANEL_GROUP,"  Help :  ")
+		editSettingsPanel = CreatePanel(10,73,280,120,editWindow,PANEL_GROUP,"  Settings :  ")
+		editSettingsZoomTextbox = CreateTextField(80,12,30,20,editSettingsPanel)
+		editSettingsFramesTextbox = CreateTextField(190,12,30,20,editSettingsPanel)
+		editSettingsColorRTextbox = CreateTextField(80,42,30,20,editSettingsPanel)
+		editSettingsColorGTextbox = CreateTextField(135,42,30,20,editSettingsPanel)
+		editSettingsColorBTextbox = CreateTextField(190,42,30,20,editSettingsPanel)
+		editSettingsZoomLabel = CreateLabel("Zoom:",10,15,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsFramesLabel = CreateLabel("Frames:",120,15,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorLabel = CreateLabel("BG Color:",10,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsIndexedLabel = CreateLabel("Save as Indexed Bitmap:",10,75,130,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsIndexedCheckbox = CreateButton("",140,73,20,20,editSettingsPanel,BUTTON_CHECKBOX)
+		editHelpPanel = CreatePanel(10,203,280,250,editWindow,PANEL_GROUP,"  Help :  ")
 		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
 		SetGadgetText(editSettingsZoomTextbox,TAppOutput.ZOOM)
 		SetGadgetText(editSettingsFramesTextbox,TAppOutput.FRAMES)
