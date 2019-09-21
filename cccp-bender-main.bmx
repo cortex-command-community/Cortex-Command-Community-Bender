@@ -467,7 +467,7 @@ Type TAppGUI
 	Global editHelpTextbox:TGadget
 	'Textboxes content
 	Global aboutTextboxContent:String[7]
-	Global helpTextboxContent:String[15]
+	Global helpTextboxContent:String[17]
 	
 	'Create Main App Window
 	Function FAppMain()
@@ -534,8 +534,10 @@ Type TAppGUI
 		helpTextboxContent[11] = "FRAMES: ~nThis sets the amount of frames output will generate. ~n~nAccepts values from 1 to 20. ~n~n"
 		helpTextboxContent[12] = "- Note : ~nLimb bending will automatically adjust to number of frames. ~n~n"
 		helpTextboxContent[13] = "BG COLOR R,G,B: ~nThis changes the background color of the output. ~n~nAccepts values from 0 to 255. ~n~n"	
-		helpTextboxContent[14] = "- Note : ~nWhen saving file, the output will automatically set background to magenta, so no manual setting before saving is needed."
-		SetGadgetText(TAppGUI.editHelpTextbox,helpTextboxContent[0]+helpTextboxContent[1]+helpTextboxContent[2]+helpTextboxContent[3]+helpTextboxContent[4]+helpTextboxContent[5]+helpTextboxContent[6]+helpTextboxContent[7]+helpTextboxContent[8]+helpTextboxContent[9]+helpTextboxContent[10]+helpTextboxContent[11]+helpTextboxContent[12]+helpTextboxContent[13]+helpTextboxContent[14]);
+		helpTextboxContent[14] = "- Note : ~nWhen saving file, the output will automatically set background to magenta, so no manual setting before saving is needed. ~n~n"
+		helpTextboxContent[15] = "SAVE AS INDEXED BITMAP : ~nWhen ticked the output will be saved as a BMP file indexed to the CC palette. ~nWhen not ticked, output will be saved as a non-indexed PNG. ~n~n"
+		helpTextboxContent[16] = "- Warning : ~nTHE INDEXING PROCESS IS SLOW! ~nI've done my best to speed it up but it still isn't blazing fast like PNG saving. ~nWhen saving indexed, the app may hang and appear unresponsive but in fact it's doing what it's supposed to. ~nFor best results, DO NOT TOUCH ANYTHING until the background color reverts from magenta to whatever it was before!" 
+		SetGadgetText(TAppGUI.editHelpTextbox,helpTextboxContent[0]+helpTextboxContent[1]+helpTextboxContent[2]+helpTextboxContent[3]+helpTextboxContent[4]+helpTextboxContent[5]+helpTextboxContent[6]+helpTextboxContent[7]+helpTextboxContent[8]+helpTextboxContent[9]+helpTextboxContent[10]+helpTextboxContent[11]+helpTextboxContent[12]+helpTextboxContent[13]+helpTextboxContent[14]+helpTextboxContent[15]+helpTextboxContent[16]);
 		'Delete no longer used MainWindow
 		FreeGadget(mainWindow)
 	EndFunction
