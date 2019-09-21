@@ -15,6 +15,34 @@ Global appVersion:String = "1.1"
 Global appVersionDate:String = "20 Sep 2019"
 
 Rem
+------- INDEXING ------------------------------------------------------------------------------------------------------
+EndRem
+
+Type TBitmapIndex
+	Const GFX_PAL:Byte=0
+
+	'Color Value Bytes
+	Global palR:Byte[256]
+	Global palG:Byte[256]
+	Global palB:Byte[256]
+
+	'Load color table file
+	Function FLoadPalette(paletteFile:String)
+		Local index:Int
+		If FileSize(paletteFile) = 768
+			Local paletteStream:TStream = ReadFile(paletteFile)
+			For index = 0 To 255
+				palR[index] = ReadByte(paletteStream)
+				palG[index] = ReadByte(paletteStream)
+				palB[index] = ReadByte(paletteStream)
+			Next
+			CloseStream paletteStream
+		EndIf
+	EndFunction
+
+EndType
+
+Rem
 ------- FILE IO -------------------------------------------------------------------------------------------------------
 EndRem
 
@@ -398,6 +426,7 @@ Type TAppGUI
 		If Not mainToEdit And importedFile <> Null Then
 			FAppEditor()
 			TAppOutput.FOutputBoot()
+			TBitmapIndex.FLoadPalette("assets/palette.act")
 			mainToEdit = True
 		EndIf
 	EndFunction
@@ -410,6 +439,7 @@ EndRem
 New TAppGUI
 New TAppOutput
 New TAppFileIO
+New TBitmapIndex
 TAppGUI.FAppMain()
 
 Rem
