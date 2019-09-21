@@ -25,6 +25,9 @@ Type TBitmapIndex
 	Global palR:Byte[256]
 	Global palG:Byte[256]
 	Global palB:Byte[256]
+	
+	'Data Streams
+	Global dataStream:TStream
 
 	'Load color table file
 	Function FLoadPalette(paletteFile:String)
@@ -42,11 +45,11 @@ Type TBitmapIndex
 
 	'Indexed Bitmap File Writer
 	Function FPixmapToIndexedBitmap(image:TPixmap,filename:String)
-		'Variables 
+		'Variables
+		Local paletteIndex:Int
 		Local bmpWidth:Int, bmpWidthM4:Int
 		Local bmpHeight:Int
 		Local bmpSizeTotal:Int, bmpSizeTotalM4:Int
-		Local paletteIndex:Int = 0
 		
 		'Dimensions calc
 		bmpWidth = PixmapWidth(image)
@@ -58,10 +61,10 @@ Type TBitmapIndex
 		bmpSizeTotalM4 = ((bmpSizeTotal + 3) / 4) * 4
 		
 		'Begin writing BMP file manually
-		Local dataStream:TStream = WriteFile(filename)
+		dataStream = WriteFile(filename)
 		
 '------ Bitmap File Header
-		'Header file data is stored in little-endian format (least-significant byte first)
+		'Data is stored in little-endian format (least-significant byte first)
 		dataStream = LittleEndianStream(dataStream)
 
 		WriteShort(dataStream,19778)			'File ID (2 bytes (short)) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
@@ -69,13 +72,8 @@ Type TBitmapIndex
 		WriteShort(dataStream,0)				'Reserved (2 bytes)
 		WriteShort(dataStream,0)				'Reserved (2 bytes)
 		WriteInt(dataStream,54)					'Pixel Array Offset (4 bytes) - pixel array starts at 54th byte
-		'Print("wrote header")
-
-		'CloseStream(headerStream)
 
 '------ DIB Header (File Info)
-		'dataStream = BigEndianStream(dataStream)
-
 		WriteInt(dataStream,40)					'DIB Header Size (4 bytes) - 40 bytes
 		WriteInt(dataStream,bmpWidth)			'Bitmap Width (4 bytes)
 		WriteInt(dataStream,bmpHeight)			'Bitmap Height (4 bytes)
@@ -87,59 +85,60 @@ Type TBitmapIndex
 		WriteInt(dataStream,2835)				'Vertical resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
 		WriteInt(dataStream,256)				'Number of colors in the color palette (4 bytes)
 		WriteInt(dataStream,0)					'Number of important colors (4 bytes) - 0 when every color is important
-		'Print("wrote dib")
 
 '------ Color Table
 		For paletteIndex = 0 To 255
-			WriteByte(dataStream,PalB[paletteIndex])	'Blue (4 bytes) - offset 54
-			WriteByte(dataStream,PalG[paletteIndex])	'Green (4 bytes) - offset 58
-			WriteByte(dataStream,PalR[paletteIndex])	'Red (4 bytes) - offset 62
+			WriteByte(dataStream,palB[paletteIndex])	'Blue (4 bytes) - offset 54
+			WriteByte(dataStream,palG[paletteIndex])	'Green (4 bytes) - offset 58
+			WriteByte(dataStream,palR[paletteIndex])	'Red (4 bytes) - offset 62
 			WriteByte(dataStream,0)						'Alpha (4 bytes) - offset 66
-			If paletteIndex = 255 Then 
-				'Print("wrote color table") 
-			EndIf
 		Next
 			
 '------ Pixel Array
 		Local px:Int, py:Int
-		Local R:Int, G:Int, B:Int, ARGB:Long
-		Local bestDistance:Int, bestIndex:Int, distance:Int
-		Local RDIFF:Int, GDIFF:Int, BDIFF:Int
-
+		Local pixelData:Long
+		Local bestIndex:Int = 0
+		Local magenta:Int = 16711935	
 		For py = bmpHeight -1 To 0 Step -1
 			For px = 0 To bmpWidthM4 -1
-				If px < bmpWidth 'if a valid pixel on canvas
-					bestDistance = 17000000
-					bestIndex = 0
-					distance = 0
-					
-					For paletteIndex = 0 To 255 ' Check all color indexes for best match by pythagora
-						ARGB = ReadPixel(image,px,py)
-						R = (ARGB & $00FF0000) Shr 16
-						G = (ARGB & $FF00) Shr 8
-						B = (ARGB & $FF)
-						RDIFF = Abs(R - palR[paletteIndex])
-						GDIFF = Abs(G - palG[paletteIndex])
-						BDIFF = Abs(B - palB[paletteIndex])
-						distance = (RDIFF^2 + GDIFF^2 + BDIFF^2)
-						If distance <= bestDistance Then
-							bestIndex = paletteIndex
-							bestDistance = distance
-						EndIf
-						'Print("working" + paletteIndex)
-					Next
+				'if a valid pixel on canvas
+				If px < bmpWidth
+					'Read pixel data
+					pixelData = ReadPixel(image,px,py)
+					'skip diffing magenta
+					If pixelData = 16711935 Then
+						WriteByte(dataStream,1)
+					Else
+						'Check all color indexes for best match by pythagora
+						Local R:Int, G:Int, B:Int
+						Local RDIFF:Int, GDIFF:Int, BDIFF:Int
+						Local bestDistance:Int = 17000000
+						Local distance:Int = 0
+						For paletteIndex = 0 To 255
+							R = (pixelData & $00FF0000) Shr 16
+							G = (pixelData & $FF00) Shr 8
+							B = (pixelData & $FF)
+							RDIFF = Abs(R - palR[paletteIndex])
+							GDIFF = Abs(G - palG[paletteIndex])
+							BDIFF = Abs(B - palB[paletteIndex])
+							distance = (RDIFF^2 + GDIFF^2 + BDIFF^2)
+							If distance <= bestDistance Then
+								bestIndex = paletteIndex
+								bestDistance = distance
+							EndIf
+						Next
+					EndIf
 					WriteByte(dataStream,bestIndex)
 				Else
-					WriteByte(dataStream,0) ' line padding
+					WriteByte(dataStream,0) 'line padding
 				EndIf
 			Next
 		Next
-		For paletteIndex = 1 To bmpSizeTotalM4 - bmpSizeTotal ' eof padding
+		For paletteIndex = 1 To bmpSizeTotalM4 - bmpSizeTotal 'eof padding
 			WriteByte(dataStream,0)
 		Next
 
 		CloseStream(dataStream)
-		'Print ("stream closed")
 	EndFunction
 	
 EndType
@@ -384,7 +383,6 @@ Type TAppOutput
 		SetRotation(0)
 		'Output copy for saving
 		TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
-		'ConvertPixmap(TAppFileIO.tempOutputImage,PF_BGR888)
 		Flip(1)
 		If TAppFileIO.prepForSave
 			TAppFileIO.FPrepForSave()
