@@ -156,20 +156,23 @@ EndRem
 Global importedFile:String = Null
 Global exportedFile:String = Null
 
+'File Filters
+Global fileFilters:String
+
 Type TAppFileIO
 	'Save Bools
+	Global saveAsIndexed:Int = False
 	Global prepForSave:Int = False
 	Global rdyForSave:Int = False
 	Global runOnce:Int = False
-	'File Filters
-	Global fileFilers:String = "Image Files:png,bmp,jpg"
+	
 	'Output copy for saving
 	Global tempOutputImage:TPixmap
 	
 	'Load Source Image
 	Function FLoadFile()
 		Local oldImportedFile:String = importedFile
-		importedFile = RequestFile("Select graphic file to open",fileFilers)
+		importedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
 		'Foolproofing
 		If importedFile = Null Then
 			importedFile = oldImportedFile
@@ -201,14 +204,17 @@ Type TAppFileIO
 	
 	'Save Output Content To File
 	Function FSaveFile()
-		exportedFile = RequestFile("Save graphic output",fileFilers,True)
+		exportedFile = RequestFile("Save graphic output",fileFilters,True)
 		'Foolproofing
 		If exportedFile = importedFile Then
 			Notify("Cannot overwrite source image!",True)
 		ElseIf exportedFile <> importedFile Then
 			'Writing new file
-	      	'SavePixmapPNG(tempOutputImage,exportedFile)
-			TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage,exportedFile)
+			If saveAsIndexed = True
+				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage,exportedFile)
+			Else
+	      		SavePixmapPNG(tempOutputImage,exportedFile)
+			EndIf
 			FRevertPrep()
 		Else
 			'On Cancel
@@ -220,9 +226,6 @@ EndType
 Rem
 ------- OUTPUT ELEMENTS -----------------------------------------------------------------------------------------------
 EndRem
-
-'Output Window Title
-AppTitle = "CCCP Bender v"+appVersion+" - Output"
 
 Type TAppOutput
 	'Output Window
@@ -387,7 +390,12 @@ Type TAppOutput
 		Next
 		SetRotation(0)
 		'Output copy for saving
-		TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
+		If TAppFileIO.saveAsIndexed = True Then
+			'If saving indexed grab a smaller pixmap to speed up indexing
+			TAppFileIO.tempOutputImage = GrabPixmap(55,120,34*FRAMES,210)
+		Else
+			TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
+		EndIf
 		Flip(1)
 		If TAppFileIO.prepForSave
 			TAppFileIO.FPrepForSave()
@@ -562,12 +570,19 @@ While True
 		TAppGUI.FAppUpdate()
 	Else
 		TAppOutput.FOutputUpdate()
+		If ButtonState(TAppGUI.editSettingsIndexedCheckbox) = True Then
+			fileFilters = "Image Files:bmp"
+			TAppFileIO.saveAsIndexed = True
+		Else
+			fileFilters = "Image Files:png"
+			TAppFileIO.saveAsIndexed = False
+		EndIf
 	EndIf
 
 	WaitEvent
 	'Print CurrentEvent.ToString()
 
-	'Event Responses	
+	'Event Responses
 	'In Main Window
 	If Not TAppGUI.mainToEdit Then
 		Select EventID()
@@ -584,7 +599,7 @@ While True
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				Exit	
 		EndSelect
-	'In Editor Window	
+	'In Editor Window
 	ElseIf TAppGUI.mainToEdit Then
 		Select EventID()
 			Case EVENT_APPRESUME
