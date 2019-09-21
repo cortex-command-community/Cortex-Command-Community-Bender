@@ -73,9 +73,8 @@ Type TBitmapIndex
 	
 			WriteShort(dataStream,19778)			'File ID (2 bytes (short)) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
 			WriteInt(dataStream,bmpSizeTotalM4)		'File Size (4 bytes (signed int))
-			WriteShort(dataStream,0)				'Reserved (2 bytes)
-			WriteShort(dataStream,0)				'Reserved (2 bytes)
-			WriteInt(dataStream,54)					'Pixel Array Offset (4 bytes) - pixel array starts at 54th byte
+			WriteInt(dataStream,0)					'Reserved (4 bytes)
+			WriteInt(dataStream,1078)				'Pixel Array Offset (4 bytes) - pixel array starts at 1078th byte (14 bytes Header + 40 bytes DIB + 1024 (256 * 4) bytes Color Table)
 	
 	'------ DIB Header (File Info)
 			WriteInt(dataStream,40)					'DIB Header Size (4 bytes) - 40 bytes
@@ -92,10 +91,14 @@ Type TBitmapIndex
 	
 	'------ Color Table
 			For paletteIndex = 0 To 255
-				WriteByte(dataStream,palB[paletteIndex])	'Blue (4 bytes) - offset 54
-				WriteByte(dataStream,palG[paletteIndex])	'Green (4 bytes) - offset 58
-				WriteByte(dataStream,palR[paletteIndex])	'Red (4 bytes) - offset 62
-				WriteByte(dataStream,0)						'Alpha (4 bytes) - offset 66
+				WriteByte(dataStream,palB[paletteIndex])	'Blue (1 byte)
+				WriteByte(dataStream,palG[paletteIndex])	'Green (1 byte)
+				WriteByte(dataStream,palR[paletteIndex])	'Red (1 byte)
+				WriteByte(dataStream,0)						'Reserved (1 byte) - Alpha channel, irrelevant for indexed bitmaps
+				
+				Rem
+				Color Table is 4 bytes (ARGB) times the amount of colors in the palette
+				EndRem
 			Next
 				
 	'------ Pixel Array
