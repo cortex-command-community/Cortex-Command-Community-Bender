@@ -9,10 +9,144 @@ Import MaxGUI.Drivers
 Import BRL.Max2D
 Import BRL.Pixmap
 Import BRL.PNGLoader
+Import BRL.Stream
+Import BRL.EndianStream
 
 'Version
-Global appVersion:String = "1.1"
-Global appVersionDate:String = "20 Sep 2019"
+Global appVersion:String = "1.2"
+Global appVersionDate:String = "21 Sep 2019"
+
+Rem
+------- INDEXING ------------------------------------------------------------------------------------------------------
+EndRem
+
+Type TBitmapIndex
+	'Color Value Bytes
+	Global palR:Byte[256]
+	Global palG:Byte[256]
+	Global palB:Byte[256]
+	
+	'Data Streams
+	Global dataStream:TStream
+
+	'Load color table file
+	Function FLoadPalette(paletteFile:String)
+		Local index:Int
+		If FileSize(paletteFile) = 768
+			Local paletteStream:TStream = ReadFile(paletteFile)
+			For index = 0 To 255
+				palR[index] = ReadByte(paletteStream)
+				palG[index] = ReadByte(paletteStream)
+				palB[index] = ReadByte(paletteStream)
+			Next
+			CloseStream paletteStream
+		EndIf
+	EndFunction
+
+	'Indexed Bitmap File Writer
+	Function FPixmapToIndexedBitmap(image:TPixmap,filename:String)
+		'Foolproofing
+		If filename = "" Then
+			TAppFileIO.FRevertPrep()
+		Else
+			'Variables
+			Local paletteIndex:Int
+			Local bmpWidth:Int, bmpWidthM4:Int
+			Local bmpHeight:Int
+			Local bmpSizeTotal:Int, bmpSizeTotalM4:Int
+			
+			'Dimensions calc
+			bmpWidth = PixmapWidth(image)
+			bmpWidthM4 = ((bmpWidth + 3) / 4) * 4
+			bmpHeight = PixmapHeight(image)
+			
+			'Filesize calc
+			bmpSizeTotal = (14 + 40) + (256 * 4) + (bmpWidthM4 * bmpHeight)
+			bmpSizeTotalM4 = ((bmpSizeTotal + 3) / 4) * 4
+			
+			'Begin writing BMP file manually
+			dataStream = WriteFile(filename)
+			
+	'------ Bitmap File Header
+			'Data is stored in little-endian format (least-significant byte first)
+			dataStream = LittleEndianStream(dataStream)
+	
+			WriteShort(dataStream,19778)			'File ID (2 bytes (short)) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
+			WriteInt(dataStream,bmpSizeTotalM4)		'File Size (4 bytes (signed int))
+			WriteShort(dataStream,0)				'Reserved (2 bytes)
+			WriteShort(dataStream,0)				'Reserved (2 bytes)
+			WriteInt(dataStream,54)					'Pixel Array Offset (4 bytes) - pixel array starts at 54th byte
+	
+	'------ DIB Header (File Info)
+			WriteInt(dataStream,40)					'DIB Header Size (4 bytes) - 40 bytes
+			WriteInt(dataStream,bmpWidth)			'Bitmap Width (4 bytes)
+			WriteInt(dataStream,bmpHeight)			'Bitmap Height (4 bytes)
+			WriteShort(dataStream,1)				'Color Planes (2 bytes) - Must be 1
+			WriteShort(dataStream,8)				'Color Depth (2 bytes) - Bits Per Pixel
+			WriteInt(dataStream,0)					'Compression Method (4 bytes) - 0 equals BI_RGB (no compression)
+			WriteInt(dataStream,bmpSizeTotalM4)		'Size of the raw bitmap data (4 bytes) - 0 can be given for BI_RGB bitmaps
+			WriteInt(dataStream,2835)				'Horizontal resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
+			WriteInt(dataStream,2835)				'Vertical resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
+			WriteInt(dataStream,256)				'Number of colors in the color palette (4 bytes)
+			WriteInt(dataStream,0)					'Number of important colors (4 bytes) - 0 when every color is important
+	
+	'------ Color Table
+			For paletteIndex = 0 To 255
+				WriteByte(dataStream,palB[paletteIndex])	'Blue (4 bytes) - offset 54
+				WriteByte(dataStream,palG[paletteIndex])	'Green (4 bytes) - offset 58
+				WriteByte(dataStream,palR[paletteIndex])	'Red (4 bytes) - offset 62
+				WriteByte(dataStream,0)						'Alpha (4 bytes) - offset 66
+			Next
+				
+	'------ Pixel Array
+			Local px:Int, py:Int
+			Local pixelData:Long
+			Local bestIndex:Int = 0
+			Local magenta:Int = 16711935	
+			For py = bmpHeight -1 To 0 Step -1
+				For px = 0 To bmpWidthM4 -1
+					'if a valid pixel on canvas
+					If px < bmpWidth
+						'Read pixel data
+						pixelData = ReadPixel(image,px,py)
+						'skip diffing magenta
+						If pixelData = 16711935 Then
+							WriteByte(dataStream,1)
+						Else
+							'Check all color indexes for best match by pythagora
+							Local R:Int, G:Int, B:Int
+							Local RDIFF:Int, GDIFF:Int, BDIFF:Int
+							Local bestDistance:Int = 17000000
+							Local distance:Int = 0
+							For paletteIndex = 0 To 255
+								R = (pixelData & $00FF0000) Shr 16
+								G = (pixelData & $FF00) Shr 8
+								B = (pixelData & $FF)
+								RDIFF = Abs(R - palR[paletteIndex])
+								GDIFF = Abs(G - palG[paletteIndex])
+								BDIFF = Abs(B - palB[paletteIndex])
+								distance = (RDIFF^2 + GDIFF^2 + BDIFF^2)
+								If distance <= bestDistance Then
+									bestIndex = paletteIndex
+									bestDistance = distance
+								EndIf
+							Next
+						EndIf
+						WriteByte(dataStream,bestIndex)
+					Else
+						WriteByte(dataStream,0) 'line padding
+					EndIf
+				Next
+			Next
+			'eof padding
+			For paletteIndex = 1 To bmpSizeTotalM4 - bmpSizeTotal
+				WriteByte(dataStream,0)
+			Next
+			'Writing file finished, close stream
+			CloseStream(dataStream)
+		EndIf
+	EndFunction
+EndType
 
 Rem
 ------- FILE IO -------------------------------------------------------------------------------------------------------
@@ -22,20 +156,23 @@ EndRem
 Global importedFile:String = Null
 Global exportedFile:String = Null
 
+'File Filters
+Global fileFilters:String
+
 Type TAppFileIO
 	'Save Bools
+	Global saveAsIndexed:Int = False
 	Global prepForSave:Int = False
 	Global rdyForSave:Int = False
 	Global runOnce:Int = False
-	'File Filters
-	Global fileFilers:String = "Image Files:png,jpg,bmp"
+	
 	'Output copy for saving
 	Global tempOutputImage:TPixmap
 	
 	'Load Source Image
 	Function FLoadFile()
 		Local oldImportedFile:String = importedFile
-		importedFile = RequestFile("Select graphic file to open",fileFilers)
+		importedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
 		'Foolproofing
 		If importedFile = Null Then
 			importedFile = oldImportedFile
@@ -67,13 +204,17 @@ Type TAppFileIO
 	
 	'Save Output Content To File
 	Function FSaveFile()
-		exportedFile = RequestFile("Save graphic output",fileFilers,True)
+		exportedFile = RequestFile("Save graphic output",fileFilters,True)
 		'Foolproofing
 		If exportedFile = importedFile Then
 			Notify("Cannot overwrite source image!",True)
 		ElseIf exportedFile <> importedFile Then
 			'Writing new file
-	      	SavePixmapPNG(tempOutputImage,exportedFile)
+			If saveAsIndexed = True
+				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage,exportedFile)
+			Else
+	      		SavePixmapPNG(tempOutputImage,exportedFile)
+			EndIf
 			FRevertPrep()
 		Else
 			'On Cancel
@@ -85,9 +226,6 @@ EndType
 Rem
 ------- OUTPUT ELEMENTS -----------------------------------------------------------------------------------------------
 EndRem
-
-'Output Window Title
-AppTitle = "CCCP Bender v"+appVersion+" - Output"
 
 Type TAppOutput
 	'Output Window
@@ -252,7 +390,12 @@ Type TAppOutput
 		Next
 		SetRotation(0)
 		'Output copy for saving
-		TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
+		If TAppFileIO.saveAsIndexed = True Then
+			'If saving indexed grab a smaller pixmap to speed up indexing
+			TAppFileIO.tempOutputImage = GrabPixmap(55,120,34*FRAMES,210)
+		Else
+			TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
+		EndIf
 		Flip(1)
 		If TAppFileIO.prepForSave
 			TAppFileIO.FPrepForSave()
@@ -305,7 +448,7 @@ Type TAppGUI
 	Global editSaveButton:TGadget
 	Global editQuitButton:TGadget
 	'Editor Window Settings
-	Global editSettingsPalel:TGadget
+	Global editSettingsPanel:TGadget
 	Global editSettingsZoomTextbox:TGadget
 	Global editSettingsFramesTextbox:TGadget
 	Global editSettingsColorRTextbox:TGadget
@@ -317,12 +460,14 @@ Type TAppGUI
 	Global editSettingsColorRLabel:TGadget
 	Global editSettingsColorGLabel:TGadget
 	Global editSettingsColorBLabel:TGadget
+	Global editSettingsIndexedLabel:TGadget
+	Global editSettingsIndexedCheckbox:TGadget
 	'Editor Window Help
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
 	'Textboxes content
 	Global aboutTextboxContent:String[7]
-	Global helpTextboxContent:String[15]
+	Global helpTextboxContent:String[17]
 	
 	'Create Main App Window
 	Function FAppMain()
@@ -353,19 +498,21 @@ Type TAppGUI
 		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editQuitButton = CreateButton("Quit",186,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
-		editSettingsPalel = CreatePanel(10,73,280,87,editWindow,PANEL_GROUP,"  Settings :  ")
-		editSettingsZoomTextbox = CreateTextField(80,12,30,20,editSettingsPalel)
-		editSettingsFramesTextbox = CreateTextField(190,12,30,20,editSettingsPalel)
-		editSettingsColorRTextbox = CreateTextField(80,42,30,20,editSettingsPalel)
-		editSettingsColorGTextbox = CreateTextField(135,42,30,20,editSettingsPalel)
-		editSettingsColorBTextbox = CreateTextField(190,42,30,20,editSettingsPalel)
-		editSettingsZoomLabel = CreateLabel("Zoom:",10,15,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsFramesLabel = CreateLabel("Frames:",120,15,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorLabel = CreateLabel("BG Color:",10,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPalel,LABEL_LEFT)
-		editHelpPanel = CreatePanel(10,170,280,250,editWindow,PANEL_GROUP,"  Help :  ")
+		editSettingsPanel = CreatePanel(10,73,280,120,editWindow,PANEL_GROUP,"  Settings :  ")
+		editSettingsZoomTextbox = CreateTextField(80,12,30,20,editSettingsPanel)
+		editSettingsFramesTextbox = CreateTextField(190,12,30,20,editSettingsPanel)
+		editSettingsColorRTextbox = CreateTextField(80,42,30,20,editSettingsPanel)
+		editSettingsColorGTextbox = CreateTextField(135,42,30,20,editSettingsPanel)
+		editSettingsColorBTextbox = CreateTextField(190,42,30,20,editSettingsPanel)
+		editSettingsZoomLabel = CreateLabel("Zoom:",10,15,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsFramesLabel = CreateLabel("Frames:",120,15,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorLabel = CreateLabel("BG Color:",10,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorRLabel = CreateLabel("R:",65,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsIndexedLabel = CreateLabel("Save as Indexed Bitmap:",10,75,130,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsIndexedCheckbox = CreateButton("",140,73,20,20,editSettingsPanel,BUTTON_CHECKBOX)
+		editHelpPanel = CreatePanel(10,203,280,250,editWindow,PANEL_GROUP,"  Help :  ")
 		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
 		SetGadgetText(editSettingsZoomTextbox,TAppOutput.ZOOM)
 		SetGadgetText(editSettingsFramesTextbox,TAppOutput.FRAMES)
@@ -387,8 +534,10 @@ Type TAppGUI
 		helpTextboxContent[11] = "FRAMES: ~nThis sets the amount of frames output will generate. ~n~nAccepts values from 1 to 20. ~n~n"
 		helpTextboxContent[12] = "- Note : ~nLimb bending will automatically adjust to number of frames. ~n~n"
 		helpTextboxContent[13] = "BG COLOR R,G,B: ~nThis changes the background color of the output. ~n~nAccepts values from 0 to 255. ~n~n"	
-		helpTextboxContent[14] = "- Note : ~nWhen saving file, the output will automatically set background to magenta, so no manual setting before saving is needed."
-		SetGadgetText(TAppGUI.editHelpTextbox,helpTextboxContent[0]+helpTextboxContent[1]+helpTextboxContent[2]+helpTextboxContent[3]+helpTextboxContent[4]+helpTextboxContent[5]+helpTextboxContent[6]+helpTextboxContent[7]+helpTextboxContent[8]+helpTextboxContent[9]+helpTextboxContent[10]+helpTextboxContent[11]+helpTextboxContent[12]+helpTextboxContent[13]+helpTextboxContent[14]);
+		helpTextboxContent[14] = "- Note : ~nWhen saving file, the output will automatically set background to magenta, so no manual setting before saving is needed. ~n~n"
+		helpTextboxContent[15] = "SAVE AS INDEXED BITMAP : ~nWhen ticked the output will be saved as a BMP file indexed to the CC palette. ~nWhen not ticked, output will be saved as a non-indexed PNG. ~n~n"
+		helpTextboxContent[16] = "- Warning : ~nTHE INDEXING PROCESS IS SLOW! ~nI've done my best to speed it up but it still isn't blazing fast like PNG saving. ~nWhen saving indexed, the app may hang and appear unresponsive but in fact it's doing what it's supposed to. ~nFor best results, DO NOT TOUCH ANYTHING until the background color reverts from magenta to whatever it was before!" 
+		SetGadgetText(TAppGUI.editHelpTextbox,helpTextboxContent[0]+helpTextboxContent[1]+helpTextboxContent[2]+helpTextboxContent[3]+helpTextboxContent[4]+helpTextboxContent[5]+helpTextboxContent[6]+helpTextboxContent[7]+helpTextboxContent[8]+helpTextboxContent[9]+helpTextboxContent[10]+helpTextboxContent[11]+helpTextboxContent[12]+helpTextboxContent[13]+helpTextboxContent[14]+helpTextboxContent[15]+helpTextboxContent[16]);
 		'Delete no longer used MainWindow
 		FreeGadget(mainWindow)
 	EndFunction
@@ -398,6 +547,7 @@ Type TAppGUI
 		If Not mainToEdit And importedFile <> Null Then
 			FAppEditor()
 			TAppOutput.FOutputBoot()
+			TBitmapIndex.FLoadPalette("assets/palette.act")
 			mainToEdit = True
 		EndIf
 	EndFunction
@@ -410,6 +560,7 @@ EndRem
 New TAppGUI
 New TAppOutput
 New TAppFileIO
+New TBitmapIndex
 TAppGUI.FAppMain()
 
 Rem
@@ -421,12 +572,19 @@ While True
 		TAppGUI.FAppUpdate()
 	Else
 		TAppOutput.FOutputUpdate()
+		If ButtonState(TAppGUI.editSettingsIndexedCheckbox) = True Then
+			fileFilters = "Image Files:bmp"
+			TAppFileIO.saveAsIndexed = True
+		Else
+			fileFilters = "Image Files:png"
+			TAppFileIO.saveAsIndexed = False
+		EndIf
 	EndIf
 
 	WaitEvent
 	'Print CurrentEvent.ToString()
 
-	'Event Responses	
+	'Event Responses
 	'In Main Window
 	If Not TAppGUI.mainToEdit Then
 		Select EventID()
@@ -443,7 +601,7 @@ While True
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				Exit	
 		EndSelect
-	'In Editor Window	
+	'In Editor Window
 	ElseIf TAppGUI.mainToEdit Then
 		Select EventID()
 			Case EVENT_APPRESUME

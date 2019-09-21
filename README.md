@@ -21,6 +21,7 @@ Arne's original bend code was used as base and has been modified and improved to
 - Frames number output setting.
 - Background color setting.
 - Automatic setting of background color to magenta on save.
+- Saving as PNG or Indexed BMP (CC Palette)
 
 ## How To
 
@@ -32,16 +33,17 @@ Arne's original bend code was used as base and has been modified and improved to
 		- **Warning:** When zooming the joint markers will reset to original positions. First zoom, then adjust.
 5. Use **Frames** setting to set number of bend frames.
 	- Bend angle will adjust automatically. First/Last frames will always be fully bent/unbent.
-6. Hit save
+6. Decide whether you want to save as Indexed BMP or not - if yes, tick the "**Save as Indexed Bitmap**" checkbox.
+7. Hit save
 	- Background color will automatically be set to magenta (255,0,255) when save is clicked and will revert back to previous color when finished.
-7. Slice the saved image into frames and apply palette.
+8. Slice the saved image into frames and apply palette.
 	- Manually touch-up the exported frames if needed.
 
 ## Current Issues
 
 - Joint adjustment is only on Y axis and adjusts upper/lower marker equally.
 - Works only with input files that are 24x24px tiled (for each limb part. Max input image size is 192x24px for 8 limb parts (4 limbs)).
-- Does not save files in .bmp format.
+- Files saved as Indexed BMPs have messed up thumbnails and do not open correctly in Photoshop. Tested to open correctly with MS Paint XP.
 
 ## Changelog
 
