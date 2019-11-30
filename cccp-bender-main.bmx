@@ -415,6 +415,11 @@ Type TAppOutput
 		DrawImage(logoImage,0,480-ImageHeight(logoImage))
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
 		FCreateLimbTiles()
+		'Have to do all this to start editor window with source image zoomed in otherwise markers and tiles don't scale properly.
+		INPUTZOOM = 4
+		SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.INPUTZOOM)
+		TILESIZE = 24 * TAppOutput.INPUTZOOM
+		redoLimbTiles = True
 		FLimbBend()
 		FOutputUpdate()
 	EndFunction
