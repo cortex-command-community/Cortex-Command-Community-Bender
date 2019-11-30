@@ -245,7 +245,7 @@ Type TAppOutput
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
-	Global ZOOM:Int = 1
+	Global INPUTZOOM:Int = 1
 	Global FRAMES:Int = 7
 	Global BACKGROUND_RED:Int = 50
 	Global BACKGROUND_GREEN:Int = 170
@@ -285,7 +285,7 @@ Type TAppOutput
 			jointX[i] = TILESIZE/2
 			jointY[i] = TILESIZE/3.3 '3.6
 			boneLength[i] = (TILESIZE/2-jointY[i])*2
-			SetImageHandle(boneImage[i],jointX[i]/ZOOM,jointY[i]/ZOOM)
+			SetImageHandle(boneImage[i],jointX[i]/INPUTZOOM,jointY[i]/INPUTZOOM)
 		Next
 	EndFunction
 	
@@ -298,7 +298,7 @@ Type TAppOutput
 			jointX[b] = TILESIZE/2 		'X is always at center, so kinda pointless to even bother - at the moment
 			jointY[b] = ym				'Determines length
 			boneLength[b] = (TILESIZE/2 -ym)*2
-			SetImageHandle(boneImage[b],jointX[b]/ZOOM,jointY[b]/ZOOM) 'Rotation handle.
+			SetImageHandle(boneImage[b],jointX[b]/INPUTZOOM,jointY[b]/INPUTZOOM) 'Rotation handle.
 		EndIf
 	EndFunction
 	
@@ -313,8 +313,8 @@ Type TAppOutput
 				b = l*2
 				x = (f * 32) + 80 						'Drawing position X
 				y = ((l * 32) * 1.5 ) + 144				'Drawing position Y
-				upperLength = boneLength[b]/ZOOM
-				lowerLength = boneLength[b+1]/ZOOM
+				upperLength = boneLength[b]/INPUTZOOM
+				lowerLength = boneLength[b+1]/INPUTZOOM
 				airLength = (stepSize * f + minExtend) * (upperLength + lowerLength)	'Sum of the two bones * step scaler for frame (hip-ankle)
 				FLawOfCosines(airLength,upperLength,lowerLength)
 				angle[b,f] = angB
@@ -334,12 +334,12 @@ Type TAppOutput
 		SetRotation(0)
 		SetColor(0,0,80)
 		x:+1 y:+1 'Add a shade for clarity on bright colours
-		DrawLine(x-1-ZOOM,y,x+1+ZOOM,y)
-		DrawLine(x,y-1-ZOOM,x,y+1+ZOOM)
+		DrawLine(x-1-INPUTZOOM,y,x+1+INPUTZOOM,y)
+		DrawLine(x,y-1-INPUTZOOM,x,y+1+INPUTZOOM)
 		x:-1 y:-1 'Cross
 		SetColor(255,230,80)
-		DrawLine(x-1-ZOOM,y,x+1+ZOOM,y)
-		DrawLine(x,y-1-ZOOM,x,y+1+ZOOM)
+		DrawLine(x-1-INPUTZOOM,y,x+1+INPUTZOOM,y)
+		DrawLine(x,y-1-INPUTZOOM,x,y+1+INPUTZOOM)
 		SetColor(255,255,255)
 	End Function
 
@@ -360,7 +360,7 @@ Type TAppOutput
 		EndIf
 		'Draw source image
 		SetColor(255,255,255)
-		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
+		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
 		If redoLimbTiles Then
 			FCreateLimbTiles()
 			redoLimbTiles = False
@@ -382,14 +382,14 @@ Type TAppOutput
 		SetColor(255,255,255)
 		For f = 0 To FRAMES-1
 			'These might be in a specific draw-order for joint overlapping purposes
-			b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
-			b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/ZOOM,ImageHeight(boneImage[b])/ZOOM)
+			b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
 		Next
 		SetRotation(0)
 		'Output copy for saving
@@ -413,7 +413,7 @@ Type TAppOutput
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
 		DrawImage(logoImage,0,480-ImageHeight(logoImage))
-		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*ZOOM,ImageHeight(sourceImage)*ZOOM)
+		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
 		FCreateLimbTiles()
 		FLimbBend()
 		FOutputUpdate()
@@ -517,7 +517,7 @@ Type TAppGUI
 		editSettingsIndexedCheckbox = CreateButton("",140,73,20,20,editSettingsPanel,BUTTON_CHECKBOX)
 		editHelpPanel = CreatePanel(10,203,280,250,editWindow,PANEL_GROUP,"  Help :  ")
 		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
-		SetGadgetText(editSettingsZoomTextbox,TAppOutput.ZOOM)
+		SetGadgetText(editSettingsZoomTextbox,TAppOutput.INPUTZOOM)
 		SetGadgetText(editSettingsFramesTextbox,TAppOutput.FRAMES)
 		SetGadgetText(editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
 		SetGadgetText(editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
@@ -633,14 +633,14 @@ While True
 						Local userInputValue:Int = GadgetText(TAppGUI.editSettingsZoomTextbox).ToInt()	
 						'Foolproofing
 						If userInputValue > 4 Then
-							TAppOutput.ZOOM = 4
+							TAppOutput.INPUTZOOM = 4
 						ElseIf userInputValue <= 0 Then
-							TAppOutput.ZOOM = 1
+							TAppOutput.INPUTZOOM = 1
 						Else
-							TAppOutput.ZOOM = userInputValue
+							TAppOutput.INPUTZOOM = userInputValue
 						EndIf
-						SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.ZOOM)
-						TAppOutput.TILESIZE = 24 * TAppOutput.ZOOM
+						SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.INPUTZOOM)
+						TAppOutput.TILESIZE = 24 * TAppOutput.INPUTZOOM
 						TAppOutput.redoLimbTiles = True
 						TAppOutput.FOutputUpdate()
 					'Frames
