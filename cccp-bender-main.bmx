@@ -20,6 +20,9 @@ Rem
 ------- INDEXING ------------------------------------------------------------------------------------------------------
 EndRem
 
+'Embed palette file for standalone exe
+Incbin "assets/palette.act"
+
 Type TBitmapIndex
 	'Color Value Bytes
 	Global palR:Byte[256]
@@ -30,10 +33,10 @@ Type TBitmapIndex
 	Global dataStream:TStream
 
 	'Load color table file
-	Function FLoadPalette(paletteFile:String)
+	Function FLoadPalette()
 		Local index:Int
-		If FileSize(paletteFile) = 768
-			Local paletteStream:TStream = ReadFile(paletteFile)
+		If IncbinLen("assets/palette.act") = 768
+			Local paletteStream:TStream = ReadFile("Incbin::assets/palette.act")
 			For index = 0 To 255
 				palR[index] = ReadByte(paletteStream)
 				palG[index] = ReadByte(paletteStream)
@@ -230,6 +233,9 @@ Rem
 ------- OUTPUT ELEMENTS -----------------------------------------------------------------------------------------------
 EndRem
 
+'Embed logo image for standalone exe
+Incbin "assets/logo-image"
+
 Type TAppOutput
 	'Output Window
 	Global outputWindow:TGraphics
@@ -241,7 +247,7 @@ Type TAppOutput
 	Const UPPER_BONE:Int = 0
 	Const LOWER_BONE:Int = 1
 	'Graphic Assets
-	Global logoImage:TImage = LoadImage("assets/logo-image",MASKEDIMAGE)
+	Global logoImage:TImage = LoadImage("Incbin::assets/logo-image",MASKEDIMAGE) '
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
@@ -555,7 +561,7 @@ Type TAppGUI
 		If Not mainToEdit And importedFile <> Null Then
 			FAppEditor()
 			TAppOutput.FOutputBoot()
-			TBitmapIndex.FLoadPalette("assets/palette.act")
+			TBitmapIndex.FLoadPalette()
 			mainToEdit = True
 		EndIf
 	EndFunction
