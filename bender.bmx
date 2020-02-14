@@ -22,8 +22,8 @@ Include "types/file-io.bmx"
 Include "types/bitmap-index.bmx"
 
 'Version
-Global appVersion:String = "1.2.1"
-Global appVersionDate:String = "22 Sep 2019"
+Global appVersion:String = "1.2.2"
+Global appVersionDate:String = "14 Feb 2020"
 
 Rem
 ------- BOOT ----------------------------------------------------------------------------------------------------------
