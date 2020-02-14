@@ -1,4 +1,3 @@
 /.bmx
-cccp-bender-main.bmx.bak
-cccp-bender-main.exe
-cccp-bender-main.debug.exe
+*.exe
+*.bak
