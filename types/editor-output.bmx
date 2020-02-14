@@ -130,40 +130,43 @@ Type TAppOutput
 		Else
 			SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		EndIf
-		'Draw source image
+		'Draw footer image
 		SetColor(255,255,255)
-		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
-		If redoLimbTiles Then
-			FCreateLimbTiles()
-			redoLimbTiles = False
-		EndIf
-		For i = 0 To BONES-1
-			'Draw limb tile dividers
-			SetColor(120,0,120)
-			DrawLine(i*TILESIZE,0,i*TILESIZE,TILESIZE-1,True)
-			'Draw the joint markers
-			FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i])
-			FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i]+boneLength[i])
-		Next	
-		'Draw footer image and text
 		DrawImage(logoImage,0,480-ImageHeight(logoImage))
-		'SetColor(255,230,80)
-		'DrawText("TBA",ImageWidth(logoImage)+7,480-18)
-		'Draw bent limbs
-		FLimbBend()
-		SetColor(255,255,255)
-		For f = 0 To FRAMES-1
-			'These might be in a specific draw-order for joint overlapping purposes
-			b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-			b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
-		Next
-		SetRotation(0)
+		'Draw source image
+		If sourceImage <> Null Then
+			DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
+			If redoLimbTiles Then
+				FCreateLimbTiles()
+				redoLimbTiles = False
+			EndIf
+			For i = 0 To BONES-1
+				'Draw limb tile dividers
+				SetColor(120,0,120)
+				DrawLine(i*TILESIZE,0,i*TILESIZE,TILESIZE-1,True)
+				'Draw the joint markers
+				FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i])
+				FCreateJointMarker(jointX[i]+i*TILESIZE,jointY[i]+boneLength[i])
+			Next	
+			'Draw bent limbs
+			FLimbBend()
+			SetColor(255,255,255)
+			For f = 0 To FRAMES-1
+				'These might be in a specific draw-order for joint overlapping purposes
+				b = 0 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 1 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 2 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 3 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 4 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 5 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 6 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+				b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
+			Next
+			SetRotation(0)
+		Else
+			SetColor(255,230,80)
+			DrawText("NO IMAGE LOADED!",(GraphicsWidth()/2)-(TextWidth("NO IMAGE LOADED!")/2),GraphicsHeight()/2)	
+		EndIf
 		'Output copy for saving
 		If TAppFileIO.saveAsIndexed = True Then
 			'If saving indexed grab a smaller pixmap to speed up indexing
@@ -181,13 +184,21 @@ Type TAppOutput
 	Function FOutputBoot()
 		SetGraphicsDriver GLMax2DDriver()
 		SetGraphics CanvasGraphics(TAppGUI.editCanvas)
+		'Load palette
+		TBitmapIndex.FLoadPalette()
 		'Window background color
 		SetClsColor(BACKGROUND_RED,BACKGROUND_GREEN,BACKGROUND_BLUE)
 		SetMaskColor(255,0,255)
 		DrawImage(logoImage,0,480-ImageHeight(logoImage))
+		SetColor(255,230,80)
+		DrawText("NO IMAGE LOADED!",(GraphicsWidth()/2)-(TextWidth("NO IMAGE LOADED!")/2),GraphicsHeight()/2)
+		FOutputUpdate()
+	EndFunction
+	
+	'Have to do all this so first loaded source image is zoomed in and has correct limb tiles and markers.
+	Function FLoadingFirstTime()
 		DrawImageRect(sourceImage,0,0,ImageWidth(sourceImage)*INPUTZOOM,ImageHeight(sourceImage)*INPUTZOOM)
 		FCreateLimbTiles()
-		'Have to do all this to start editor window with source image zoomed in otherwise markers and tiles don't scale properly.
 		INPUTZOOM = 4
 		SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.INPUTZOOM)
 		TILESIZE = 24 * TAppOutput.INPUTZOOM

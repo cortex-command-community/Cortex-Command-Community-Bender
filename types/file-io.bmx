@@ -10,6 +10,9 @@ Global exportedFile:String = Null
 Global fileFilters:String
 
 Type TAppFileIO
+	'Load Bools
+	Global loadingFirstTime:Int = True
+		
 	'Save Bools
 	Global saveAsIndexed:Int = False
 	Global prepForSave:Int = False
@@ -29,7 +32,12 @@ Type TAppFileIO
 			TAppOutput.sourceImage = TAppOutput.sourceImage
 		Else
 			TAppOutput.sourceImage = LoadImage(importedFile,0)
-			TAppOutput.redoLimbTiles = True
+			If loadingFirstTime = True Then
+				TAppOutput.FLoadingFirstTime()
+				loadingFirstTime = False
+			Else
+				TAppOutput.redoLimbTiles = True
+			EndIf
 		EndIf
 	EndFunction
 	

@@ -14,8 +14,8 @@ Type TBitmapIndex
 	'Load color table file
 	Function FLoadPalette()
 		Local index:Int
-		If IncbinLen("assets/palette.act") = 768
-			Local paletteStream:TStream = ReadFile("Incbin::assets/palette.act")
+		If IncbinLen("assets/palette") = 768
+			Local paletteStream:TStream = ReadFile("Incbin::assets/palette")
 			For index = 0 To 255
 				palR[index] = ReadByte(paletteStream)
 				palG[index] = ReadByte(paletteStream)
