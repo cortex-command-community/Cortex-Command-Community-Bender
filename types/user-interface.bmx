@@ -21,6 +21,9 @@ Type TAppGUI
 	Global mainAboutTextbox:TGadget
 	'Editor Window
 	Global editWindow:TGadget
+	'Editor Window about menu
+	Global editAboutMenu:TGadget
+	Const ABOUT_MENU:Int = 1
 	'Editor Window Canvas Graphics
 	Global editCanvas:TGadget
 	'Editor Window Buttons
@@ -66,8 +69,10 @@ Type TAppGUI
 	'Create Editor Window
 	Function FAppEditor()
 		EnablePolledInput()
-		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-700,DesktopHeight()/2-240,300+768,430+50,Null,WINDOW_TITLEBAR|WINDOW_CLIENTCOORDS)
+		editWindow = CreateWindow("CCCP Bender v"+appversion+" - Editor",DesktopWidth()/2-700,DesktopHeight()/2-240,300+768,430+50,Null,WINDOW_TITLEBAR|WINDOW_MENU|WINDOW_CLIENTCOORDS)
 		editCanvas = CreateCanvas(300,0,768,480,editWindow)
+		editAboutMenu = CreateMenu("About",ABOUT_MENU,WindowMenu(editWindow))
+		UpdateWindowMenu(editWindow)
 		editWindowButtonPanel = CreatePanel(10,7,280,57,editWindow,PANEL_GROUP)	
 		editLoadButton = CreateButton("Load",6,0,80,30,editWindowButtonPanel,BUTTON_PUSH)
 		editSaveButton = CreateButton("Save",96,0,80,30,editWindowButtonPanel,BUTTON_PUSH)

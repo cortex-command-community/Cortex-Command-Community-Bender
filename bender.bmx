@@ -83,7 +83,13 @@ While True
 			Case EVENT_WINDOWACTIVATE
 				TAppOutput.FOutputUpdate()
 			Case EVENT_GADGETLOSTFOCUS
-				TAppOutput.FOutputUpdate()	
+				TAppOutput.FOutputUpdate()
+			Case EVENT_MENUACTION
+				Select EventData()
+					Case TAppGUI.ABOUT_MENU
+						AppTitle = "CCCP Bender v"+appversion
+						Notify(LoadText("Incbin::assets/about-textbox-content"),false)
+				EndSelect	
 			Case EVENT_GADGETACTION
 				Select EventSource()
 					'Quitting confirm
