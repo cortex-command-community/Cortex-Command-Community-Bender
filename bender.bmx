@@ -22,8 +22,8 @@ Include "types/file-io.bmx"
 Include "types/bitmap-index.bmx"
 
 'Version
-Global appVersion:String = "1.2.2"
-Global appVersionDate:String = "14 Feb 2020"
+Global appVersion:String = "1.3.0"
+Global appVersionDate:String = "16 Feb 2020"
 
 AppTitle = "CCCP Bender v"+appVersion
 
