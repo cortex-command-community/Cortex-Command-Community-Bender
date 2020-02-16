@@ -15,12 +15,14 @@ Type TAppFileIO
 		
 	'Save Bools
 	Global saveAsIndexed:Int = False
+	Global saveAsFrames:Int = False
 	Global prepForSave:Int = False
 	Global rdyForSave:Int = False
 	Global runOnce:Int = False
 	
 	'Output copy for saving
 	Global tempOutputImage:TPixmap
+	Global tempOutputFrame:TPixmap[4,20] 'noice
 	
 	'Load Source Image
 	Function FLoadFile()
@@ -48,7 +50,11 @@ Type TAppFileIO
 				runOnce = True
 				TAppOutput.FOutputUpdate()
 			Else
-				FSaveFile()
+				If Not saveAsFrames Then
+					FSaveFile()
+				Else
+					FSaveFileAsFrames()
+				EndIf
 			EndIf
 		EndIf
 	EndFunction
@@ -66,7 +72,7 @@ Type TAppFileIO
 		'Foolproofing
 		If exportedFile = importedFile Then
 			Notify("Cannot overwrite source image!",True)
-		ElseIf exportedFile <> importedFile Then
+		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
 			'Writing new file
 			If saveAsIndexed = True
 				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage,exportedFile)
@@ -78,5 +84,47 @@ Type TAppFileIO
 			'On Cancel
 			FRevertPrep()
 		EndIf
+	EndFunction
+	
+	'Save Output Content As Frames
+	Function FSaveFileAsFrames()
+		exportedFile = RequestFile("Save graphic output","",True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		'Foolproofing
+		If exportedFile = importedFile Then
+			Notify("Cannot overwrite source image!",True)
+		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
+			'Writing new file
+			Local row:Int, frame:Int
+			For row = 0 To 3
+				'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
+				Local rowName:String
+				If row = 0 Then
+					rowName = "ArmFG"
+				ElseIf row = 1 Then
+					rowName = "ArmBG"
+				ElseIf row = 2 Then
+					rowName = "LegFG"
+				ElseIf row = 3 Then
+					rowName = "LegBG"
+				EndIf
+				For frame = 0 To TAppOutput.FRAMES-1
+					Local exportedFileTempName:String
+					If frame < 10 Then
+						exportedFileTempName = exportedFile+rowName+"00"+frame
+					Else
+						exportedFileTempName = exportedFile+rowName+"0"+frame
+					EndIf
+					If saveAsIndexed = True
+						TBitmapIndex.FPixmapToIndexedBitmap(tempOutputFrame[row,frame],exportedFileTempName+".bmp")
+					Else
+			      		SavePixmapPNG(tempOutputFrame[row,frame],exportedFileTempName+".png")
+					EndIf
+				Next
+			Next
+			FRevertPrep()
+		Else
+			'On Cancel
+			FRevertPrep()
+		EndIf	
 	EndFunction
 EndType

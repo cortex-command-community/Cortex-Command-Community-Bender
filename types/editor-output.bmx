@@ -163,20 +163,11 @@ Type TAppOutput
 				b = 7 SetRotation(angle[b,f]) DrawImageRect(boneImage[b],xBone[b,f],yBone[b,f],ImageWidth(boneImage[b])/INPUTZOOM,ImageHeight(boneImage[b])/INPUTZOOM)
 			Next
 			SetRotation(0)
+			FGrabOutputForSaving()
 		Else
 			SetColor(255,230,80)
-			DrawText("NO IMAGE LOADED!",(GraphicsWidth()/2)-(TextWidth("NO IMAGE LOADED!")/2),GraphicsHeight()/2)	
-		EndIf
-		'Output copy for saving
-		If TAppFileIO.saveAsIndexed = True Then
-			'If saving indexed grab a smaller pixmap to speed up indexing
-			TAppFileIO.tempOutputImage = GrabPixmap(55,120,34*FRAMES,210)
-		Else
-			TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
-		EndIf
-		Flip(1)
-		If TAppFileIO.prepForSave
-			TAppFileIO.FPrepForSave()
+			DrawText("NO IMAGE LOADED!",(GraphicsWidth()/2)-(TextWidth("NO IMAGE LOADED!")/2),GraphicsHeight()/2)
+			Flip(1)	
 		EndIf
 	EndFunction
 	
@@ -206,4 +197,41 @@ Type TAppOutput
 		FLimbBend()
 		FOutputUpdate()
 	EndFunction
+	
+	'Output copy for saving
+	Function FGrabOutputForSaving()
+		If TAppFileIO.saveAsFrames = True Then
+			Local row:Int, frame:Int
+			Local tile:TImage = LoadImage("Incbin::assets/tile")
+			For row = 0 To 3
+				For frame = 0 To FRAMES-1
+					'Draw a tile outline around all frames to see we are within bounds.
+					DrawImage(tile,62+(frame*(TILESIZE/INPUTZOOM+8)),138+(row*48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
+					'Draw names of rows
+					SetColor(255,230,80)
+					DrawText("Arm FG",8,145)
+					DrawText("Arm BG",8,145+48)
+					DrawText("Leg FG",8,145+(48*2))
+					DrawText("Leg BG",8,145+(48*3))
+					'Grab pixmap inside tile bounds for saving
+					TAppFileIO.tempOutputFrame[row,frame] = GrabPixmap(63+(frame*(TILESIZE/INPUTZOOM+8)),139+(row*48),TILESIZE/INPUTZOOM,TILESIZE/INPUTZOOM)
+					'HFlip the legs so they're facing right
+					If row >= 2 Then
+						TAppFileIO.tempOutputFrame[row,frame] = XFlipPixmap(TAppFileIO.tempOutputFrame[row,frame])
+					EndIf
+				Next
+			Next
+		Else
+			If TAppFileIO.saveAsIndexed = True Then
+				'If saving indexed grab a smaller pixmap to speed up indexing
+				TAppFileIO.tempOutputImage = GrabPixmap(55,120,34*FRAMES,210)
+			Else
+				TAppFileIO.tempOutputImage = GrabPixmap(0,96,768,384)
+			EndIf
+		EndIf
+		Flip(1)
+		If TAppFileIO.prepForSave
+			TAppFileIO.FPrepForSave()
+		EndIf
+	EndFunction	
 EndType

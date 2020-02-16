@@ -22,8 +22,10 @@ Include "types/file-io.bmx"
 Include "types/bitmap-index.bmx"
 
 'Version
-Global appVersion:String = "1.2.2"
-Global appVersionDate:String = "14 Feb 2020"
+Global appVersion:String = "1.3.0"
+Global appVersionDate:String = "16 Feb 2020"
+
+AppTitle = "CCCP Bender v"+appVersion
 
 Rem
 ------- BOOT ----------------------------------------------------------------------------------------------------------
@@ -40,7 +42,7 @@ Rem
 ------- EVENT HANDLING ------------------------------------------------------------------------------------------------
 EndRem
 
-While True	
+While True
 	TAppOutput.FOutputUpdate()
 	
 	If ButtonState(TAppGUI.editSettingsIndexedCheckbox) = True Then
@@ -50,11 +52,19 @@ While True
 		fileFilters = "Image Files:png"
 		TAppFileIO.saveAsIndexed = False
 	EndIf
+	
+	If ButtonState(TAppGUI.editSettingsSaveAsFramesCheckbox) = True Then
+		TAppFileIO.saveAsFrames = True
+	Else
+		TAppFileIO.saveAsFrames = False
+	EndIf
 
-	WaitEvent
-	'Print CurrentEvent.ToString()
-	'Print GCMemAlloced()
+	'Debug stuff
+	'Print "current event: " + CurrentEvent.ToString()
+	'Print "allocated memory in bytes: " + GCMemAlloced() 'not sure how accurate this really is, numbers don't match with task manager
+	'Print "mouse position in canvas: x = " + MouseX() + " y = " + MouseY()
 
+	PollEvent
 	'Event Responses
 	Select EventID()
 		Case EVENT_APPRESUME
@@ -67,7 +77,6 @@ While True
 		Case EVENT_MENUACTION
 			Select EventData()
 				Case TAppGUI.ABOUT_MENU
-					AppTitle = "CCCP Bender v"+appversion
 					Notify(LoadText("Incbin::assets/about-textbox-content"),False)
 			EndSelect
 		Case EVENT_GADGETACTION
@@ -81,8 +90,12 @@ While True
 					TAppOutput.FOutputUpdate()
 				'Saving
 				Case TAppGUI.editSaveButton
-					TAppFileIO.prepForSave = True
-					TAppOutput.FOutputUpdate()
+					If TAppOutput.sourceImage <> Null Then
+						TAppFileIO.prepForSave = True
+						TAppOutput.FOutputUpdate()
+					Else
+						Notify("Nothing to save!",False)
+					EndIf
 				'Settings textbox inputs
 				'Scale
 				Case TAppGUI.editSettingsZoomTextbox

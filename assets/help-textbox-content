@@ -64,3 +64,15 @@ THE INDEXING PROCESS IS SLOW!
 I've done my best to speed it up but it still isn't blazing fast like PNG saving.
 When saving indexed, the app may hang and appear unresponsive but in fact it's doing what it's supposed to.
 For best results, DO NOT TOUCH ANYTHING until the background color reverts from magenta to whatever it was before!
+
+
+SAVE AS FRAMES:
+When ticked each frame of the output will be exported as an individual file.
+Exported frame size is fixed to 24x24px. A bounding box will be shown around each frame to help user stay within bounds.
+Anything outside bounds will be cropped.
+
+Does not conflict with "SAVE AS INDEXED BITMAP" and can be used together to export indexed individual frames.
+
+- Quadruple Warning :
+WHEN SAVING, DO NOT MANUALLY ADD LIMB NAME OR FRAME NUMBER TO FILE NAME. THIS IS DONE AUTOMATICALLY.
+DOING SO WILL RESULT IS HORRIBLE HORRIBLE EXPORTED FILE NAMES.

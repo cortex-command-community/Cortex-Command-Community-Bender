@@ -36,6 +36,8 @@ Type TAppGUI
 	Global editSettingsColorBLabel:TGadget
 	Global editSettingsIndexedLabel:TGadget
 	Global editSettingsIndexedCheckbox:TGadget
+	Global editSettingsSaveAsFramesLabel:TGadget
+	Global editSettingsSaveAsFramesCheckbox:TGadget
 	'Editor Window Help
 	Global editHelpPanel:TGadget
 	Global editHelpTextbox:TGadget
@@ -64,7 +66,9 @@ Type TAppGUI
 		editSettingsColorGLabel = CreateLabel("G:",120,45,50,20,editSettingsPanel,LABEL_LEFT)
 		editSettingsColorBLabel = CreateLabel("B:",175,45,50,20,editSettingsPanel,LABEL_LEFT)
 		editSettingsIndexedLabel = CreateLabel("Save as Indexed Bitmap:",10,75,130,20,editSettingsPanel,LABEL_LEFT)
-		editSettingsIndexedCheckbox = CreateButton("",140,73,20,20,editSettingsPanel,BUTTON_CHECKBOX)
+		editSettingsIndexedCheckbox = CreateButton("",140,75,15,15,editSettingsPanel,BUTTON_CHECKBOX)
+		editSettingsSaveAsFramesLabel = CreateLabel("Save as Frames:",160,75,80,20,editSettingsPanel,LABEL_LEFT)
+		editSettingsSaveAsFramesCheckbox = CreateButton("",250,75,15,15,editSettingsPanel,BUTTON_CHECKBOX)
 		editHelpPanel = CreatePanel(10,203,280,250,editWindow,PANEL_GROUP,"  Help :  ")
 		editHelpTextbox = CreateTextArea(7,5,GadgetWidth(editHelpPanel)-21,GadgetHeight(editHelpPanel)-32,editHelpPanel,TEXTAREA_WORDWRAP|TEXTAREA_READONLY)
 		'Populate textboxes

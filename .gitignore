@@ -1,3 +1,8 @@
 /.bmx
 *.exe
 *.bak
+*.png
+*.bmp
+
+!test-image.bmp
+!input-template.bmp
