@@ -51,10 +51,12 @@ While True
 		TAppFileIO.saveAsIndexed = False
 	EndIf
 
-	WaitEvent
-	'Print CurrentEvent.ToString()
-	'Print GCMemAlloced()
+	'Debug stuff
+	'Print "current event: " + CurrentEvent.ToString()
+	'Print "allocated memory in bytes: " + GCMemAlloced() 'not sure how accurate this really is, numbers don't match with task manager
+	'Print "mouse position in canvas: x = " + MouseX() + " y = " + MouseY()
 
+	PollEvent
 	'Event Responses
 	Select EventID()
 		Case EVENT_APPRESUME
