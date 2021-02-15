@@ -9,7 +9,7 @@ Global exportedFile:String = Null
 'File Filters
 Global fileFilters:String
 
-Type TAppFileIO
+Type FileIO
 	'Load Bools
 	Global loadingFirstTime:Int = True
 		
@@ -27,20 +27,20 @@ Type TAppFileIO
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Load Source Image
-	Function FLoadFile()
+	Function LoadFile()
 		Local oldImportedFile:String = importedFile
 		importedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
 		'Foolproofing
 		If importedFile = Null Then
 			importedFile = oldImportedFile
-			TAppOutput.sourceImage = TAppOutput.sourceImage
+			GraphicsOutput.sourceImage = GraphicsOutput.sourceImage
 		Else
-			TAppOutput.sourceImage = LoadImage(importedFile, 0)
+			GraphicsOutput.sourceImage = LoadImage(importedFile, 0)
 			If loadingFirstTime = True Then
-				TAppOutput.FLoadingFirstTime()
+				GraphicsOutput.LoadingFirstTime()
 				loadingFirstTime = False
 			Else
-				TAppOutput.redoLimbTiles = True
+				GraphicsOutput.redoLimbTiles = True
 			EndIf
 		EndIf
 	EndFunction
@@ -48,16 +48,16 @@ Type TAppFileIO
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Prep Output For Saving
-	Function FPrepForSave()
+	Function PrepForSave()
 		If prepForSave Then
 			If Not runOnce Then
 				runOnce = True
-				TAppOutput.FOutputUpdate()
+				GraphicsOutput.OutputUpdate()
 			Else
 				If Not saveAsFrames Then
-					FSaveFile()
+					SaveFile()
 				Else
-					FSaveFileAsFrames()
+					SaveFileAsFrames()
 				EndIf
 			EndIf
 		EndIf
@@ -65,17 +65,17 @@ Type TAppFileIO
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	Function FRevertPrep()
+	Function RevertPrep()
 		prepForSave = False
 		rdyForSave = False
 		runOnce = False
-		TAppOutput.FOutputUpdate()
+		GraphicsOutput.OutputUpdate()
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Save Output Content To File
-	Function FSaveFile()
+	Function SaveFile()
 		exportedFile = RequestFile("Save graphic output", fileFilters, True)
 		'Foolproofing
 		If exportedFile = importedFile Then
@@ -83,21 +83,21 @@ Type TAppFileIO
 		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
 			'Writing new file
 			If saveAsIndexed = True
-				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage, exportedFile)
+				BitmapIndexer.PixmapToIndexedBitmap(tempOutputImage, exportedFile)
 			Else
 	      		SavePixmapPNG(tempOutputImage, exportedFile)
 			EndIf
-			FRevertPrep()
+			RevertPrep()
 		Else
 			'On Cancel
-			FRevertPrep()
+			RevertPrep()
 		EndIf
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Save Output Content As Frames
-	Function FSaveFileAsFrames()
+	Function SaveFileAsFrames()
 		exportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
 		'Foolproofing
 		If exportedFile = importedFile Then
@@ -117,7 +117,7 @@ Type TAppFileIO
 				ElseIf row = 3 Then
 					rowName = "LegBG"
 				EndIf
-				For frame = 0 To TAppOutput.FRAMES - 1
+				For frame = 0 To GraphicsOutput.FRAMES - 1
 					Local exportedFileTempName:String
 					If frame < 10 Then
 						exportedFileTempName = exportedFile+rowName + "00" + frame
@@ -125,16 +125,16 @@ Type TAppFileIO
 						exportedFileTempName = exportedFile+rowName + "0" + frame
 					EndIf
 					If saveAsIndexed = True
-						TBitmapIndex.FPixmapToIndexedBitmap(tempOutputFrame[row, frame], exportedFileTempName + ".bmp")
+						BitmapIndexer.PixmapToIndexedBitmap(tempOutputFrame[row, frame], exportedFileTempName + ".bmp")
 					Else
 			      		SavePixmapPNG(tempOutputFrame[row, frame], exportedFileTempName + ".png")
 					EndIf
 				Next
 			Next
-			FRevertPrep()
+			RevertPrep()
 		Else
 			'On Cancel
-			FRevertPrep()
+			RevertPrep()
 		EndIf	
 	EndFunction
 EndType

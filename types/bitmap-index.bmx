@@ -2,7 +2,7 @@ Rem
 ------- INDEXING ------------------------------------------------------------------------------------------------------
 EndRem
 
-Type TBitmapIndex
+Type BitmapIndexer
 	'Color Value Bytes
 	Global palR:Byte[256]
 	Global palG:Byte[256]
@@ -14,7 +14,7 @@ Type TBitmapIndex
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	'Load color table file
-	Function FLoadPalette()
+	Function LoadPalette()
 		Local index:Int
 		If IncbinLen("Assets/Palette") = 768
 			Local paletteStream:TStream = ReadFile("Incbin::Assets/Palette")
@@ -30,10 +30,10 @@ Type TBitmapIndex
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 
 	'Indexed Bitmap File Writer
-	Function FPixmapToIndexedBitmap(image:TPixmap, filename:String)
+	Function PixmapToIndexedBitmap(image:TPixmap, filename:String)
 		'Foolproofing
 		If filename = "" Then
-			TAppFileIO.FRevertPrep()
+			FileIO.RevertPrep()
 		Else
 			'Variables
 			Local paletteIndex:Int

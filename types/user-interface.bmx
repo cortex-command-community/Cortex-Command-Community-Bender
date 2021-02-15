@@ -5,7 +5,7 @@ EndRem
 'Bool For Quitting
 Global quitResult:Int = False
 
-Type TAppGUI
+Type UserInterface
 
 	'About menu event tag
 	Const ABOUT_MENU:Int = 100
@@ -45,7 +45,7 @@ Type TAppGUI
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 	
 	'Create Editor Window
-	Function FAppEditor()
+	Function InitializeWindow()
 		EnablePolledInput()
 		editWindow = CreateWindow("CCCP Bender " + appversion + " - Editor", DesktopWidth() / 2 - 700, DesktopHeight() / 2 - 240, 300 + 768, 430 + 50, Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_CLIENTCOORDS)
 		editCanvas = CreateCanvas(300, 0, 768, 480, editWindow)
@@ -74,11 +74,11 @@ Type TAppGUI
 		editHelpPanel = CreatePanel(10, 203, 280, 250, editWindow, PANEL_GROUP, "  Help :  ")
 		editHelpTextbox = CreateTextArea(7, 5, GadgetWidth(editHelpPanel) - 21, GadgetHeight(editHelpPanel) - 32, editHelpPanel, TEXTAREA_WORDWRAP | TEXTAREA_READONLY)
 		'Populate textboxes
-		SetGadgetText(editSettingsZoomTextbox, TAppOutput.INPUTZOOM)
-		SetGadgetText(editSettingsFramesTextbox, TAppOutput.FRAMES)
-		SetGadgetText(editSettingsColorRTextbox, TAppOutput.BACKGROUND_RED)
-		SetGadgetText(editSettingsColorGTextbox, TAppOutput.BACKGROUND_GREEN)
-		SetGadgetText(editSettingsColorBTextbox, TAppOutput.BACKGROUND_BLUE)
+		SetGadgetText(editSettingsZoomTextbox, GraphicsOutput.INPUTZOOM)
+		SetGadgetText(editSettingsFramesTextbox, GraphicsOutput.FRAMES)
+		SetGadgetText(editSettingsColorRTextbox, GraphicsOutput.BACKGROUND_RED)
+		SetGadgetText(editSettingsColorGTextbox, GraphicsOutput.BACKGROUND_GREEN)
+		SetGadgetText(editSettingsColorBTextbox, GraphicsOutput.BACKGROUND_BLUE)
 		SetGadgetText(editHelpTextbox, LoadText("Incbin::Assets/TextboxHelp"))
 	EndFunction
 EndType
