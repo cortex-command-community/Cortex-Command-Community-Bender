@@ -13,7 +13,7 @@ Import BRL.Stream
 Import BRL.EndianStream
 
 'Load assets
-Include "assets.bmx"
+Include "EmbeddedAssets.bmx"
 
 'Include individual types
 Include "types/user-interface.bmx"
@@ -77,7 +77,7 @@ While True
 		Case EVENT_MENUACTION
 			Select EventData()
 				Case TAppGUI.ABOUT_MENU
-					Notify(LoadText("Incbin::assets/about-textbox-content"),False)
+					Notify(LoadText("Incbin::Assets/TextboxAbout"),False)
 			EndSelect
 		Case EVENT_GADGETACTION
 			Select EventSource()

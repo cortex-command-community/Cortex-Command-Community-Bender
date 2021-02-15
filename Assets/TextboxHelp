@@ -1,4 +1,4 @@
--------------------------- GUI --------------------------
+--- GUI
 
 LOAD:
 This loads an image file and starts bending. 
@@ -17,7 +17,7 @@ Files are saved in .png format, typing in the extension is not needed.
 Currently loaded file cannot be overwritten.
 
 
------------------ ADJUSTING JOINTS ----------------
+--- ADJUSTING JOINTS
 
 To adjust the joint positing on a limb part, click the upper joint marker on and drag it up/down, or click at desired point to set it there. 
 Output will update automatically as you adjust the markers.
@@ -27,7 +27,7 @@ Joint markers cannot be adjusted on the X axis, and will adjust equally on the Y
 For best results, please position the limb parts as close to dead center as possible for each tile in the input file.
 
 
----------------------- SETTINGS -----------------------
+--- SETTINGS
 
 ZOOM:
 This magnifies the source image For easier placement of joint markers. 

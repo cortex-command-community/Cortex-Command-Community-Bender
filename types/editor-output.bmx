@@ -13,7 +13,7 @@ Type TAppOutput
 	Const UPPER_BONE:Int = 0
 	Const LOWER_BONE:Int = 1
 	'Graphic Assets
-	Global logoImage:TImage = LoadImage("Incbin::assets/logo-image",MASKEDIMAGE) '
+	Global logoImage:TImage = LoadImage("Incbin::Assets/Logo", MASKEDIMAGE)
 	Global sourceImage:TImage
 	Global boneImage:TImage[BONES]
 	'Output Settings
@@ -202,7 +202,7 @@ Type TAppOutput
 	Function FGrabOutputForSaving()
 		If TAppFileIO.saveAsFrames = True Then
 			Local row:Int, frame:Int
-			Local tile:TImage = LoadImage("Incbin::assets/tile")
+			Local tile:TImage = LoadImage("Incbin::Assets/Tile")
 			For row = 0 To 3
 				For frame = 0 To FRAMES-1
 					'Draw a tile outline around all frames to see we are within bounds.

@@ -77,6 +77,6 @@ Type TAppGUI
 		SetGadgetText(editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
 		SetGadgetText(editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
 		SetGadgetText(editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE)
-		SetGadgetText(editHelpTextbox,LoadText("Incbin::assets/help-textbox-content"))
+		SetGadgetText(editHelpTextbox, LoadText("Incbin::Assets/TextboxHelp"))
 	EndFunction
 EndType
