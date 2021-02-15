@@ -47,7 +47,7 @@ Type UserInterface
 	'Create Editor Window
 	Function InitializeWindow()
 		EnablePolledInput()
-		editWindow = CreateWindow("CCCP Bender " + appversion + " - Editor", DesktopWidth() / 2 - 700, DesktopHeight() / 2 - 240, 300 + 768, 430 + 50, Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_CLIENTCOORDS)
+		editWindow = CreateWindow("CCCP Bender " + appversion + " - Editor", DesktopWidth() / 2 - 700, DesktopHeight() / 2 - 240, 300 + 768, 430 + 50, Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_RESIZABLE | WINDOW_CLIENTCOORDS)
 		editCanvas = CreateCanvas(300, 0, 768, 480, editWindow)
 		editAboutMenu = CreateMenu("About", ABOUT_MENU, WindowMenu(editWindow))
 		UpdateWindowMenu(editWindow)
