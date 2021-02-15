@@ -29,32 +29,32 @@ Rem
 ------- BOOT ----------------------------------------------------------------------------------------------------------
 EndRem
 
-New TAppGUI
-New TAppOutput
-New TAppFileIO
-New TBitmapIndex
-TAppGUI.FAppEditor()
-TAppOutput.FOutputBoot()
+Local ui:UserInterface = New UserInterface
+Local output:GraphicsOutput = New GraphicsOutput
+Local io:FileIO = New FileIO
+Local indexer:BitmapIndexer = New BitmapIndexer
+ui.InitializeWindow()
+output.OutputBoot()
 
 Rem
 ------- EVENT HANDLING ------------------------------------------------------------------------------------------------
 EndRem
 
 While True
-	TAppOutput.FOutputUpdate()
+	output.OutputUpdate()
 	
-	If ButtonState(TAppGUI.editSettingsIndexedCheckbox) = True Then
+	If ButtonState(ui.editSettingsIndexedCheckbox) = True Then
 		fileFilters = "Image Files:bmp"
-		TAppFileIO.saveAsIndexed = True
+		io.saveAsIndexed = True
 	Else
 		fileFilters = "Image Files:png"
-		TAppFileIO.saveAsIndexed = False
+		io.saveAsIndexed = False
 	EndIf
 	
-	If ButtonState(TAppGUI.editSettingsSaveAsFramesCheckbox) = True Then
-		TAppFileIO.saveAsFrames = True
+	If ButtonState(ui.editSettingsSaveAsFramesCheckbox) = True Then
+		io.saveAsFrames = True
 	Else
-		TAppFileIO.saveAsFrames = False
+		io.saveAsFrames = False
 	EndIf
 
 	'Debug stuff
@@ -66,103 +66,103 @@ While True
 	'Event Responses
 	Select EventID()
 		Case EVENT_APPRESUME
-			ActivateWindow(TAppGUI.editWindow)
-			TAppOutput.FOutputUpdate()
+			ActivateWindow(ui.editWindow)
+			output.OutputUpdate()
 		Case EVENT_WINDOWACTIVATE
-			TAppOutput.FOutputUpdate()
+			output.OutputUpdate()
 		Case EVENT_GADGETLOSTFOCUS
-			TAppOutput.FOutputUpdate()
+			output.OutputUpdate()
 		Case EVENT_MENUACTION
 			Select EventData()
-				Case TAppGUI.ABOUT_MENU
+				Case ui.ABOUT_MENU
 					Notify(LoadText("Incbin::Assets/TextboxAbout"),False)
 			EndSelect
 		Case EVENT_GADGETACTION
 			Select EventSource()
 				'Quitting confirm
-				Case TAppGUI.editQuitButton
+				Case ui.editQuitButton
 					quitResult = Confirm("Quit program?")
 				'Loading
-				Case TAppGUI.editLoadButton
-					TAppFileIO.FLoadFile()
-					TAppOutput.FOutputUpdate()
+				Case ui.editLoadButton
+					io.LoadFile()
+					output.OutputUpdate()
 				'Saving
-				Case TAppGUI.editSaveButton
-					If TAppOutput.sourceImage <> Null Then
-						TAppFileIO.prepForSave = True
-						TAppOutput.FOutputUpdate()
+				Case ui.editSaveButton
+					If output.sourceImage <> Null Then
+						io.prepForSave = True
+						output.OutputUpdate()
 					Else
 						Notify("Nothing to save!",False)
 					EndIf
 				'Settings textbox inputs
 				'Scale
-				Case TAppGUI.editSettingsZoomTextbox
-					Local userInputValue:Int = GadgetText(TAppGUI.editSettingsZoomTextbox).ToInt()	
+				Case ui.editSettingsZoomTextbox
+					Local userInputValue:Int = GadgetText(ui.editSettingsZoomTextbox).ToInt()	
 					'Foolproofing
 					If userInputValue > 4 Then
-						TAppOutput.INPUTZOOM = 4
+						output.INPUTZOOM = 4
 					ElseIf userInputValue <= 0 Then
-						TAppOutput.INPUTZOOM = 1
+						output.INPUTZOOM = 1
 					Else
-						TAppOutput.INPUTZOOM = userInputValue
+						output.INPUTZOOM = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsZoomTextbox, TAppOutput.INPUTZOOM)
-					TAppOutput.TILESIZE = 24 * TAppOutput.INPUTZOOM
-					TAppOutput.redoLimbTiles = True
-					TAppOutput.FOutputUpdate()
+					SetGadgetText(ui.editSettingsZoomTextbox, output.INPUTZOOM)
+					output.TILESIZE = 24 * output.INPUTZOOM
+					output.redoLimbTiles = True
+					output.OutputUpdate()
 				'Frames
-				Case TAppGUI.editSettingsFramesTextbox
-					Local userInputValue:Int = GadgetText(TAppGUI.editSettingsFramesTextbox).ToInt()
+				Case ui.editSettingsFramesTextbox
+					Local userInputValue:Int = GadgetText(ui.editSettingsFramesTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 20 Then
-						TAppOutput.FRAMES = 20
+						output.FRAMES = 20
 					ElseIf userInputValue <= 0 Then
-						TAppOutput.FRAMES = 1
+						output.FRAMES = 1
 					Else
-						TAppOutput.FRAMES = userInputValue
+						output.FRAMES = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsFramesTextbox, TAppOutput.FRAMES)
-					TAppOutput.FOutputUpdate()
+					SetGadgetText(ui.editSettingsFramesTextbox, output.FRAMES)
+					output.OutputUpdate()
 				'Bacground Color
 				'Red
-				Case TAppGUI.editSettingsColorRTextbox
-					Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorRTextbox).ToInt()
+				Case ui.editSettingsColorRTextbox
+					Local userInputValue:Int = GadgetText(ui.editSettingsColorRTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						TAppOutput.BACKGROUND_RED = 255
+						output.BACKGROUND_RED = 255
 					ElseIf userInputValue < 0 Then
-						TAppOutput.BACKGROUND_RED = 0
+						output.BACKGROUND_RED = 0
 					Else
-						TAppOutput.BACKGROUND_RED = userInputValue
+						output.BACKGROUND_RED = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorRTextbox, TAppOutput.BACKGROUND_RED)
-					TAppOutput.FOutputUpdate()
+					SetGadgetText(ui.editSettingsColorRTextbox, output.BACKGROUND_RED)
+					output.OutputUpdate()
 				'Green
-				Case TAppGUI.editSettingsColorGTextbox
-					Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorGTextbox).ToInt()
+				Case ui.editSettingsColorGTextbox
+					Local userInputValue:Int = GadgetText(ui.editSettingsColorGTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						TAppOutput.BACKGROUND_GREEN = 255
+						output.BACKGROUND_GREEN = 255
 					ElseIf userInputValue < 0 Then
-						TAppOutput.BACKGROUND_GREEN = 0
+						output.BACKGROUND_GREEN = 0
 					Else
-						TAppOutput.BACKGROUND_GREEN = userInputValue
+						output.BACKGROUND_GREEN = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorGTextbox, TAppOutput.BACKGROUND_GREEN)
-					TAppOutput.FOutputUpdate()
+					SetGadgetText(ui.editSettingsColorGTextbox, output.BACKGROUND_GREEN)
+					output.OutputUpdate()
 				'Blue
-				Case TAppGUI.editSettingsColorBTextbox
-					Local userInputValue:Int = GadgetText(TAppGUI.editSettingsColorBTextbox).ToInt()
+				Case ui.editSettingsColorBTextbox
+					Local userInputValue:Int = GadgetText(ui.editSettingsColorBTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						TAppOutput.BACKGROUND_BLUE = 255
+						output.BACKGROUND_BLUE = 255
 					ElseIf userInputValue < 0 Then
-						TAppOutput.BACKGROUND_BLUE = 0
+						output.BACKGROUND_BLUE = 0
 					Else
-						TAppOutput.BACKGROUND_BLUE = userInputValue
+						output.BACKGROUND_BLUE = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorBTextbox, TAppOutput.BACKGROUND_BLUE)
-					TAppOutput.FOutputUpdate()
+					SetGadgetText(ui.editSettingsColorBTextbox, output.BACKGROUND_BLUE)
+					output.OutputUpdate()
 			EndSelect
 		'Quitting confirm
 		Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
