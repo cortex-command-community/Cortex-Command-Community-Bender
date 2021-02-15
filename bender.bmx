@@ -1,10 +1,13 @@
 Rem
-------- CORTEX COMMAND COMMUNITY PROJECT BENDER -----------------------------------------------------------------------
+ ██████  ██████  ██████  ████████ ███████ ██   ██      ██████  ██████  ███    ███ ███    ███  █████  ███    ██ ██████      ██████  ███████ ███    ██ ██████  ███████ ██████
+██      ██    ██ ██   ██    ██    ██       ██ ██      ██      ██    ██ ████  ████ ████  ████ ██   ██ ████   ██ ██   ██     ██   ██ ██      ████   ██ ██   ██ ██      ██   ██
+██      ██    ██ ██████     ██    █████     ███       ██      ██    ██ ██ ████ ██ ██ ████ ██ ███████ ██ ██  ██ ██   ██     ██████  █████   ██ ██  ██ ██   ██ █████   ██████
+██      ██    ██ ██   ██    ██    ██       ██ ██      ██      ██    ██ ██  ██  ██ ██  ██  ██ ██   ██ ██  ██ ██ ██   ██     ██   ██ ██      ██  ██ ██ ██   ██ ██      ██   ██
+ ██████  ██████  ██   ██    ██    ███████ ██   ██      ██████  ██████  ██      ██ ██      ██ ██   ██ ██   ████ ██████      ██████  ███████ ██   ████ ██████  ███████ ██   ██
 EndRem
 
 SuperStrict
 
-'Import dependencies into build
 Import MaxGUI.Drivers
 Import BRL.Max2D
 Import BRL.Pixmap
@@ -12,20 +15,15 @@ Import BRL.PNGLoader
 Import BRL.Stream
 Import BRL.EndianStream
 
-'Load assets
 Include "EmbeddedAssets.bmx"
 
-'Include individual types
 Include "types/user-interface.bmx"
 Include "types/editor-output.bmx"
 Include "types/file-io.bmx"
 Include "types/bitmap-index.bmx"
 
-'Version
 Global appVersion:String = "1.3.0"
-Global appVersionDate:String = "16 Feb 2020"
-
-AppTitle = "CCCP Bender v"+appVersion
+AppTitle = "CCCP Bender " + appVersion
 
 Rem
 ------- BOOT ----------------------------------------------------------------------------------------------------------
@@ -108,7 +106,7 @@ While True
 					Else
 						TAppOutput.INPUTZOOM = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsZoomTextbox,TAppOutput.INPUTZOOM)
+					SetGadgetText(TAppGUI.editSettingsZoomTextbox, TAppOutput.INPUTZOOM)
 					TAppOutput.TILESIZE = 24 * TAppOutput.INPUTZOOM
 					TAppOutput.redoLimbTiles = True
 					TAppOutput.FOutputUpdate()
@@ -123,7 +121,7 @@ While True
 					Else
 						TAppOutput.FRAMES = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsFramesTextbox,TAppOutput.FRAMES)
+					SetGadgetText(TAppGUI.editSettingsFramesTextbox, TAppOutput.FRAMES)
 					TAppOutput.FOutputUpdate()
 				'Bacground Color
 				'Red
@@ -137,7 +135,7 @@ While True
 					Else
 						TAppOutput.BACKGROUND_RED = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorRTextbox,TAppOutput.BACKGROUND_RED)
+					SetGadgetText(TAppGUI.editSettingsColorRTextbox, TAppOutput.BACKGROUND_RED)
 					TAppOutput.FOutputUpdate()
 				'Green
 				Case TAppGUI.editSettingsColorGTextbox
@@ -150,7 +148,7 @@ While True
 					Else
 						TAppOutput.BACKGROUND_GREEN = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorGTextbox,TAppOutput.BACKGROUND_GREEN)
+					SetGadgetText(TAppGUI.editSettingsColorGTextbox, TAppOutput.BACKGROUND_GREEN)
 					TAppOutput.FOutputUpdate()
 				'Blue
 				Case TAppGUI.editSettingsColorBTextbox
@@ -163,7 +161,7 @@ While True
 					Else
 						TAppOutput.BACKGROUND_BLUE = userInputValue
 					EndIf
-					SetGadgetText(TAppGUI.editSettingsColorBTextbox,TAppOutput.BACKGROUND_BLUE)
+					SetGadgetText(TAppGUI.editSettingsColorBTextbox, TAppOutput.BACKGROUND_BLUE)
 					TAppOutput.FOutputUpdate()
 			EndSelect
 		'Quitting confirm

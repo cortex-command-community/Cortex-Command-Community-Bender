@@ -22,7 +22,9 @@ Type TAppFileIO
 	
 	'Output copy for saving
 	Global tempOutputImage:TPixmap
-	Global tempOutputFrame:TPixmap[4,20] 'noice
+	Global tempOutputFrame:TPixmap[4, 20]
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Load Source Image
 	Function FLoadFile()
@@ -33,7 +35,7 @@ Type TAppFileIO
 			importedFile = oldImportedFile
 			TAppOutput.sourceImage = TAppOutput.sourceImage
 		Else
-			TAppOutput.sourceImage = LoadImage(importedFile,0)
+			TAppOutput.sourceImage = LoadImage(importedFile, 0)
 			If loadingFirstTime = True Then
 				TAppOutput.FLoadingFirstTime()
 				loadingFirstTime = False
@@ -42,6 +44,8 @@ Type TAppFileIO
 			EndIf
 		EndIf
 	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Prep Output For Saving
 	Function FPrepForSave()
@@ -58,6 +62,8 @@ Type TAppFileIO
 			EndIf
 		EndIf
 	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Function FRevertPrep()
 		prepForSave = False
@@ -65,19 +71,21 @@ Type TAppFileIO
 		runOnce = False
 		TAppOutput.FOutputUpdate()
 	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Save Output Content To File
 	Function FSaveFile()
-		exportedFile = RequestFile("Save graphic output",fileFilters,True)
+		exportedFile = RequestFile("Save graphic output", fileFilters, True)
 		'Foolproofing
 		If exportedFile = importedFile Then
-			Notify("Cannot overwrite source image!",True)
+			Notify("Cannot overwrite source image!", True)
 		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
 			'Writing new file
 			If saveAsIndexed = True
-				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage,exportedFile)
+				TBitmapIndex.FPixmapToIndexedBitmap(tempOutputImage, exportedFile)
 			Else
-	      		SavePixmapPNG(tempOutputImage,exportedFile)
+	      		SavePixmapPNG(tempOutputImage, exportedFile)
 			EndIf
 			FRevertPrep()
 		Else
@@ -85,13 +93,15 @@ Type TAppFileIO
 			FRevertPrep()
 		EndIf
 	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Save Output Content As Frames
 	Function FSaveFileAsFrames()
-		exportedFile = RequestFile("Save graphic output","",True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		exportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
 		'Foolproofing
 		If exportedFile = importedFile Then
-			Notify("Cannot overwrite source image!",True)
+			Notify("Cannot overwrite source image!", True)
 		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
 			'Writing new file
 			Local row:Int, frame:Int
@@ -107,17 +117,17 @@ Type TAppFileIO
 				ElseIf row = 3 Then
 					rowName = "LegBG"
 				EndIf
-				For frame = 0 To TAppOutput.FRAMES-1
+				For frame = 0 To TAppOutput.FRAMES - 1
 					Local exportedFileTempName:String
 					If frame < 10 Then
-						exportedFileTempName = exportedFile+rowName+"00"+frame
+						exportedFileTempName = exportedFile+rowName + "00" + frame
 					Else
-						exportedFileTempName = exportedFile+rowName+"0"+frame
+						exportedFileTempName = exportedFile+rowName + "0" + frame
 					EndIf
 					If saveAsIndexed = True
-						TBitmapIndex.FPixmapToIndexedBitmap(tempOutputFrame[row,frame],exportedFileTempName+".bmp")
+						TBitmapIndex.FPixmapToIndexedBitmap(tempOutputFrame[row, frame], exportedFileTempName + ".bmp")
 					Else
-			      		SavePixmapPNG(tempOutputFrame[row,frame],exportedFileTempName+".png")
+			      		SavePixmapPNG(tempOutputFrame[row, frame], exportedFileTempName + ".png")
 					EndIf
 				Next
 			Next
