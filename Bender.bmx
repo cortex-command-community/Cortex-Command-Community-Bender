@@ -17,10 +17,10 @@ Import BRL.EndianStream
 
 Include "EmbeddedAssets.bmx"
 
-Include "types/user-interface.bmx"
-Include "types/editor-output.bmx"
-Include "types/file-io.bmx"
-Include "types/bitmap-index.bmx"
+Include "Types/UserInterface.bmx"
+Include "Types/GraphicsOutput.bmx"
+Include "Types/FileIO.bmx"
+Include "Types/BitmapIndexer.bmx"
 
 Global appVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + appVersion
