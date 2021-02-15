@@ -80,5 +80,9 @@ Type UserInterface
 		SetGadgetText(m_SettingsColorGTextbox, GraphicsOutput.m_BackgroundGreen)
 		SetGadgetText(m_SettingsColorBTextbox, GraphicsOutput.m_BackgroundBlue)
 		SetGadgetText(m_HelpTextbox, LoadText("Incbin::Assets/TextboxHelp"))
+
+		'Initialize canvas graphics
+		SetGraphicsDriver GLMax2DDriver()
+		SetGraphics CanvasGraphics(m_Canvas)
 	EndFunction
 EndType

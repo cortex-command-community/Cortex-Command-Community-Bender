@@ -185,9 +185,6 @@ Type GraphicsOutput
 	
 	'Create output window and draw assets
 	Function OutputBoot()
-		SetGraphicsDriver GLMax2DDriver()
-		SetGraphics CanvasGraphics(UserInterface.m_Canvas)
-		'Load palette
 		BitmapIndexer.LoadPalette()
 		'Window background color
 		SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
