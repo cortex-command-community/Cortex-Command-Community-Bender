@@ -22,8 +22,8 @@ Include "Types/GraphicsOutput.bmx"
 Include "Types/FileIO.bmx"
 Include "Types/BitmapIndexer.bmx"
 
-Global appVersion:String = "1.3.0"
-AppTitle = "CCCP Bender " + appVersion
+Global g_AppVersion:String = "1.3.0"
+AppTitle = "CCCP Bender " + g_AppVersion
 
 Rem
 ------- BOOT ----------------------------------------------------------------------------------------------------------
@@ -43,18 +43,18 @@ EndRem
 While True
 	output.OutputUpdate()
 	
-	If ButtonState(ui.editSettingsIndexedCheckbox) = True Then
-		fileFilters = "Image Files:bmp"
-		io.saveAsIndexed = True
+	If ButtonState(ui.m_SettingsIndexedCheckbox) = True Then
+		g_FileFilters = "Image Files:bmp"
+		io.m_SaveAsIndexed = True
 	Else
-		fileFilters = "Image Files:png"
-		io.saveAsIndexed = False
+		g_FileFilters = "Image Files:png"
+		io.m_SaveAsIndexed = False
 	EndIf
 	
-	If ButtonState(ui.editSettingsSaveAsFramesCheckbox) = True Then
-		io.saveAsFrames = True
+	If ButtonState(ui.m_SettingsSaveAsFramesCheckbox) = True Then
+		io.m_SaveAsFrames = True
 	Else
-		io.saveAsFrames = False
+		io.m_SaveAsFrames = False
 	EndIf
 
 	'Debug stuff
@@ -66,7 +66,7 @@ While True
 	'Event Responses
 	Select EventID()
 		Case EVENT_APPRESUME
-			ActivateWindow(ui.editWindow)
+			ActivateWindow(ui.m_Window)
 			output.OutputUpdate()
 		Case EVENT_WINDOWACTIVATE
 			output.OutputUpdate()
@@ -74,100 +74,100 @@ While True
 			output.OutputUpdate()
 		Case EVENT_MENUACTION
 			Select EventData()
-				Case ui.ABOUT_MENU
+				Case ui.c_AboutMenuTag
 					Notify(LoadText("Incbin::Assets/TextboxAbout"),False)
 			EndSelect
 		Case EVENT_GADGETACTION
 			Select EventSource()
 				'Quitting confirm
-				Case ui.editQuitButton
-					quitResult = Confirm("Quit program?")
+				Case ui.m_QuitButton
+					g_QuitResult = Confirm("Quit program?")
 				'Loading
-				Case ui.editLoadButton
+				Case ui.m_LoadButton
 					io.LoadFile()
 					output.OutputUpdate()
 				'Saving
-				Case ui.editSaveButton
-					If output.sourceImage <> Null Then
-						io.prepForSave = True
+				Case ui.m_SaveButton
+					If output.m_SourceImage <> Null Then
+						io.m_PrepForSave = True
 						output.OutputUpdate()
 					Else
 						Notify("Nothing to save!",False)
 					EndIf
 				'Settings textbox inputs
 				'Scale
-				Case ui.editSettingsZoomTextbox
-					Local userInputValue:Int = GadgetText(ui.editSettingsZoomTextbox).ToInt()	
+				Case ui.m_SettingsZoomTextbox
+					Local userInputValue:Int = GadgetText(ui.m_SettingsZoomTextbox).ToInt()	
 					'Foolproofing
 					If userInputValue > 4 Then
-						output.INPUTZOOM = 4
+						output.m_InputZoom = 4
 					ElseIf userInputValue <= 0 Then
-						output.INPUTZOOM = 1
+						output.m_InputZoom = 1
 					Else
-						output.INPUTZOOM = userInputValue
+						output.m_InputZoom = userInputValue
 					EndIf
-					SetGadgetText(ui.editSettingsZoomTextbox, output.INPUTZOOM)
-					output.TILESIZE = 24 * output.INPUTZOOM
-					output.redoLimbTiles = True
+					SetGadgetText(ui.m_SettingsZoomTextbox, output.m_InputZoom)
+					output.m_TileSize = 24 * output.m_InputZoom
+					output.m_RedoLimbTiles = True
 					output.OutputUpdate()
 				'Frames
-				Case ui.editSettingsFramesTextbox
-					Local userInputValue:Int = GadgetText(ui.editSettingsFramesTextbox).ToInt()
+				Case ui.m_SettingsFramesTextbox
+					Local userInputValue:Int = GadgetText(ui.m_SettingsFramesTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 20 Then
-						output.FRAMES = 20
+						output.m_Frames = 20
 					ElseIf userInputValue <= 0 Then
-						output.FRAMES = 1
+						output.m_Frames = 1
 					Else
-						output.FRAMES = userInputValue
+						output.m_Frames = userInputValue
 					EndIf
-					SetGadgetText(ui.editSettingsFramesTextbox, output.FRAMES)
+					SetGadgetText(ui.m_SettingsFramesTextbox, output.m_Frames)
 					output.OutputUpdate()
 				'Bacground Color
 				'Red
-				Case ui.editSettingsColorRTextbox
-					Local userInputValue:Int = GadgetText(ui.editSettingsColorRTextbox).ToInt()
+				Case ui.m_SettingsColorRTextbox
+					Local userInputValue:Int = GadgetText(ui.m_SettingsColorRTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						output.BACKGROUND_RED = 255
+						output.m_BackgroundRed = 255
 					ElseIf userInputValue < 0 Then
-						output.BACKGROUND_RED = 0
+						output.m_BackgroundRed = 0
 					Else
-						output.BACKGROUND_RED = userInputValue
+						output.m_BackgroundRed = userInputValue
 					EndIf
-					SetGadgetText(ui.editSettingsColorRTextbox, output.BACKGROUND_RED)
+					SetGadgetText(ui.m_SettingsColorRTextbox, output.m_BackgroundRed)
 					output.OutputUpdate()
 				'Green
-				Case ui.editSettingsColorGTextbox
-					Local userInputValue:Int = GadgetText(ui.editSettingsColorGTextbox).ToInt()
+				Case ui.m_SettingsColorGTextbox
+					Local userInputValue:Int = GadgetText(ui.m_SettingsColorGTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						output.BACKGROUND_GREEN = 255
+						output.m_BackgroundGreen = 255
 					ElseIf userInputValue < 0 Then
-						output.BACKGROUND_GREEN = 0
+						output.m_BackgroundGreen = 0
 					Else
-						output.BACKGROUND_GREEN = userInputValue
+						output.m_BackgroundGreen = userInputValue
 					EndIf
-					SetGadgetText(ui.editSettingsColorGTextbox, output.BACKGROUND_GREEN)
+					SetGadgetText(ui.m_SettingsColorGTextbox, output.m_BackgroundGreen)
 					output.OutputUpdate()
 				'Blue
-				Case ui.editSettingsColorBTextbox
-					Local userInputValue:Int = GadgetText(ui.editSettingsColorBTextbox).ToInt()
+				Case ui.m_SettingsColorBTextbox
+					Local userInputValue:Int = GadgetText(ui.m_SettingsColorBTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 255 Then
-						output.BACKGROUND_BLUE = 255
+						output.m_BackgroundBlue = 255
 					ElseIf userInputValue < 0 Then
-						output.BACKGROUND_BLUE = 0
+						output.m_BackgroundBlue = 0
 					Else
-						output.BACKGROUND_BLUE = userInputValue
+						output.m_BackgroundBlue = userInputValue
 					EndIf
-					SetGadgetText(ui.editSettingsColorBTextbox, output.BACKGROUND_BLUE)
+					SetGadgetText(ui.m_SettingsColorBTextbox, output.m_BackgroundBlue)
 					output.OutputUpdate()
 			EndSelect
 		'Quitting confirm
 		Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-			quitResult = Confirm("Quit program?")
+			g_QuitResult = Confirm("Quit program?")
 	EndSelect
 	'Quitting
-	If quitResult Then Exit
+	If g_QuitResult Then Exit
 EndWhile

@@ -3,44 +3,44 @@ Rem
 EndRem
 
 'Filepaths
-Global importedFile:String = Null
-Global exportedFile:String = Null
+Global g_ImportedFile:String = Null
+Global g_ExportedFile:String = Null
 
 'File Filters
-Global fileFilters:String
+Global g_FileFilters:String
 
 Type FileIO
 	'Load Bools
-	Global loadingFirstTime:Int = True
+	Global m_LoadingFirstTime:Int = True
 		
 	'Save Bools
-	Global saveAsIndexed:Int = False
-	Global saveAsFrames:Int = False
-	Global prepForSave:Int = False
-	Global rdyForSave:Int = False
-	Global runOnce:Int = False
+	Global m_SaveAsIndexed:Int = False
+	Global m_SaveAsFrames:Int = False
+	Global m_PrepForSave:Int = False
+	Global m_ReadyForSave:Int = False
+	Global m_RunOnce:Int = False
 	
 	'Output copy for saving
-	Global tempOutputImage:TPixmap
-	Global tempOutputFrame:TPixmap[4, 20]
+	Global m_TempOutputImageCopy:TPixmap
+	Global m_TempOutputFrameCopy:TPixmap[4, 20]
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	'Load Source Image
 	Function LoadFile()
-		Local oldImportedFile:String = importedFile
-		importedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
+		Local oldImportedFile:String = g_ImportedFile
+		g_ImportedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
 		'Foolproofing
-		If importedFile = Null Then
-			importedFile = oldImportedFile
-			GraphicsOutput.sourceImage = GraphicsOutput.sourceImage
+		If g_ImportedFile = Null Then
+			g_ImportedFile = oldImportedFile
+			GraphicsOutput.m_SourceImage = GraphicsOutput.m_SourceImage
 		Else
-			GraphicsOutput.sourceImage = LoadImage(importedFile, 0)
-			If loadingFirstTime = True Then
+			GraphicsOutput.m_SourceImage = LoadImage(g_ImportedFile, 0)
+			If m_LoadingFirstTime = True Then
 				GraphicsOutput.LoadingFirstTime()
-				loadingFirstTime = False
+				m_LoadingFirstTime = False
 			Else
-				GraphicsOutput.redoLimbTiles = True
+				GraphicsOutput.m_RedoLimbTiles = True
 			EndIf
 		EndIf
 	EndFunction
@@ -49,12 +49,12 @@ Type FileIO
 	
 	'Prep Output For Saving
 	Function PrepForSave()
-		If prepForSave Then
-			If Not runOnce Then
-				runOnce = True
+		If m_PrepForSave Then
+			If Not m_RunOnce Then
+				m_RunOnce = True
 				GraphicsOutput.OutputUpdate()
 			Else
-				If Not saveAsFrames Then
+				If Not m_SaveAsFrames Then
 					SaveFile()
 				Else
 					SaveFileAsFrames()
@@ -66,9 +66,9 @@ Type FileIO
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	Function RevertPrep()
-		prepForSave = False
-		rdyForSave = False
-		runOnce = False
+		m_PrepForSave = False
+		m_ReadyForSave = False
+		m_RunOnce = False
 		GraphicsOutput.OutputUpdate()
 	EndFunction
 
@@ -76,16 +76,16 @@ Type FileIO
 	
 	'Save Output Content To File
 	Function SaveFile()
-		exportedFile = RequestFile("Save graphic output", fileFilters, True)
+		g_ExportedFile = RequestFile("Save graphic output", g_FileFilters, True)
 		'Foolproofing
-		If exportedFile = importedFile Then
+		If g_ExportedFile = g_ImportedFile Then
 			Notify("Cannot overwrite source image!", True)
-		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
+		ElseIf g_ExportedFile <> g_ImportedFile And g_ExportedFile <> Null Then
 			'Writing new file
-			If saveAsIndexed = True
-				BitmapIndexer.PixmapToIndexedBitmap(tempOutputImage, exportedFile)
+			If m_SaveAsIndexed = True
+				BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputImageCopy, g_ExportedFile)
 			Else
-	      		SavePixmapPNG(tempOutputImage, exportedFile)
+	      		SavePixmapPNG(m_TempOutputImageCopy, g_ExportedFile)
 			EndIf
 			RevertPrep()
 		Else
@@ -98,11 +98,11 @@ Type FileIO
 	
 	'Save Output Content As Frames
 	Function SaveFileAsFrames()
-		exportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		g_ExportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
 		'Foolproofing
-		If exportedFile = importedFile Then
+		If g_ExportedFile = g_ImportedFile Then
 			Notify("Cannot overwrite source image!", True)
-		ElseIf exportedFile <> importedFile And exportedFile <> Null Then
+		ElseIf g_ExportedFile <> g_ImportedFile And g_ExportedFile <> Null Then
 			'Writing new file
 			Local row:Int, frame:Int
 			For row = 0 To 3
@@ -117,17 +117,17 @@ Type FileIO
 				ElseIf row = 3 Then
 					rowName = "LegBG"
 				EndIf
-				For frame = 0 To GraphicsOutput.FRAMES - 1
+				For frame = 0 To GraphicsOutput.m_Frames - 1
 					Local exportedFileTempName:String
 					If frame < 10 Then
-						exportedFileTempName = exportedFile+rowName + "00" + frame
+						exportedFileTempName = g_ExportedFile+rowName + "00" + frame
 					Else
-						exportedFileTempName = exportedFile+rowName + "0" + frame
+						exportedFileTempName = g_ExportedFile+rowName + "0" + frame
 					EndIf
-					If saveAsIndexed = True
-						BitmapIndexer.PixmapToIndexedBitmap(tempOutputFrame[row, frame], exportedFileTempName + ".bmp")
+					If m_SaveAsIndexed = True
+						BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp")
 					Else
-			      		SavePixmapPNG(tempOutputFrame[row, frame], exportedFileTempName + ".png")
+			      		SavePixmapPNG(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".png")
 					EndIf
 				Next
 			Next
