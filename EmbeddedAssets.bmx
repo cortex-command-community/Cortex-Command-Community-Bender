@@ -2,5 +2,5 @@
 Incbin "Assets/Logo"
 Incbin "Assets/Palette"
 Incbin "Assets/Tile"
-Incbin "Assets/TextboxAbout"
-Incbin "Assets/TextboxHelp"
+Incbin "Assets/TextAbout"
+Incbin "Assets/TextHelp"

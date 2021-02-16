@@ -13,8 +13,11 @@ Type UserInterface
 
 	'Title bar buttons
 	Global m_HelpMenu:TGadget
+	Global m_HelpMenuText:String = LoadText("Incbin::Assets/TextHelp")
 	Const c_HelpMenuTag:Int = 100
+
 	Global m_AboutMenu:TGadget
+	Global m_AboutMenuText:String = LoadText("Incbin::Assets/TextAbout")
 	Const c_AboutMenuTag:Int = 101
 
 	Global m_ButtonPanel:TGadget
@@ -134,9 +137,9 @@ Type UserInterface
 			Case EVENT_MENUACTION
 				Select EventData()
 					Case c_HelpMenuTag
-						Notify(LoadText("Incbin::Assets/TextboxHelp"), False)
+						Notify(m_HelpMenuText, False)
 					Case c_AboutMenuTag
-						Notify(LoadText("Incbin::Assets/TextboxAbout"), False)
+						Notify(m_AboutMenuText, False)
 				EndSelect
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				m_QuitResult = Confirm("Quit program?")
