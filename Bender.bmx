@@ -66,6 +66,9 @@ While True
 	PollEvent
 	'Event Responses
 	Select EventID()
+		Case EVENT_WINDOWSIZE
+			ui.ProcessWindowResize()
+			output.OutputUpdate()
 		Case EVENT_APPRESUME
 			ActivateWindow(ui.m_MainWindow)
 			output.OutputUpdate()
