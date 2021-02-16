@@ -26,9 +26,7 @@ Include "Types/BitmapIndexer.bmx"
 Global g_AppVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + g_AppVersion
 
-Rem
-------- BOOT ----------------------------------------------------------------------------------------------------------
-EndRem
+'//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Local ui:UserInterface = New UserInterface
 Local output:GraphicsOutput = New GraphicsOutput
@@ -38,9 +36,7 @@ ui.InitializeUserInterface(output.m_InputZoom, output.m_Frames, output.m_Backgro
 output.OutputBoot()
 indexer.LoadPalette()
 
-Rem
-------- EVENT HANDLING ------------------------------------------------------------------------------------------------
-EndRem
+'//// EVENT HANDLING ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
 	output.OutputUpdate()
