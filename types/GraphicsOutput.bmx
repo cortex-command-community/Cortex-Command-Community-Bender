@@ -4,6 +4,12 @@ Type GraphicsOutput
 	'Draw Bools
 	Global m_RedoLimbTiles:Int = False
 	'Constants
+	Const c_MinZoom:Int = 1
+	Const c_MaxZoom:Int = 4
+	Const c_MinFrameCount:Int = 1
+	Const c_MaxFrameCount:Int = 20
+	Const c_MinBGColorValue:Int = 0
+	Const c_MaxBGColorValue:Int = 255
 	Const c_Bones:Int = 8
 	Const c_Limbs:Int = c_Bones / 2
 	Const c_UpperBone:Int = 0

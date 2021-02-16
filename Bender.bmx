@@ -17,7 +17,7 @@ Import BRL.EndianStream
 Import BRL.Vector
 
 Include "EmbeddedAssets.bmx"
-
+Include "Types/Utility.bmx"
 Include "Types/UserInterface.bmx"
 Include "Types/GraphicsOutput.bmx"
 Include "Types/FileIO.bmx"
@@ -88,70 +88,35 @@ While True
 				'Settings textbox inputs
 				'Scale
 				Case ui.m_SettingsZoomTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsZoomTextbox).ToInt()
-					'Foolproofing
-					If userInputValue > 4 Then
-						output.m_InputZoom = 4
-					ElseIf userInputValue <= 0 Then
-						output.m_InputZoom = 1
-					Else
-						output.m_InputZoom = userInputValue
-					EndIf
+					output.m_InputZoom = Utility.Clamp(GadgetText(ui.m_SettingsZoomTextbox).ToInt(), output.c_MinZoom, output.c_MaxZoom)
+
 					SetGadgetText(ui.m_SettingsZoomTextbox, output.m_InputZoom)
 					output.m_TileSize = 24 * output.m_InputZoom
 					output.m_RedoLimbTiles = True
 					output.OutputUpdate()
 				'Frames
 				Case ui.m_SettingsFramesTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsFramesTextbox).ToInt()
-					'Foolproofing
-					If userInputValue > 20 Then
-						output.m_Frames = 20
-					ElseIf userInputValue <= 0 Then
-						output.m_Frames = 1
-					Else
-						output.m_Frames = userInputValue
-					EndIf
+					output.m_Frames = Utility.Clamp(GadgetText(ui.m_SettingsFramesTextbox).ToInt(), output.c_MinFrameCount, output.c_MaxFrameCount)
+
 					SetGadgetText(ui.m_SettingsFramesTextbox, output.m_Frames)
 					output.OutputUpdate()
 				'Bacground Color
 				'Red
 				Case ui.m_SettingsColorRTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsColorRTextbox).ToInt()
-					'Foolproofing
-					If userInputValue > 255 Then
-						output.m_BackgroundRed = 255
-					ElseIf userInputValue < 0 Then
-						output.m_BackgroundRed = 0
-					Else
-						output.m_BackgroundRed = userInputValue
-					EndIf
+					output.m_BackgroundRed = Utility.Clamp(GadgetText(ui.m_SettingsColorRTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+
 					SetGadgetText(ui.m_SettingsColorRTextbox, output.m_BackgroundRed)
 					output.OutputUpdate()
 				'Green
 				Case ui.m_SettingsColorGTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsColorGTextbox).ToInt()
-					'Foolproofing
-					If userInputValue > 255 Then
-						output.m_BackgroundGreen = 255
-					ElseIf userInputValue < 0 Then
-						output.m_BackgroundGreen = 0
-					Else
-						output.m_BackgroundGreen = userInputValue
-					EndIf
+					output.m_BackgroundGreen = Utility.Clamp(GadgetText(ui.m_SettingsColorGTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+
 					SetGadgetText(ui.m_SettingsColorGTextbox, output.m_BackgroundGreen)
 					output.OutputUpdate()
 				'Blue
 				Case ui.m_SettingsColorBTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsColorBTextbox).ToInt()
-					'Foolproofing
-					If userInputValue > 255 Then
-						output.m_BackgroundBlue = 255
-					ElseIf userInputValue < 0 Then
-						output.m_BackgroundBlue = 0
-					Else
-						output.m_BackgroundBlue = userInputValue
-					EndIf
+					output.m_BackgroundBlue = Utility.Clamp(GadgetText(ui.m_SettingsColorBTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+
 					SetGadgetText(ui.m_SettingsColorBTextbox, output.m_BackgroundBlue)
 					output.OutputUpdate()
 			EndSelect
