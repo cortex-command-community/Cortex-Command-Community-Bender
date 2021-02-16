@@ -10,13 +10,11 @@ Type GraphicsOutput
 	Const c_MaxFrameCount:Int = 20
 	Const c_MinBGColorValue:Int = 0
 	Const c_MaxBGColorValue:Int = 255
-	Const c_Bones:Int = 8
-	Const c_Limbs:Int = c_Bones / 2
-	Const c_UpperBone:Int = 0
-	Const c_LowerBone:Int = 1
+	Const c_BoneCount:Int = 8
+	Const c_LimbCount:Int = c_BoneCount / 2
 	'Graphic Assets
 	Global m_SourceImage:TImage
-	Global m_BoneImage:TImage[c_Bones]
+	Global m_BoneImage:TImage[c_BoneCount]
 	'Output Settings
 	Global m_InputZoom:Int = 1
 	Global m_Frames:Int = 7
@@ -24,14 +22,14 @@ Type GraphicsOutput
 	Global m_BackgroundGreen:Int = 170
 	Global m_BackgroundBlue:Int = 255
 	'Limb Parts
-	Global m_JointX:Float[c_Bones]
-	Global m_JointY:Float[c_Bones]
-	Global m_BoneLength:Float[c_Bones]
+	Global m_JointX:Float[c_BoneCount]
+	Global m_JointY:Float[c_BoneCount]
+	Global m_BoneLength:Float[c_BoneCount]
 	'Precalc for drawing
 	Global m_TileSize:Int = 24
-	Global m_BoneAngle:Int[c_Bones, 20]
-	Global m_BoneX:Int[c_Bones, 20]
-	Global m_BoneY:Int[c_Bones, 20]
+	Global m_BoneAngle:Int[c_BoneCount, 20]
+	Global m_BoneX:Int[c_BoneCount, 20]
+	Global m_BoneY:Int[c_BoneCount, 20]
 	'Variables
 	Global m_AngleA:Float
 	Global m_AngleB:Float
@@ -51,14 +49,14 @@ Type GraphicsOutput
 	'Create limb part tiles from source image
 	Function CreateLimbTiles()
 		Local b:Int, i:Int
-		For b = 0 To c_Bones-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
+		For b = 0 To c_BoneCount-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
 			m_BoneImage[b] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
 			GrabImage(m_BoneImage[b], b * m_TileSize, 0)
 			SetColor(120, 0, 120)
 			DrawLine(i * m_TileSize, 0, i * m_TileSize, m_TileSize - 1, True)
 		Next
 		'Set up default bone sizes
-		For i = 0 To c_Bones - 1
+		For i = 0 To c_BoneCount - 1
 			m_JointX[i] = m_TileSize / 2
 			m_JointY[i] = m_TileSize / 3.3 '3.6
 			m_BoneLength[i] = (m_TileSize / 2 - m_JointY[i]) * 2
@@ -72,7 +70,7 @@ Type GraphicsOutput
 	Function SetJointMarker()
 		Local xm:Int = MouseX()
 		Local ym:Int = MouseY()
-		If ym < (m_TileSize / 2 - 2) And ym > 0 And xm > 0 And xm < m_TileSize * c_Bones Then
+		If ym < (m_TileSize / 2 - 2) And ym > 0 And xm > 0 And xm < m_TileSize * c_BoneCount Then
 			Local b:Int = xm / m_TileSize
 			m_JointX[b] = m_TileSize / 2 		'X is always at center, so kinda pointless to even bother - at the moment
 			m_JointY[b] = ym				'Determines length
@@ -89,7 +87,7 @@ Type GraphicsOutput
 		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider)
 		Local stepSize:Float = (maxExtend - minExtend) / (m_Frames - 1) ' -1 to make inclusive of last value (full range)
 		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float
-		For l = 0 To c_Limbs - 1
+		For l = 0 To c_LimbCount - 1
 			For f = 0 To m_Frames - 1
 				b = l * 2
 				x = (f * 32) + 80 						'Drawing position X
@@ -150,7 +148,7 @@ Type GraphicsOutput
 				CreateLimbTiles()
 				m_RedoLimbTiles = False
 			EndIf
-			For i = 0 To c_Bones - 1
+			For i = 0 To c_BoneCount - 1
 				'Draw limb tile dividers
 				SetColor(120, 0, 120)
 				DrawLine(i * m_TileSize, 0, i * m_TileSize, m_TileSize - 1, True)
