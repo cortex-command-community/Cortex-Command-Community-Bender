@@ -14,6 +14,7 @@ Import BRL.Pixmap
 Import BRL.PNGLoader
 Import BRL.Stream
 Import BRL.EndianStream
+Import BRL.Vector
 
 Include "EmbeddedAssets.bmx"
 
@@ -33,7 +34,7 @@ Local ui:UserInterface = New UserInterface
 Local output:GraphicsOutput = New GraphicsOutput
 Local io:FileIO = New FileIO
 Local indexer:BitmapIndexer = New BitmapIndexer
-ui.InitializeWindow()
+ui.InitializeUserInterface(output.m_InputZoom, output.m_Frames, output.m_BackgroundRed, output.m_BackgroundGreen, output.m_BackgroundBlue)
 output.OutputBoot()
 
 Rem
@@ -66,7 +67,7 @@ While True
 	'Event Responses
 	Select EventID()
 		Case EVENT_APPRESUME
-			ActivateWindow(ui.m_Window)
+			ActivateWindow(ui.m_MainWindow)
 			output.OutputUpdate()
 		Case EVENT_WINDOWACTIVATE
 			output.OutputUpdate()
@@ -74,14 +75,13 @@ While True
 			output.OutputUpdate()
 		Case EVENT_MENUACTION
 			Select EventData()
+				Case ui.c_HelpMenuTag
+					Notify(LoadText("Incbin::Assets/TextboxHelp"), False)
 				Case ui.c_AboutMenuTag
-					Notify(LoadText("Incbin::Assets/TextboxAbout"),False)
+					Notify(LoadText("Incbin::Assets/TextboxAbout"), False)
 			EndSelect
 		Case EVENT_GADGETACTION
 			Select EventSource()
-				'Quitting confirm
-				Case ui.m_QuitButton
-					g_QuitResult = Confirm("Quit program?")
 				'Loading
 				Case ui.m_LoadButton
 					io.LoadFile()
