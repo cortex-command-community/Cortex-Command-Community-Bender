@@ -74,7 +74,7 @@ Type FileIO
 		ElseIf g_ExportedFile <> g_ImportedFile And g_ExportedFile <> Null Then
 			'Writing new file
 			If m_SaveAsIndexed = True
-				BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputImageCopy, g_ExportedFile)
+				g_BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputImageCopy, g_ExportedFile)
 			Else
 	      		SavePixmapPNG(m_TempOutputImageCopy, g_ExportedFile)
 			EndIf
@@ -116,7 +116,7 @@ Type FileIO
 						exportedFileTempName = g_ExportedFile+rowName + "0" + frame
 					EndIf
 					If m_SaveAsIndexed = True
-						BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp")
+						g_BitmapIndexer.PixmapToIndexedBitmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp")
 					Else
 			      		SavePixmapPNG(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".png")
 					EndIf

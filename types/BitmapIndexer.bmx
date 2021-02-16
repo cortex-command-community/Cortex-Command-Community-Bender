@@ -1,34 +1,30 @@
 '//// BITMAP INDEXER ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type BitmapIndexer
-	'Color Value Bytes
-	Global m_PalR:Byte[256]
-	Global m_PalG:Byte[256]
-	Global m_PalB:Byte[256]
-
-	'Data Streams
-	Global m_DataStream:TStream
+	Field m_PalR:Byte[256]
+	Field m_PalG:Byte[256]
+	Field m_PalB:Byte[256]
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Load color table file
-	Function LoadPalette()
-		Local index:Int
-		If IncbinLen("Assets/Palette") = 768
+	Method LoadPalette()
+		If IncbinLen("Assets/Palette") <> 768
+			Notify("Palette file size is incorrect! File was not loaded!", False)
+		Else
 			Local paletteStream:TStream = ReadFile("Incbin::Assets/Palette")
-			For index = 0 To 255
+			For Local index:Int = 0 To 255
 				m_PalR[index] = ReadByte(paletteStream)
 				m_PalG[index] = ReadByte(paletteStream)
 				m_PalB[index] = ReadByte(paletteStream)
 			Next
 			CloseStream paletteStream
 		EndIf
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	'Indexed Bitmap File Writer
-	Function PixmapToIndexedBitmap(image:TPixmap, filename:String)
+	Method PixmapToIndexedBitmap(image:TPixmap, filename:String)
 		'Foolproofing
 		If filename = "" Then
 			FileIO.RevertPrep()
@@ -49,36 +45,36 @@ Type BitmapIndexer
 			bmpSizeTotalM4 = ((bmpSizeTotal + 3) / 4) * 4
 
 			'Begin writing BMP file manually
-			m_DataStream = WriteFile(filename)
+			Local outputStream:TStream = WriteFile(filename)
 
 	'------ Bitmap File Header
 			'Data is stored in little-endian format (least-significant byte first)
-			m_DataStream = LittleEndianStream(m_DataStream)
+			outputStream = LittleEndianStream(outputStream)
 
-			WriteShort(m_DataStream, 19778)			'File ID (2 bytes (short)) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
-			WriteInt(m_DataStream, bmpSizeTotalM4)	'File Size (4 bytes (signed int))
-			WriteInt(m_DataStream, 0)					'Reserved (4 bytes)
-			WriteInt(m_DataStream, 1078)				'Pixel Array Offset (4 bytes) - pixel array starts at 1078th byte (14 bytes Header + 40 bytes DIB + 1024 (256 * 4) bytes Color Table)
+			WriteShort(outputStream, 19778)				'File ID (2 bytes (short)) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
+			WriteInt(outputStream, bmpSizeTotalM4)		'File Size (4 bytes (signed int))
+			WriteInt(outputStream, 0)					'Reserved (4 bytes)
+			WriteInt(outputStream, 1078)				'Pixel Array Offset (4 bytes) - pixel array starts at 1078th byte (14 bytes Header + 40 bytes DIB + 1024 (256 * 4) bytes Color Table)
 
 	'------ DIB Header (File Info)
-			WriteInt(m_DataStream, 40)				'DIB Header Size (4 bytes) - 40 bytes
-			WriteInt(m_DataStream, bmpWidth)			'Bitmap Width (4 bytes)
-			WriteInt(m_DataStream, bmpHeight)			'Bitmap Height (4 bytes)
-			WriteShort(m_DataStream, 1)				'Color Planes (2 bytes) - Must be 1
-			WriteShort(m_DataStream, 8)				'Color Depth (2 bytes) - Bits Per Pixel
-			WriteInt(m_DataStream, 0)					'Compression Method (4 bytes) - 0 equals BI_RGB (no compression)
-			WriteInt(m_DataStream, bmpSizeTotalM4)	'Size of the raw bitmap data (4 bytes) - 0 can be given for BI_RGB bitmaps
-			WriteInt(m_DataStream, 2835)				'Horizontal resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
-			WriteInt(m_DataStream, 2835)				'Vertical resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
-			WriteInt(m_DataStream, 256)				'Number of colors in the color palette (4 bytes)
-			WriteInt(m_DataStream, 0)					'Number of important colors (4 bytes) - 0 when every color is important
+			WriteInt(outputStream, 40)					'DIB Header Size (4 bytes) - 40 bytes
+			WriteInt(outputStream, bmpWidth)			'Bitmap Width (4 bytes)
+			WriteInt(outputStream, bmpHeight)			'Bitmap Height (4 bytes)
+			WriteShort(outputStream, 1)					'Color Planes (2 bytes) - Must be 1
+			WriteShort(outputStream, 8)					'Color Depth (2 bytes) - Bits Per Pixel
+			WriteInt(outputStream, 0)					'Compression Method (4 bytes) - 0 equals BI_RGB (no compression)
+			WriteInt(outputStream, bmpSizeTotalM4)		'Size of the raw bitmap data (4 bytes) - 0 can be given for BI_RGB bitmaps
+			WriteInt(outputStream, 2835)				'Horizontal resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
+			WriteInt(outputStream, 2835)				'Vertical resolution of the image (4 bytes) - Pixels Per Metre (2835 PPM equals 72.009 DPI/PPI)
+			WriteInt(outputStream, 256)					'Number of colors in the color palette (4 bytes)
+			WriteInt(outputStream, 0)					'Number of important colors (4 bytes) - 0 when every color is important
 
 	'------ Color Table
 			For paletteIndex = 0 To 255
-				WriteByte(m_DataStream, m_PalB[paletteIndex])	'Blue (1 byte)
-				WriteByte(m_DataStream, m_PalG[paletteIndex])	'Green (1 byte)
-				WriteByte(m_DataStream, m_PalR[paletteIndex])	'Red (1 byte)
-				WriteByte(m_DataStream, 0)					'Reserved (1 byte) - Alpha channel, irrelevant for indexed bitmaps
+				WriteByte(outputStream, m_PalB[paletteIndex])	'Blue (1 byte)
+				WriteByte(outputStream, m_PalG[paletteIndex])	'Green (1 byte)
+				WriteByte(outputStream, m_PalR[paletteIndex])	'Red (1 byte)
+				WriteByte(outputStream, 0)						'Reserved (1 byte) - Alpha channel, irrelevant for indexed bitmaps
 
 				Rem
 				Color Table is 4 bytes (ARGB) times the amount of colors in the palette
@@ -98,7 +94,7 @@ Type BitmapIndexer
 						pixelData = ReadPixel(image, px, py)
 						'skip diffing magenta
 						If pixelData = 16711935 Then
-							WriteByte(m_DataStream, 1)
+							WriteByte(outputStream, 1)
 						Else
 							'Check all color indexes for best match by pythagora
 							Local R:Int, G:Int, B:Int
@@ -119,18 +115,18 @@ Type BitmapIndexer
 								EndIf
 							Next
 						EndIf
-						WriteByte(m_DataStream, bestIndex)
+						WriteByte(outputStream, bestIndex)
 					Else
-						WriteByte(m_DataStream, 0) 'line padding
+						WriteByte(outputStream, 0) 'line padding
 					EndIf
 				Next
 			Next
 			'eof padding
 			For paletteIndex = 1 To bmpSizeTotalM4 - bmpSizeTotal
-				WriteByte(m_DataStream, 0)
+				WriteByte(outputStream, 0)
 			Next
 			'Writing file finished, close stream
-			CloseStream(m_DataStream)
+			CloseStream(outputStream)
 		EndIf
-	EndFunction
+	EndMethod
 EndType
