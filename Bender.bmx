@@ -65,25 +65,16 @@ While True
 	'Print "mouse position in canvas: x = " + MouseX() + " y = " + MouseY()
 
 	PollEvent
+	Local eventID:Int = EventID()
+
 	'Event Responses
-	Select EventID()
-		Case EVENT_WINDOWSIZE
-			ui.ProcessWindowResize()
-			output.OutputUpdate()
-		Case EVENT_APPRESUME
-			ActivateWindow(ui.m_MainWindow)
-			output.OutputUpdate()
+	ui.HandleEvents(eventID)
+
+	Select eventID
 		Case EVENT_WINDOWACTIVATE
 			output.OutputUpdate()
 		Case EVENT_GADGETLOSTFOCUS
 			output.OutputUpdate()
-		Case EVENT_MENUACTION
-			Select EventData()
-				Case ui.c_HelpMenuTag
-					Notify(LoadText("Incbin::Assets/TextboxHelp"), False)
-				Case ui.c_AboutMenuTag
-					Notify(LoadText("Incbin::Assets/TextboxAbout"), False)
-			EndSelect
 		Case EVENT_GADGETACTION
 			Select EventSource()
 				'Loading
@@ -168,10 +159,5 @@ While True
 					SetGadgetText(ui.m_SettingsColorBTextbox, output.m_BackgroundBlue)
 					output.OutputUpdate()
 			EndSelect
-		'Quitting confirm
-		Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-			g_QuitResult = Confirm("Quit program?")
 	EndSelect
-	'Quitting
-	If g_QuitResult Then Exit
 EndWhile

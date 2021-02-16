@@ -2,9 +2,6 @@ Rem
 ------- GUI ELEMENTS --------------------------------------------------------------------------------------------------
 EndRem
 
-'Bool For Quitting
-Global g_QuitResult:Int = False
-
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type UserInterface
@@ -54,6 +51,9 @@ Type UserInterface
 
 	Global m_SettingsSaveAsFramesLabel:TGadget
 	Global m_SettingsSaveAsFramesCheckbox:TGadget
+
+	'Bool For Quitting
+	Global m_QuitResult:Int = False
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,5 +125,27 @@ Type UserInterface
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], GadgetWidth(m_MainWindow), m_CanvasGraphicsAnchor[1], GadgetHeight(m_MainWindow))
 		SetGraphicsDriver GLMax2DDriver()
 		SetGraphics CanvasGraphics(m_CanvasGraphics)
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function HandleEvents(eventID:Int)
+		Select eventID
+			Case EVENT_APPRESUME
+				ActivateWindow(m_MainWindow)
+			Case EVENT_WINDOWSIZE
+				ProcessWindowResize()
+			Case EVENT_MENUACTION
+				Select EventData()
+					Case c_HelpMenuTag
+						Notify(LoadText("Incbin::Assets/TextboxHelp"), False)
+					Case c_AboutMenuTag
+						Notify(LoadText("Incbin::Assets/TextboxAbout"), False)
+				EndSelect
+			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
+				m_QuitResult = Confirm("Quit program?")
+		EndSelect
+
+		If m_QuitResult Then End
 	EndFunction
 EndType
