@@ -23,34 +23,40 @@ Include "Types/GraphicsOutput.bmx"
 Include "Types/FileIO.bmx"
 Include "Types/BitmapIndexer.bmx"
 
+'//// GLOBAL VARIABLES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Global g_AppVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + g_AppVersion
 
+Global g_ImportedFile:String = Null
+Global g_ExportedFile:String = Null
+Global g_FileFilters:String
+
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Local ui:UserInterface = New UserInterface
-Local output:GraphicsOutput = New GraphicsOutput
-Local io:FileIO = New FileIO
-Local indexer:BitmapIndexer = New BitmapIndexer
-ui.InitializeUserInterface(output.m_InputZoom, output.m_Frames, output.m_BackgroundRed, output.m_BackgroundGreen, output.m_BackgroundBlue)
-output.OutputBoot()
-indexer.LoadPalette()
+Global g_UserInterface:UserInterface = New UserInterface
+Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput
+Global g_FileIO:FileIO = New FileIO
+Global g_BitmapIndexer:BitmapIndexer = New BitmapIndexer
+g_UserInterface.InitializeUserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
+g_GraphicsOutput.OutputBoot()
+g_BitmapIndexer.LoadPalette()
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
-	If ButtonState(ui.m_SettingsIndexedCheckbox) = True Then
+	If ButtonState(g_UserInterface.m_SettingsIndexedCheckbox) = True Then
 		g_FileFilters = "Image Files:bmp"
-		io.m_SaveAsIndexed = True
+		g_FileIO.m_SaveAsIndexed = True
 	Else
 		g_FileFilters = "Image Files:png"
-		io.m_SaveAsIndexed = False
+		g_FileIO.m_SaveAsIndexed = False
 	EndIf
 
-	If ButtonState(ui.m_SettingsSaveAsFramesCheckbox) = True Then
-		io.m_SaveAsFrames = True
+	If ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox) = True Then
+		g_FileIO.m_SaveAsFrames = True
 	Else
-		io.m_SaveAsFrames = False
+		g_FileIO.m_SaveAsFrames = False
 	EndIf
 
 	'Debug stuff
@@ -62,7 +68,7 @@ While True
 	Local eventID:Int = EventID()
 
 	'Event Responses
-	ui.HandleEvents(eventID)
+	g_UserInterface.HandleEvents(eventID)
 
 	Select eventID
 		'Case EVENT_WINDOWACTIVATE
@@ -70,46 +76,46 @@ While True
 		Case EVENT_GADGETACTION
 			Select EventSource()
 				'Loading
-				Case ui.m_LoadButton
-					io.LoadFile()
+				Case g_UserInterface.m_LoadButton
+					g_FileIO.LoadFile()
 				'Saving
-				Case ui.m_SaveButton
-					If output.m_SourceImage <> Null Then
-						io.m_PrepForSave = True
+				Case g_UserInterface.m_SaveButton
+					If g_GraphicsOutput.m_SourceImage <> Null Then
+						g_FileIO.m_PrepForSave = True
 					Else
 						Notify("Nothing to save!",False)
 					EndIf
 				'Settings textbox inputs
 				'Scale
-				Case ui.m_SettingsZoomTextbox
-					output.m_InputZoom = Utility.Clamp(GadgetText(ui.m_SettingsZoomTextbox).ToInt(), output.c_MinZoom, output.c_MaxZoom)
+				Case g_UserInterface.m_SettingsZoomTextbox
+					g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), g_GraphicsOutput.c_MinZoom, g_GraphicsOutput.c_MaxZoom)
 
-					SetGadgetText(ui.m_SettingsZoomTextbox, output.m_InputZoom)
-					output.m_TileSize = 24 * output.m_InputZoom
-					output.m_RedoLimbTiles = True
+					SetGadgetText(g_UserInterface.m_SettingsZoomTextbox, g_GraphicsOutput.m_InputZoom)
+					g_GraphicsOutput.m_TileSize = 24 * g_GraphicsOutput.m_InputZoom
+					g_GraphicsOutput.m_RedoLimbTiles = True
 				'Frames
-				Case ui.m_SettingsFramesTextbox
-					output.m_Frames = Utility.Clamp(GadgetText(ui.m_SettingsFramesTextbox).ToInt(), output.c_MinFrameCount, output.c_MaxFrameCount)
+				Case g_UserInterface.m_SettingsFramesTextbox
+					g_GraphicsOutput.m_Frames = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), g_GraphicsOutput.c_MinFrameCount, g_GraphicsOutput.c_MaxFrameCount)
 
-					SetGadgetText(ui.m_SettingsFramesTextbox, output.m_Frames)
+					SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_Frames)
 				'Bacground Color
 				'Red
-				Case ui.m_SettingsColorRTextbox
-					output.m_BackgroundRed = Utility.Clamp(GadgetText(ui.m_SettingsColorRTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+				Case g_UserInterface.m_SettingsColorRTextbox
+					g_GraphicsOutput.m_BackgroundRed = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorRTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
 
-					SetGadgetText(ui.m_SettingsColorRTextbox, output.m_BackgroundRed)
+					SetGadgetText(g_UserInterface.m_SettingsColorRTextbox, g_GraphicsOutput.m_BackgroundRed)
 				'Green
-				Case ui.m_SettingsColorGTextbox
-					output.m_BackgroundGreen = Utility.Clamp(GadgetText(ui.m_SettingsColorGTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+				Case g_UserInterface.m_SettingsColorGTextbox
+					g_GraphicsOutput.m_BackgroundGreen = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorGTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
 
-					SetGadgetText(ui.m_SettingsColorGTextbox, output.m_BackgroundGreen)
+					SetGadgetText(g_UserInterface.m_SettingsColorGTextbox, g_GraphicsOutput.m_BackgroundGreen)
 				'Blue
-				Case ui.m_SettingsColorBTextbox
-					output.m_BackgroundBlue = Utility.Clamp(GadgetText(ui.m_SettingsColorBTextbox).ToInt(), output.c_MinBGColorValue, output.c_MaxBGColorValue)
+				Case g_UserInterface.m_SettingsColorBTextbox
+					g_GraphicsOutput.m_BackgroundBlue = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorBTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
 
-					SetGadgetText(ui.m_SettingsColorBTextbox, output.m_BackgroundBlue)
+					SetGadgetText(g_UserInterface.m_SettingsColorBTextbox, g_GraphicsOutput.m_BackgroundBlue)
 			EndSelect
 	EndSelect
 
-	output.OutputUpdate()
+	g_GraphicsOutput.OutputUpdate()
 EndWhile

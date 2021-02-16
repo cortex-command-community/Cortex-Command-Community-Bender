@@ -1,12 +1,5 @@
 '//// FILE IO ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-'Filepaths
-Global g_ImportedFile:String = Null
-Global g_ExportedFile:String = Null
-
-'File Filters
-Global g_FileFilters:String
-
 Type FileIO
 	'Load Bools
 	Global m_LoadingFirstTime:Int = True
