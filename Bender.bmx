@@ -44,20 +44,6 @@ g_BitmapIndexer.LoadPalette()
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
-	If ButtonState(g_UserInterface.m_SettingsIndexedCheckbox) = True Then
-		g_FileFilters = "Image Files:bmp"
-		g_FileIO.m_SaveAsIndexed = True
-	Else
-		g_FileFilters = "Image Files:png"
-		g_FileIO.m_SaveAsIndexed = False
-	EndIf
-
-	If ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox) = True Then
-		g_FileIO.m_SaveAsFrames = True
-	Else
-		g_FileIO.m_SaveAsFrames = False
-	EndIf
-
 	'Debug stuff
 	'Print "current event: " + CurrentEvent.ToString()
 	'Print "allocated memory in bytes: " + GCMemAlloced() 'not sure how accurate this really is, numbers don't match with task manager
@@ -66,7 +52,6 @@ While True
 	PollEvent
 	Local eventID:Int = EventID()
 
-	'Event Responses
 	g_UserInterface.HandleEvents(eventID)
 
 	Select eventID
@@ -84,7 +69,6 @@ While True
 					Else
 						Notify("Nothing to save!",False)
 					EndIf
-				'Settings textbox inputs
 				'Scale
 				Case g_UserInterface.m_SettingsZoomTextbox
 					g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), g_GraphicsOutput.c_MinZoom, g_GraphicsOutput.c_MaxZoom)
@@ -97,7 +81,6 @@ While True
 					g_GraphicsOutput.m_Frames = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), g_GraphicsOutput.c_MinFrameCount, g_GraphicsOutput.c_MaxFrameCount)
 
 					SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_Frames)
-				'Bacground Color
 				'Red
 				Case g_UserInterface.m_SettingsColorRTextbox
 					g_GraphicsOutput.m_BackgroundRed = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorRTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
@@ -113,6 +96,22 @@ While True
 					g_GraphicsOutput.m_BackgroundBlue = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorBTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
 
 					SetGadgetText(g_UserInterface.m_SettingsColorBTextbox, g_GraphicsOutput.m_BackgroundBlue)
+				'Save as Frames
+				Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
+					If ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox) = True Then
+						g_FileIO.m_SaveAsFrames = True
+					Else
+						g_FileIO.m_SaveAsFrames = False
+					EndIf
+				'Save as Indexed
+				Case g_UserInterface.m_SettingsIndexedCheckbox
+					If ButtonState(g_UserInterface.m_SettingsIndexedCheckbox) = True Then
+						g_FileFilters = "Image Files:bmp"
+						g_FileIO.m_SaveAsIndexed = True
+					Else
+						g_FileFilters = "Image Files:png"
+						g_FileIO.m_SaveAsIndexed = False
+					EndIf
 			EndSelect
 	EndSelect
 
