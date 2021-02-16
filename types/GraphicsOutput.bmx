@@ -15,7 +15,6 @@ Type GraphicsOutput
 	Const c_UpperBone:Int = 0
 	Const c_LowerBone:Int = 1
 	'Graphic Assets
-	Global m_LogoImage:TImage = LoadImage("Incbin::Assets/Logo", MASKEDIMAGE)
 	Global m_SourceImage:TImage
 	Global m_BoneImage:TImage[c_Bones]
 	'Output Settings
@@ -144,9 +143,6 @@ Type GraphicsOutput
 		Else
 			SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
 		EndIf
-		'Draw footer image
-		SetColor(255, 255, 255)
-		DrawImage(m_LogoImage, 0, 480 - ImageHeight(m_LogoImage))
 		'Draw source image
 		If m_SourceImage <> Null Then
 			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
@@ -192,7 +188,6 @@ Type GraphicsOutput
 		'Window background color
 		SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
 		SetMaskColor(255, 0, 255)
-		DrawImage(m_LogoImage, 0, 480 - ImageHeight(m_LogoImage))
 		SetColor(255, 230, 80)
 		DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
 		OutputUpdate()

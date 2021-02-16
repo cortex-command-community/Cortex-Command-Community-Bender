@@ -51,20 +51,25 @@ Type UserInterface
 	Global m_SettingsSaveAsFramesLabel:TGadget
 	Global m_SettingsSaveAsFramesCheckbox:TGadget
 
+	Global m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
+	Global m_LogoImagePanel:TGadget
+	Global m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - PixmapHeight(m_LogoImage))
+	Global m_LogoImagePanelSize:SVec2I = New SVec2I(PixmapWidth(m_LogoImage), PixmapHeight(m_LogoImage))
+
 	'Bool For Quitting
 	Global m_QuitResult:Int = False
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
+	Function MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
 		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
-	EndMethod
+	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
+	Function ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
 		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
-	EndMethod
+	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -121,6 +126,9 @@ Type UserInterface
 		m_SettingsIndexedLabel = CreateLabel("Save as Indexed", horizMargin, GadgetY(m_SettingsSaveAsFramesLabel) + labelVertOffset, 87, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsIndexedCheckbox = CreateButton(Null, vertMargin + GadgetWidth(m_SettingsIndexedLabel), GadgetY(m_SettingsIndexedLabel), 20, 20, m_SettingsPanel, BUTTON_CHECKBOX)
 
+		m_LogoImagePanel = CreatePanel(m_LogoImagePanelAnchor[0], m_LogoImagePanelAnchor[1], m_LogoImagePanelSize[0], m_LogoImagePanelSize[1], m_LeftColumn, Null)
+		SetPanelPixmap(m_LogoImagePanel, m_LogoImage, PANELPIXMAP_CENTER)
+
 		'Initialize canvas graphics
 		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], m_MainWindow)
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], m_CanvasGraphicsSize[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[1])
@@ -134,6 +142,10 @@ Type UserInterface
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function ProcessWindowResize()
+		ResizeGadget(m_LeftColumn, GadgetWidth(m_LeftColumn), GadgetHeight(m_MainWindow))
+		MoveGadget(m_LogoImagePanel, 0, GadgetHeight(m_MainWindow) - m_LogoImagePanelSize[1])
+
+		'Have to recreate the canvas because resizing verically shifts the origin point and no obvious way to reset it
 		FreeGadget(m_CanvasGraphics)
 		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], GadgetWidth(m_MainWindow), m_CanvasGraphicsAnchor[1], GadgetHeight(m_MainWindow))
