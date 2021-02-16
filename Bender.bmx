@@ -43,7 +43,7 @@ EndRem
 
 While True
 	output.OutputUpdate()
-	
+
 	If ButtonState(ui.m_SettingsIndexedCheckbox) = True Then
 		g_FileFilters = "Image Files:bmp"
 		io.m_SaveAsIndexed = True
@@ -51,7 +51,7 @@ While True
 		g_FileFilters = "Image Files:png"
 		io.m_SaveAsIndexed = False
 	EndIf
-	
+
 	If ButtonState(ui.m_SettingsSaveAsFramesCheckbox) = True Then
 		io.m_SaveAsFrames = True
 	Else
@@ -100,7 +100,7 @@ While True
 				'Settings textbox inputs
 				'Scale
 				Case ui.m_SettingsZoomTextbox
-					Local userInputValue:Int = GadgetText(ui.m_SettingsZoomTextbox).ToInt()	
+					Local userInputValue:Int = GadgetText(ui.m_SettingsZoomTextbox).ToInt()
 					'Foolproofing
 					If userInputValue > 4 Then
 						output.m_InputZoom = 4

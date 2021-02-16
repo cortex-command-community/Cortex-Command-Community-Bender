@@ -35,7 +35,7 @@ Type GraphicsOutput
 	Global m_AngleC:Float
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Rotation Calc
 	Function LawOfCosines(ab:Float, bc:Float, ca:Float)
 		m_AngleA = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
@@ -44,7 +44,7 @@ Type GraphicsOutput
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Create limb part tiles from source image
 	Function CreateLimbTiles()
 		Local b:Int, i:Int
@@ -64,7 +64,7 @@ Type GraphicsOutput
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Set Joint Marker
 	Function SetJointMarker()
 		Local xm:Int = MouseX()
@@ -79,15 +79,15 @@ Type GraphicsOutput
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Bending
 	Function LimbBend()
 		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider)
 		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider)
 		Local stepSize:Float = (maxExtend - minExtend) / (m_Frames - 1) ' -1 to make inclusive of last value (full range)
-		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float 
+		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float
 		For l = 0 To c_Limbs - 1
-			For f = 0 To m_Frames - 1 
+			For f = 0 To m_Frames - 1
 				b = l * 2
 				x = (f * 32) + 80 						'Drawing position X
 				y = ((l * 32) * 1.5 ) + 144				'Drawing position Y
@@ -133,7 +133,7 @@ Type GraphicsOutput
 		If MouseDown(1) Then
 			SetJointMarker()
 		EndIf
-		'Drawing Output	
+		'Drawing Output
 		'Set background color
 		If FileIO.m_PrepForSave
 			SetClsColor(255, 0, 255)
@@ -157,7 +157,7 @@ Type GraphicsOutput
 				'Draw the joint markers
 				CreateJointMarker(m_JointX[i] + i * m_TileSize, m_JointY[i])
 				CreateJointMarker(m_JointX[i] + i * m_TileSize, m_JointY[i] + m_BoneLength[i])
-			Next	
+			Next
 			'Draw bent limbs
 			LimbBend()
 			SetColor(255, 255, 255)
@@ -177,12 +177,12 @@ Type GraphicsOutput
 		Else
 			SetColor(255, 230, 80)
 			DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
-			Flip(1)	
+			Flip(1)
 		EndIf
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Create output window and draw assets
 	Function OutputBoot()
 		BitmapIndexer.LoadPalette()
@@ -196,7 +196,7 @@ Type GraphicsOutput
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Have to do all this so first loaded source image is zoomed in and has correct limb tiles and markers.
 	Function LoadingFirstTime()
 		DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
@@ -210,7 +210,7 @@ Type GraphicsOutput
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Output copy for saving
 	Function GrabOutputForSaving()
 		If FileIO.m_SaveAsFrames = True Then
@@ -246,5 +246,5 @@ Type GraphicsOutput
 		If FileIO.m_PrepForSave
 			FileIO.PrepForSave()
 		EndIf
-	EndFunction	
+	EndFunction
 EndType

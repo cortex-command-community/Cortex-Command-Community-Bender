@@ -12,20 +12,20 @@ Global g_FileFilters:String
 Type FileIO
 	'Load Bools
 	Global m_LoadingFirstTime:Int = True
-		
+
 	'Save Bools
 	Global m_SaveAsIndexed:Int = False
 	Global m_SaveAsFrames:Int = False
 	Global m_PrepForSave:Int = False
 	Global m_ReadyForSave:Int = False
 	Global m_RunOnce:Int = False
-	
+
 	'Output copy for saving
 	Global m_TempOutputImageCopy:TPixmap
 	Global m_TempOutputFrameCopy:TPixmap[4, 20]
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Load Source Image
 	Function LoadFile()
 		Local oldImportedFile:String = g_ImportedFile
@@ -46,7 +46,7 @@ Type FileIO
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Prep Output For Saving
 	Function PrepForSave()
 		If m_PrepForSave Then
@@ -64,7 +64,7 @@ Type FileIO
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	Function RevertPrep()
 		m_PrepForSave = False
 		m_ReadyForSave = False
@@ -73,7 +73,7 @@ Type FileIO
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Save Output Content To File
 	Function SaveFile()
 		g_ExportedFile = RequestFile("Save graphic output", g_FileFilters, True)
@@ -95,7 +95,7 @@ Type FileIO
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	'Save Output Content As Frames
 	Function SaveFileAsFrames()
 		g_ExportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
@@ -135,6 +135,6 @@ Type FileIO
 		Else
 			'On Cancel
 			RevertPrep()
-		EndIf	
+		EndIf
 	EndFunction
 EndType
