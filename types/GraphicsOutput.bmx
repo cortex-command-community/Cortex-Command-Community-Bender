@@ -185,7 +185,6 @@ Type GraphicsOutput
 
 	'Create output window and draw assets
 	Function OutputBoot()
-		BitmapIndexer.LoadPalette()
 		'Window background color
 		SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
 		SetMaskColor(255, 0, 255)

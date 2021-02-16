@@ -36,6 +36,7 @@ Local io:FileIO = New FileIO
 Local indexer:BitmapIndexer = New BitmapIndexer
 ui.InitializeUserInterface(output.m_InputZoom, output.m_Frames, output.m_BackgroundRed, output.m_BackgroundGreen, output.m_BackgroundBlue)
 output.OutputBoot()
+indexer.LoadPalette()
 
 Rem
 ------- EVENT HANDLING ------------------------------------------------------------------------------------------------
