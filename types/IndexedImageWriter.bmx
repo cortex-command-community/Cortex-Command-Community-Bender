@@ -18,13 +18,13 @@ Type IndexedImageWriter
 			m_PalG[index] = ReadByte(paletteStream)
 			m_PalB[index] = ReadByte(paletteStream)
 		Next
-		CloseStream paletteStream
+		CloseStream(paletteStream)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method ConvertColorToClosestIndex:Byte(pixelData:Int)
-		'pixelData is a 32bit integer with a decimal color value (0 - 16777215). Bits 24-31 alpha value, bits 16-23 red value , bits 8-15 green value, bits 0-7 blue value.
+		'pixelData is a 32bit integer with a decimal color value (0 - 16777215). Bits 24-31 alpha value, bits 16-23 red value, bits 8-15 green value, bits 0-7 blue value.
 		Select pixelData
 			Case 16711935 'Magenta (255, 0, 255)
 				Return 0

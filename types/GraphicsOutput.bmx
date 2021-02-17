@@ -210,10 +210,9 @@ Type GraphicsOutput
 	'Output copy for saving
 	Function GrabOutputForSaving()
 		If FileIO.m_SaveAsFrames = True Then
-			Local row:Int, frame:Int
 			Local tile:TImage = LoadImage("Incbin::Assets/Tile")
-			For row = 0 To 3
-				For frame = 0 To m_Frames - 1
+			For Local row:Int = 0 To 3
+				For Local frame:Int = 0 To m_Frames - 1
 					'Draw a tile outline around all frames to see we are within bounds.
 					DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
 					'Draw names of rows
@@ -223,7 +222,7 @@ Type GraphicsOutput
 					DrawText("Leg FG", 8, 145 + (48 * 2))
 					DrawText("Leg BG", 8, 145 + (48 * 3))
 					'Grab pixmap inside tile bounds for saving
-					FileIO.m_TempOutputFrameCopy[row,frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
+					FileIO.m_TempOutputFrameCopy[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
 					'HFlip the legs so they're facing right
 					If row >= 2 Then
 						FileIO.m_TempOutputFrameCopy[row, frame] = XFlipPixmap(FileIO.m_TempOutputFrameCopy[row, frame])

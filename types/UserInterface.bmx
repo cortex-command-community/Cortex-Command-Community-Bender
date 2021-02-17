@@ -129,8 +129,8 @@ Type UserInterface
 		'Initialize canvas graphics
 		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], m_MainWindow)
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], m_CanvasGraphicsSize[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[1])
-		SetGraphicsDriver GLMax2DDriver()
-		SetGraphics CanvasGraphics(m_CanvasGraphics)
+		SetGraphicsDriver(GLMax2DDriver())
+		SetGraphics(CanvasGraphics(m_CanvasGraphics))
 
 		UpdateWindowMenu(m_MainWindow)
 		EnablePolledInput()
@@ -146,8 +146,8 @@ Type UserInterface
 		FreeGadget(m_CanvasGraphics)
 		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], GadgetWidth(m_MainWindow), m_CanvasGraphicsAnchor[1], GadgetHeight(m_MainWindow))
-		SetGraphicsDriver GLMax2DDriver()
-		SetGraphics CanvasGraphics(m_CanvasGraphics)
+		SetGraphicsDriver(GLMax2DDriver())
+		SetGraphics(CanvasGraphics(m_CanvasGraphics))
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
