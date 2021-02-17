@@ -36,10 +36,10 @@ Global g_FileFilters:String
 Global g_UserInterface:UserInterface = New UserInterface
 Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput
 Global g_FileIO:FileIO = New FileIO
-Global g_BitmapIndexer:BitmapIndexer = New BitmapIndexer
+Global g_IndexedImageWriter:IndexedImageWriter = New IndexedImageWriter
 g_UserInterface.InitializeUserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
+g_IndexedImageWriter.LoadDefaultPalette()
 g_GraphicsOutput.OutputBoot()
-g_BitmapIndexer.LoadPalette()
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
