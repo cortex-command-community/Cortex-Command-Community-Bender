@@ -24,7 +24,7 @@ Include "Types/BitmapIndexer.bmx"
 
 '//// GLOBAL VARIABLES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Global g_AppVersion:String = "1.3.0"
+Const g_AppVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + g_AppVersion
 
 Global g_ImportedFile:String = Null

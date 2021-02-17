@@ -1,79 +1,76 @@
 '//// USER INTERFACE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type UserInterface
-	Global m_MainWindow:TGadget
+	Field m_MainWindow:TGadget
 
-	Global m_LeftColumn:TGadget
-	Global m_LeftColumnSize:SVec2I = New SVec2I(260, 480)
+	Field m_LeftColumn:TGadget
+	Field m_LeftColumnSize:SVec2I = New SVec2I(260, 480)
 
 	'Canvas for graphics output
-	Global m_CanvasGraphics:TGadget
-	Global m_CanvasGraphicsAnchor:SVec2I = New SVec2I(m_LeftColumnSize[0], 0)
-	Global m_CanvasGraphicsSize:SVec2I = New SVec2I(768, 480)
+	Field m_CanvasGraphics:TGadget
+	Field m_CanvasGraphicsAnchor:SVec2I = New SVec2I(m_LeftColumnSize[0], 0)
+	Field m_CanvasGraphicsSize:SVec2I = New SVec2I(768, 480)
 
 	'Title bar buttons
-	Global m_HelpMenu:TGadget
-	Global m_HelpMenuText:String = LoadText("Incbin::Assets/TextHelp")
+	Field m_HelpMenu:TGadget
+	Field m_HelpMenuText:String = LoadText("Incbin::Assets/TextHelp")
 	Const c_HelpMenuTag:Int = 100
 
-	Global m_AboutMenu:TGadget
-	Global m_AboutMenuText:String = LoadText("Incbin::Assets/TextAbout")
+	Field m_AboutMenu:TGadget
+	Field m_AboutMenuText:String = LoadText("Incbin::Assets/TextAbout")
 	Const c_AboutMenuTag:Int = 101
 
-	Global m_ButtonPanel:TGadget
-	Global m_ButtonPanelAnchor:SVec2I = New SVec2I(10, 5)
-	Global m_ButtonPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 55)
+	Field m_ButtonPanel:TGadget
+	Field m_ButtonPanelAnchor:SVec2I = New SVec2I(10, 5)
+	Field m_ButtonPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 55)
 
-	Global m_LoadButton:TGadget
-	Global m_SaveButton:TGadget
+	Field m_LoadButton:TGadget
+	Field m_SaveButton:TGadget
 
-	Global m_SettingsPanel:TGadget
-	Global m_SettingsPanelAnchor:SVec2I = New SVec2I(10, m_ButtonPanelSize[1] + 15)
-	Global m_SettingsPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 175)
+	Field m_SettingsPanel:TGadget
+	Field m_SettingsPanelAnchor:SVec2I = New SVec2I(10, m_ButtonPanelSize[1] + 15)
+	Field m_SettingsPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 175)
 
-	Global m_SettingsZoomLabel:TGadget
-	Global m_SettingsZoomTextbox:TGadget
+	Field m_SettingsZoomLabel:TGadget
+	Field m_SettingsZoomTextbox:TGadget
 
-	Global m_SettingsFramesLabel:TGadget
-	Global m_SettingsFramesTextbox:TGadget
+	Field m_SettingsFramesLabel:TGadget
+	Field m_SettingsFramesTextbox:TGadget
 
-	Global m_SettingsColorLabel:TGadget
-	Global m_SettingsColorRLabel:TGadget
-	Global m_SettingsColorRTextbox:TGadget
-	Global m_SettingsColorGLabel:TGadget
-	Global m_SettingsColorGTextbox:TGadget
-	Global m_SettingsColorBLabel:TGadget
-	Global m_SettingsColorBTextbox:TGadget
+	Field m_SettingsColorLabel:TGadget
+	Field m_SettingsColorRLabel:TGadget
+	Field m_SettingsColorRTextbox:TGadget
+	Field m_SettingsColorGLabel:TGadget
+	Field m_SettingsColorGTextbox:TGadget
+	Field m_SettingsColorBLabel:TGadget
+	Field m_SettingsColorBTextbox:TGadget
 
-	Global m_SettingsIndexedLabel:TGadget
-	Global m_SettingsIndexedCheckbox:TGadget
+	Field m_SettingsIndexedLabel:TGadget
+	Field m_SettingsIndexedCheckbox:TGadget
 
-	Global m_SettingsSaveAsFramesLabel:TGadget
-	Global m_SettingsSaveAsFramesCheckbox:TGadget
+	Field m_SettingsSaveAsFramesLabel:TGadget
+	Field m_SettingsSaveAsFramesCheckbox:TGadget
 
-	Global m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
-	Global m_LogoImagePanel:TGadget
-	Global m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - PixmapHeight(m_LogoImage))
-	Global m_LogoImagePanelSize:SVec2I = New SVec2I(PixmapWidth(m_LogoImage), PixmapHeight(m_LogoImage))
-
-	'Bool For Quitting
-	Global m_QuitResult:Int = False
+	Field m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
+	Field m_LogoImagePanel:TGadget
+	Field m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - PixmapHeight(m_LogoImage))
+	Field m_LogoImagePanelSize:SVec2I = New SVec2I(PixmapWidth(m_LogoImage), PixmapHeight(m_LogoImage))
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
+	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
 		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
+	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
 		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function InitializeUserInterface(zoomValue:Int, framesValue:Int, bgRedValue:Int, bgGreenValue:Int, bgBlueValue:Int)
+	Method InitializeUserInterface(zoomValue:Int, framesValue:Int, bgRedValue:Int, bgGreenValue:Int, bgBlueValue:Int)
 		m_MainWindow = CreateWindow(AppTitle, (DesktopWidth() / 2) - ((m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0]) / 2), (DesktopHeight() / 2) - (m_CanvasGraphicsSize[1] / 2), m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_RESIZABLE | WINDOW_CLIENTCOORDS)
 		m_HelpMenu = CreateMenu("Help", c_HelpMenuTag, WindowMenu(m_MainWindow))
 		m_AboutMenu = CreateMenu("About", c_AboutMenuTag, WindowMenu(m_MainWindow))
@@ -137,11 +134,11 @@ Type UserInterface
 
 		UpdateWindowMenu(m_MainWindow)
 		EnablePolledInput()
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function ProcessWindowResize()
+	Method ProcessWindowResize()
 		ResizeGadget(m_LeftColumn, GadgetWidth(m_LeftColumn), GadgetHeight(m_MainWindow))
 		MoveGadget(m_LogoImagePanel, 0, GadgetHeight(m_MainWindow) - m_LogoImagePanelSize[1])
 
@@ -151,11 +148,11 @@ Type UserInterface
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], GadgetWidth(m_MainWindow), m_CanvasGraphicsAnchor[1], GadgetHeight(m_MainWindow))
 		SetGraphicsDriver GLMax2DDriver()
 		SetGraphics CanvasGraphics(m_CanvasGraphics)
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function HandleEvents(eventID:Int)
+	Method HandleEvents(eventID:Int)
 		Select eventID
 			Case EVENT_APPRESUME
 				ActivateWindow(m_MainWindow)
@@ -169,9 +166,7 @@ Type UserInterface
 						Notify(m_AboutMenuText, False)
 				EndSelect
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				m_QuitResult = Confirm("Quit program?")
+				If Confirm("Quit program?") Then End
 		EndSelect
-
-		If m_QuitResult Then End
-	EndFunction
+	EndMethod
 EndType

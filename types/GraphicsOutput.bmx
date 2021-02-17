@@ -198,7 +198,7 @@ Type GraphicsOutput
 		DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
 		CreateLimbTiles()
 		m_InputZoom = 4
-		SetGadgetText(UserInterface.m_SettingsZoomTextbox, GraphicsOutput.m_InputZoom)
+		SetGadgetText(g_UserInterface.m_SettingsZoomTextbox, GraphicsOutput.m_InputZoom)
 		m_TileSize = 24 * GraphicsOutput.m_InputZoom
 		m_RedoLimbTiles = True
 		LimbBend()
