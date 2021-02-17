@@ -15,12 +15,13 @@ Import BRL.EventQueue
 Import BRL.Vector
 Import BRL.PNGLoader
 
-Include "EmbeddedAssets.bmx"
-Include "Types/Utility.bmx"
+Import "EmbeddedAssets.bmx"
+Import "Types/Utility.bmx"
+Import "Types/IndexedImageWriter.bmx"
+
 Include "Types/UserInterface.bmx"
 Include "Types/GraphicsOutput.bmx"
 Include "Types/FileIO.bmx"
-Include "Types/BitmapIndexer.bmx"
 
 '//// GLOBAL VARIABLES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
