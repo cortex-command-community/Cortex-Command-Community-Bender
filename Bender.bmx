@@ -45,14 +45,9 @@ g_GraphicsOutput.OutputBoot()
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
-	'Debug stuff
-	'Print "current event: " + CurrentEvent.ToString()
-	'Print "allocated memory in bytes: " + GCMemAlloced() 'not sure how accurate this really is, numbers don't match with task manager
-	'Print "mouse position in canvas: x = " + MouseX() + " y = " + MouseY()
 	PollEvent()
 
 	Local eventID:Int = EventID()
-
 	g_UserInterface.HandleEvents(eventID)
 
 	Select eventID
