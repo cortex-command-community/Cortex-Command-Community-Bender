@@ -8,8 +8,8 @@ EndRem
 
 SuperStrict
 
-Framework BRL.Basic
-Framework BRL.GLMax2D
+Import BRL.Basic
+Import BRL.GLMax2D
 Import MaxGUI.Drivers
 Import BRL.EventQueue
 Import BRL.Vector
