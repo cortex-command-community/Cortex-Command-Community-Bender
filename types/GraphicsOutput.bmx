@@ -37,6 +37,29 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Function DrawCross(centerPosX:Int, centerPosY:Int, radius:Int = 2, drawShadow:Int = True)
+		Local centerPos:SVec2I = New SVec2I(centerPosX, centerPosY)
+		DrawCross(centerPos, radius, drawShadow)
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function DrawCross(centerPos:SVec2I, radius:Int = 2, drawShadow:Int = True)
+		If drawShadow = True Then
+			Local shadowOffset:Int = 1
+			SetColor(0, 0, 80)
+			DrawLine(centerPos[0] - radius + shadowOffset, centerPos[1] + shadowOffset, centerPos[0] + radius + shadowOffset, centerPos[1] + shadowOffset)
+			DrawLine(centerPos[0] + shadowOffset, centerPos[1] - radius + shadowOffset, centerPos[0] + shadowOffset, centerPos[1] + radius + shadowOffset)
+		EndIf
+
+		SetColor(255, 230, 80)
+		DrawLine(centerPos[0] - radius, centerPos[1], centerPos[0] + radius, centerPos[1])
+		DrawLine(centerPos[0], centerPos[1] - radius, centerPos[0], centerPos[1] + radius)
+		SetColor(255, 255, 255)
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	'Rotation Calc
 	Function LawOfCosines(ab:Float, bc:Float, ca:Float)
 		m_AngleA = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
@@ -113,8 +136,8 @@ Type GraphicsOutput
 	'Create Joint Markers
 	Function CreateJointMarker(x:Float, y:Float)
 		SetRotation(0)
-		Utility.DrawCross(Int(x), Int(y), m_InputZoom)
-	End Function
+		DrawCross(Int(x), Int(y), m_InputZoom)
+	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
