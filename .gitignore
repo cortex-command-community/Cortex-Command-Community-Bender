@@ -5,5 +5,8 @@
 *.png
 *.bmp
 
+*.code-workspace
+.vscode/
+
 !test-image.bmp
 !input-template.bmp
