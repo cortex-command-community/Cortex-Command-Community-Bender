@@ -38,10 +38,7 @@ While True
 
 	Repeat
 		PollEvent()
-		Local eventID:Int = EventID()
-		g_UserInterface.HandleEvents(eventID)
-
-		Select eventID
+		Select EventID()
 			Case EVENT_APPRESUME
 				ActivateWindow(g_UserInterface.m_MainWindow)
 			Case EVENT_WINDOWSIZE

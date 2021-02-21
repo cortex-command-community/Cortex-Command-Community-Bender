@@ -166,12 +166,4 @@ Type UserInterface
 	Method GetMaxWorkspaceWidth:Int()
 		Return DesktopWidth() - m_LeftColumnSize[0]
 	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method HandleEvents(eventID:Int)
-		Select eventID
-
-		EndSelect
-	EndMethod
 EndType
