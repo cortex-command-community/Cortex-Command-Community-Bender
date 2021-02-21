@@ -1,4 +1,3 @@
-'Import "Types/IndexedImageWriter.bmx"
 Include "IndexedImageWriter.bmx"
 
 '//// FILE IO ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +85,9 @@ Type FileIO
 					RevertPrep()
 				EndIf
 			Else
-	      		SavePixmapPNG(m_TempOutputImageCopy, exportedFile)
+				If m_IndexedImageWriter.WriteIndexedPNGFromPixmap(m_TempOutputImageCopy, exportedFile) = False Then
+					RevertPrep()
+				EndIf
 			EndIf
 			RevertPrep()
 		Else
@@ -130,7 +131,9 @@ Type FileIO
 							RevertPrep()
 						EndIf
 					Else
-			      		SavePixmapPNG(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".png")
+						If m_IndexedImageWriter.WriteIndexedPNGFromPixmap(m_TempOutputImageCopy, exportedFileTempName + ".png") = False Then
+							RevertPrep()
+						EndIf
 					EndIf
 				Next
 			Next

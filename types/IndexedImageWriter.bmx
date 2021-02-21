@@ -118,4 +118,21 @@ Type IndexedImageWriter
 			Return True
 		EndIf
 	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method WriteIndexedPNGFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
+		If filename.Length = 0 Then
+			Return False
+		Else
+			Local pngWidth:Int = PixmapWidth(sourcePixmap)
+			Local pngHeight:Int = PixmapHeight(sourcePixmap)
+
+			'Begin writing PNG file manually
+			Local outputStream:TStream = BigEndianStream(WriteFile(filename)) 'PNG file data is stored in network byte order (big-endian, most-significant byte first)
+
+			CloseStream(outputStream)
+			Return True
+		EndIf
+	EndMethod
 EndType
