@@ -1,3 +1,6 @@
+'Import "Types/IndexedImageWriter.bmx"
+Include "IndexedImageWriter.bmx"
+
 '//// FILE IO ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type FileIO
@@ -18,6 +21,8 @@ Type FileIO
 	'Output copy for saving
 	Global m_TempOutputImageCopy:TPixmap
 	Global m_TempOutputFrameCopy:TPixmap[4, 20]
+
+	Global m_IndexedImageWriter:IndexedImageWriter = New IndexedImageWriter
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,7 +83,7 @@ Type FileIO
 		ElseIf m_ExportedFile <> m_ImportedFile And m_ExportedFile <> Null Then
 			'Writing new file
 			If m_SaveAsIndexed = True
-				If g_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputImageCopy, m_ExportedFile) = False Then
+				If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputImageCopy, m_ExportedFile) = False Then
 					RevertPrep()
 				EndIf
 			Else
@@ -122,7 +127,7 @@ Type FileIO
 						exportedFileTempName = m_ExportedFile+rowName + "0" + frame
 					EndIf
 					If m_SaveAsIndexed = True
-						If g_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp") = False Then
+						If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp") = False Then
 							RevertPrep()
 						EndIf
 					Else

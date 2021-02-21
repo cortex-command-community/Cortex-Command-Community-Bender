@@ -17,7 +17,6 @@ Import BRL.PNGLoader
 
 Import "EmbeddedAssets.bmx"
 Import "Types/Utility.bmx"
-Import "Types/IndexedImageWriter.bmx"
 
 Include "Types/UserInterface.bmx"
 Include "Types/GraphicsOutput.bmx"
@@ -33,7 +32,6 @@ AppTitle = "CCCP Bender " + g_AppVersion
 Global g_UserInterface:UserInterface = New UserInterface
 Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput
 Global g_FileIO:FileIO = New FileIO
-Global g_IndexedImageWriter:IndexedImageWriter = New IndexedImageWriter
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
