@@ -44,6 +44,21 @@ While True
 		g_UserInterface.HandleEvents(eventID)
 
 		Select eventID
+			Case EVENT_APPRESUME
+				ActivateWindow(g_UserInterface.m_MainWindow)
+			Case EVENT_WINDOWSIZE
+				g_UserInterface.ProcessWindowResize()
+			Case EVENT_MENUACTION
+				Select EventData()
+					Case g_UserInterface.c_HelpMenuTag
+						Notify(g_UserInterface.m_HelpMenuText, False)
+					Case g_UserInterface.c_AboutMenuTag
+						Notify(g_UserInterface.m_AboutMenuText, False)
+				EndSelect
+			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
+				If Confirm("Quit program?") Then End
+
+
 			'Case EVENT_WINDOWACTIVATE
 			'Case EVENT_GADGETLOSTFOCUS
 			Case EVENT_GADGETACTION

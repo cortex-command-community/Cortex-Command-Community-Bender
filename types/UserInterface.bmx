@@ -167,19 +167,7 @@ Type UserInterface
 
 	Method HandleEvents(eventID:Int)
 		Select eventID
-			Case EVENT_APPRESUME
-				ActivateWindow(m_MainWindow)
-			Case EVENT_WINDOWSIZE
-				ProcessWindowResize()
-			Case EVENT_MENUACTION
-				Select EventData()
-					Case c_HelpMenuTag
-						Notify(m_HelpMenuText, False)
-					Case c_AboutMenuTag
-						Notify(m_AboutMenuText, False)
-				EndSelect
-			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				If Confirm("Quit program?") Then End
+
 		EndSelect
 	EndMethod
 EndType
