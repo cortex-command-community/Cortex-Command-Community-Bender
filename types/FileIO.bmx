@@ -5,7 +5,6 @@ Include "IndexedImageWriter.bmx"
 
 Type FileIO
 	Global m_ImportedFile:String = Null
-	Global m_ExportedFile:String = Null
 	Global m_FileFilters:String
 
 	'Load Bools
@@ -29,7 +28,7 @@ Type FileIO
 	'Load Source Image
 	Function LoadFile()
 		Local oldImportedFile:String = m_ImportedFile
-		m_ImportedFile = RequestFile("Select graphic file to open","Image Files:png,bmp,jpg")
+		m_ImportedFile = RequestFile("Select graphic file to open", "Image Files:png,bmp,jpg")
 		'Foolproofing
 		If m_ImportedFile = Null Then
 			m_ImportedFile = oldImportedFile
@@ -76,18 +75,18 @@ Type FileIO
 
 	'Save Output Content To File
 	Function SaveFile()
-		m_ExportedFile = RequestFile("Save graphic output", m_FileFilters, True)
+		Local exportedFile:String = RequestFile("Save graphic output", m_FileFilters, True)
 		'Foolproofing
-		If m_ExportedFile = m_ImportedFile Then
+		If exportedFile = m_ImportedFile Then
 			Notify("Cannot overwrite source image!", True)
-		ElseIf m_ExportedFile <> m_ImportedFile And m_ExportedFile <> Null Then
+		ElseIf exportedFile <> m_ImportedFile And exportedFile <> Null Then
 			'Writing new file
 			If m_SaveAsIndexed = True
-				If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputImageCopy, m_ExportedFile) = False Then
+				If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputImageCopy, exportedFile) = False Then
 					RevertPrep()
 				EndIf
 			Else
-	      		SavePixmapPNG(m_TempOutputImageCopy, m_ExportedFile)
+	      		SavePixmapPNG(m_TempOutputImageCopy, exportedFile)
 			EndIf
 			RevertPrep()
 		Else
@@ -100,11 +99,11 @@ Type FileIO
 
 	'Save Output Content As Frames
 	Function SaveFileAsFrames()
-		m_ExportedFile = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		Local exportedFile:String = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
 		'Foolproofing
-		If m_ExportedFile = m_ImportedFile Then
+		If exportedFile = m_ImportedFile Then
 			Notify("Cannot overwrite source image!", True)
-		ElseIf m_ExportedFile <> m_ImportedFile And m_ExportedFile <> Null Then
+		ElseIf exportedFile <> m_ImportedFile And exportedFile <> Null Then
 			'Writing new file
 			Local row:Int, frame:Int
 			For row = 0 To 3
@@ -122,9 +121,9 @@ Type FileIO
 				For frame = 0 To GraphicsOutput.m_Frames - 1
 					Local exportedFileTempName:String
 					If frame < 10 Then
-						exportedFileTempName = m_ExportedFile+rowName + "00" + frame
+						exportedFileTempName = exportedFile + rowName + "00" + frame
 					Else
-						exportedFileTempName = m_ExportedFile+rowName + "0" + frame
+						exportedFileTempName = exportedFile + rowName + "0" + frame
 					EndIf
 					If m_SaveAsIndexed = True
 						If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp") = False Then

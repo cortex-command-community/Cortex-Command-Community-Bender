@@ -27,9 +27,9 @@ Type GraphicsOutput
 	Global m_BoneLength:Float[c_BoneCount]
 	'Precalc for drawing
 	Global m_TileSize:Int = 24
-	Global m_BoneAngle:Int[c_BoneCount, 20]
-	Global m_BoneX:Int[c_BoneCount, 20]
-	Global m_BoneY:Int[c_BoneCount, 20]
+	Global m_BoneAngle:Int[c_BoneCount, c_MaxFrameCount]
+	Global m_BoneX:Int[c_BoneCount, c_MaxFrameCount]
+	Global m_BoneY:Int[c_BoneCount, c_MaxFrameCount]
 	'Variables
 	Global m_AngleA:Float
 	Global m_AngleB:Float
@@ -48,10 +48,10 @@ Type GraphicsOutput
 
 	'Create limb part tiles from source image
 	Function CreateLimbTiles()
-		Local b:Int, i:Int
-		For b = 0 To c_BoneCount-1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
-			m_BoneImage[b] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
-			GrabImage(m_BoneImage[b], b * m_TileSize, 0)
+		Local i:Int
+		For Local bone:Int = 0 To c_BoneCount - 1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
+			m_BoneImage[bone] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
+			GrabImage(m_BoneImage[bone], bone * m_TileSize, 0)
 			SetColor(120, 0, 120)
 			DrawLine(i * m_TileSize, 0, i * m_TileSize, m_TileSize - 1, True)
 		Next
@@ -72,7 +72,7 @@ Type GraphicsOutput
 		Local ym:Int = MouseY()
 		If ym < (m_TileSize / 2 - 2) And ym > 0 And xm > 0 And xm < m_TileSize * c_BoneCount Then
 			Local b:Int = xm / m_TileSize
-			m_JointX[b] = m_TileSize / 2 		'X is always at center, so kinda pointless to even bother - at the moment
+			m_JointX[b] = m_TileSize / 2 	'X is always at center, so kinda pointless to even bother - at the moment
 			m_JointY[b] = ym				'Determines length
 			m_BoneLength[b] = (m_TileSize / 2 - ym) * 2
 			SetImageHandle(m_BoneImage[b], m_JointX[b] / m_InputZoom, m_JointY[b] / m_InputZoom) 'Rotation handle.
@@ -83,15 +83,15 @@ Type GraphicsOutput
 
 	'Bending
 	Function LimbBend()
-		Local maxExtend:Float = 0.99		'Possibly make definable in settings (slider)
-		Local minExtend:Float = 0.30		'Possibly make definable in settings (slider)
+		Local maxExtend:Float = 0.99	'Possibly make definable in settings (slider)
+		Local minExtend:Float = 0.30	'Possibly make definable in settings (slider)
 		Local stepSize:Float = (maxExtend - minExtend) / (m_Frames - 1) ' -1 to make inclusive of last value (full range)
 		Local b:Int, f:Int, l:Float, x:Float, y:Float, airLength:Float, upperLength:Float, lowerLength:Float
 		For l = 0 To c_LimbCount - 1
 			For f = 0 To m_Frames - 1
 				b = l * 2
-				x = (f * 32) + 80 						'Drawing position X
-				y = ((l * 32) * 1.5 ) + 144				'Drawing position Y
+				x = (f * 32) + 80 				'Drawing position X
+				y = ((l * 32) * 1.5 ) + 144		'Drawing position Y
 				upperLength = m_BoneLength[b] / m_InputZoom
 				lowerLength = m_BoneLength[b + 1] / m_InputZoom
 				airLength = (stepSize * f + minExtend) * (upperLength + lowerLength)	'Sum of the two bones * step scaler for frame (hip-ankle)
@@ -99,8 +99,8 @@ Type GraphicsOutput
 				m_BoneAngle[b, f] = m_AngleB
 				m_BoneX[b, f] = x
 				m_BoneY[b, f] = y
-				x :- Sin(m_BoneAngle[b, f]) * upperLength		'Position of knee
-				y :+ Cos(m_BoneAngle[b, f]) * upperLength		'Could just use another m_BoneAngle of the triangle though, but I (arne) didn't
+				x :- Sin(m_BoneAngle[b, f]) * upperLength			'Position of knee
+				y :+ Cos(m_BoneAngle[b, f]) * upperLength			'Could just use another m_BoneAngle of the triangle though, but I (arne) didn't
 				m_BoneAngle[b + 1, f] = m_AngleC + m_AngleB + 180	'It looks correct on screen so i'm (arne) just gonna leave it at that!
 				m_BoneX[b + 1, f] = x
 				m_BoneY[b + 1, f] = y
@@ -113,15 +113,7 @@ Type GraphicsOutput
 	'Create Joint Markers
 	Function CreateJointMarker(x:Float, y:Float)
 		SetRotation(0)
-		SetColor(0, 0, 80)
-		x :+ 1 y :+ 1 'Add a shade for clarity on bright colours
-		DrawLine(x - 1 - m_InputZoom, y, x + 1 + m_InputZoom, y)
-		DrawLine(x, y - 1 - m_InputZoom, x, y + 1 + m_InputZoom)
-		x :- 1 y :- 1 'Cross
-		SetColor(255, 230, 80)
-		DrawLine(x - 1 - m_InputZoom, y, x + 1 + m_InputZoom, y)
-		DrawLine(x, y - 1 - m_InputZoom, x, y + 1 + m_InputZoom)
-		SetColor(255, 255, 255)
+		Utility.DrawCross(Int(x), Int(y), m_InputZoom)
 	End Function
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

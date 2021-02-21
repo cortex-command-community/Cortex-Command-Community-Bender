@@ -59,7 +59,7 @@ Type IndexedImageWriter
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method WriteIndexedBitmapFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
-		If filename.length = 0 Then
+		If filename.Length = 0 Then
 			Return False
 		Else
 			Local bmpWidth:Int = PixmapWidth(sourcePixmap)
@@ -99,7 +99,7 @@ Type IndexedImageWriter
 			Next
 
 			'Pixel Array
-			For Local pixelY:Int = bmpHeight - 1 To 0 Step - 1
+			For Local pixelY:Int = bmpHeight - 1 To 0 Step -1
 				For Local pixelX:Int = 0 To bmpWidthM4 - 1
 					If pixelX < bmpWidth Then
 						WriteByte(outputStream, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
