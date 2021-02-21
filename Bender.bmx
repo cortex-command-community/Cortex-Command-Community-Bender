@@ -9,16 +9,14 @@ EndRem
 SuperStrict
 
 Import BRL.Basic
-Import BRL.GLMax2D
-Import MaxGUI.Drivers
 Import BRL.EventQueue
-Import BRL.Vector
+'Import BRL.Vector
 Import BRL.PNGLoader
 
 Import "EmbeddedAssets.bmx"
 Import "Types/Utility.bmx"
+Import "Types/UserInterface.bmx"
 
-Include "Types/UserInterface.bmx"
 Include "Types/GraphicsOutput.bmx"
 Include "Types/FileIO.bmx"
 
