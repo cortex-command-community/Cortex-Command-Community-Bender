@@ -144,7 +144,7 @@ Type UserInterface
 		ResizeGadget(m_LeftColumn, GadgetWidth(m_LeftColumn), GadgetHeight(m_MainWindow))
 		MoveGadget(m_LogoImagePanel, 0, GadgetHeight(m_MainWindow) - m_LogoImagePanelSize[1])
 
-		'Have to recreate the canvas because resizing verically shifts the origin point and no obvious way to reset it
+		'Have to recreate the canvas because resizing vertically shifts the origin point and no obvious way to reset it
 		FreeGadget(m_CanvasGraphics)
 		InitializeCanvasGraphics()
 	EndMethod

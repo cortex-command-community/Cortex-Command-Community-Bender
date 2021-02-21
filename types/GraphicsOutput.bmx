@@ -35,6 +35,15 @@ Type GraphicsOutput
 	Global m_AngleB:Float
 	Global m_AngleC:Float
 
+	Global m_PrepForSave:Int
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function LoadFile(fileToLoad:String)
+		m_SourceImage = LoadImage(fileToLoad, 0)
+		m_RedoLimbTiles = True
+	EndFunction
+
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function DrawCross(centerPosX:Int, centerPosY:Int, radius:Int = 2, drawShadow:Int = True)
@@ -72,7 +81,7 @@ Type GraphicsOutput
 	'Create limb part tiles from source image
 	Function CreateLimbTiles()
 		Local i:Int
-		For Local bone:Int = 0 To c_BoneCount - 1 'Because I (arne) can't set handles on inidividial anim image frames, I must use my own frame sys
+		For Local bone:Int = 0 To c_BoneCount - 1 'Because I (arne) can't set handles on individual anim image frames, I must use my own frame sys
 			m_BoneImage[bone] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
 			GrabImage(m_BoneImage[bone], bone * m_TileSize, 0)
 			SetColor(120, 0, 120)
@@ -151,7 +160,7 @@ Type GraphicsOutput
 		EndIf
 		'Drawing Output
 		'Set background color
-		If FileIO.m_PrepForSave
+		If m_PrepForSave
 			SetClsColor(255, 0, 255)
 		Else
 			SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
@@ -193,7 +202,12 @@ Type GraphicsOutput
 				b = 7 SetRotation(m_BoneAngle[b, f]) DrawImageRect(m_BoneImage[b], m_BoneX[b, f], m_BoneY[b, f], ImageWidth(m_BoneImage[b]) / m_InputZoom, ImageHeight(m_BoneImage[b]) / m_InputZoom)
 			Next
 			SetRotation(0)
-			GrabOutputForSaving()
+
+			If m_PrepForSave
+				GrabOutputForSaving()
+			Else
+				Flip(1)
+			EndIf
 		Else
 			SetColor(255, 230, 80)
 			DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
@@ -232,31 +246,32 @@ Type GraphicsOutput
 
 	'Output copy for saving
 	Function GrabOutputForSaving()
-		If FileIO.m_SaveAsFrames = True Then
-			Local tile:TImage = LoadImage("Incbin::Assets/Tile")
-			For Local row:Int = 0 To 3
-				For Local frame:Int = 0 To m_Frames - 1
-					'Draw a tile outline around all frames to see we are within bounds.
-					DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
-					'Grab pixmap inside tile bounds for saving
-					FileIO.m_TempOutputFrameCopy[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
-					'HFlip the legs so they're facing right
-					If row >= 2 Then
-						FileIO.m_TempOutputFrameCopy[row, frame] = XFlipPixmap(FileIO.m_TempOutputFrameCopy[row, frame])
-					EndIf
-				Next
-			Next
+		If m_SourceImage = Null Then
+			Notify("Nothing to save!", False)
 		Else
-			If FileIO.m_SaveAsIndexed = True Then
-				'If saving indexed grab a smaller pixmap to speed up indexing
-				FileIO.m_TempOutputImageCopy = GrabPixmap(55, 120, 34 * m_Frames, 210)
+			m_PrepForSave = True
+
+			If Not g_FileIO.m_SaveAsFrames Then
+				g_FileIO.SaveFile(GrabPixmap(55, 120, 34 * m_Frames, 210))
 			Else
-				FileIO.m_TempOutputImageCopy = GrabPixmap(0, 96, 768, 384)
+				Local framesToSave:TPixmap[c_LimbCount, m_Frames]
+				Local tile:TImage = LoadImage("Incbin::Assets/Tile")
+				For Local row:Int = 0 To 3
+					For Local frame:Int = 0 To m_Frames - 1
+						'Draw a tile outline around all frames to see we are within bounds.
+						DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
+						'Grab pixmap inside tile bounds for saving
+						framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
+						'HFlip the legs so they're facing right
+						If row >= 2 Then
+							framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
+						EndIf
+					Next
+				Next
+				g_FileIO.SaveFileAsFrames(framesToSave, m_Frames)
 			EndIf
+			Flip(1)
 		EndIf
-		Flip(1)
-		If FileIO.m_PrepForSave
-			FileIO.PrepForSave()
-		EndIf
+		m_PrepForSave = False
 	EndFunction
 EndType

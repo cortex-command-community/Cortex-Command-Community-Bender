@@ -16,9 +16,10 @@ Import BRL.PNGLoader
 Import "EmbeddedAssets.bmx"
 Import "Types/Utility.bmx"
 Import "Types/UserInterface.bmx"
+Import "Types/FileIO.bmx"
 
 Include "Types/GraphicsOutput.bmx"
-Include "Types/FileIO.bmx"
+
 
 '//// GLOBAL VARIABLES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,8 +29,8 @@ AppTitle = "CCCP Bender " + g_AppVersion
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Global g_UserInterface:UserInterface = New UserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
-Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput
-Global g_FileIO:FileIO = New FileIO
+Global g_FileIO:FileIO = New FileIO()
+Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput()
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -60,14 +61,10 @@ While True
 				Select EventSource()
 					'Loading
 					Case g_UserInterface.m_LoadButton
-						g_FileIO.LoadFile()
+						g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad())
 					'Saving
 					Case g_UserInterface.m_SaveButton
-						If g_GraphicsOutput.m_SourceImage <> Null Then
-							g_FileIO.m_PrepForSave = True
-						Else
-							Notify("Nothing to save!",False)
-						EndIf
+						g_GraphicsOutput.GrabOutputForSaving()
 					'Scale
 					Case g_UserInterface.m_SettingsZoomTextbox
 						g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), g_GraphicsOutput.c_MinZoom, g_GraphicsOutput.c_MaxZoom)

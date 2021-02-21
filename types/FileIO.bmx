@@ -1,146 +1,105 @@
-Include "IndexedImageWriter.bmx"
+Import "IndexedImageWriter.bmx"
+Import BRL.PNGLoader
 
 '//// FILE IO ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type FileIO
-	Global m_ImportedFile:String = Null
-	Global m_FileFilters:String
+	Field m_ImportedFile:String = Null
+	Field m_FileFilters:String
 
-	'Load Bools
-	Global m_LoadingFirstTime:Int = True
+	Field m_SaveAsIndexed:Int = False
+	Field m_SaveAsFrames:Int = False
 
-	'Save Bools
-	Global m_SaveAsIndexed:Int = False
-	Global m_SaveAsFrames:Int = False
-	Global m_PrepForSave:Int = False
-	Global m_ReadyForSave:Int = False
-	Global m_RunOnce:Int = False
-
-	'Output copy for saving
-	Global m_TempOutputImageCopy:TPixmap
-	Global m_TempOutputFrameCopy:TPixmap[4, 20]
-
-	Global m_IndexedImageWriter:IndexedImageWriter = New IndexedImageWriter
+	Field m_IndexedImageWriter:IndexedImageWriter
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Load Source Image
-	Function LoadFile()
-		Local oldImportedFile:String = m_ImportedFile
-		m_ImportedFile = RequestFile("Select graphic file to open", "Image Files:png,bmp,jpg")
-		'Foolproofing
-		If m_ImportedFile = Null Then
-			m_ImportedFile = oldImportedFile
-			GraphicsOutput.m_SourceImage = GraphicsOutput.m_SourceImage
-		Else
-			GraphicsOutput.m_SourceImage = LoadImage(m_ImportedFile, 0)
-			If m_LoadingFirstTime = True Then
-				GraphicsOutput.LoadingFirstTime()
-				m_LoadingFirstTime = False
+	Method New()
+		m_IndexedImageWriter = New IndexedImageWriter()
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetFileToLoad:String()
+		Local newImportFile:String = RequestFile("Select graphic file to open", "Image Files:png,bmp")
+		If newImportFile <> m_ImportedFile And newImportFile <> Null Then
+			m_ImportedFile = newImportFile
+		EndIf
+		Return m_ImportedFile
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SaveFile:Int(pixmapToSave:TPixmap)
+		Local filename:String = RequestFile("Save graphic output", m_FileFilters, True)
+		If CheckValidExportFileName(filename) Then
+			Local saveSuccess:Int = True
+			If m_SaveAsIndexed = True Then
+				saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave, filename)
+				'saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave, filename)
 			Else
-				GraphicsOutput.m_RedoLimbTiles = True
+				saveSuccess = SavePixmapPNG(pixmapToSave, filename)
+			EndIf
+			If Not saveSuccess Then
+				Notify("Failed to save file: " + filename)
 			EndIf
 		EndIf
-	EndFunction
+		Return True 'Retrun something to indicate function finished so workspace can be reverted
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Prep Output For Saving
-	Function PrepForSave()
-		If m_PrepForSave Then
-			If Not m_RunOnce Then
-				m_RunOnce = True
-				GraphicsOutput.OutputUpdate()
-			Else
-				If Not m_SaveAsFrames Then
-					SaveFile()
-				Else
-					SaveFileAsFrames()
-				EndIf
-			EndIf
-		EndIf
-	EndFunction
+	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
+		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		If CheckValidExportFileName(filename) Then
+			For Local row:Int = 0 To 3
+				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
+				Select row
+					Case 0
+						rowName = "ArmFG"
+					Case 1
+						rowName = "ArmBG"
+					Case 2
+						rowName = "LegFG"
+					Case 3
+						rowName = "LegBG"
+				EndSelect
 
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Function RevertPrep()
-		m_PrepForSave = False
-		m_ReadyForSave = False
-		m_RunOnce = False
-		GraphicsOutput.OutputUpdate()
-	EndFunction
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	'Save Output Content To File
-	Function SaveFile()
-		Local exportedFile:String = RequestFile("Save graphic output", m_FileFilters, True)
-		'Foolproofing
-		If exportedFile = m_ImportedFile Then
-			Notify("Cannot overwrite source image!", True)
-		ElseIf exportedFile <> m_ImportedFile And exportedFile <> Null Then
-			'Writing new file
-			If m_SaveAsIndexed = True
-				If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputImageCopy, exportedFile) = False Then
-					RevertPrep()
-				EndIf
-			Else
-				If m_IndexedImageWriter.WriteIndexedPNGFromPixmap(m_TempOutputImageCopy, exportedFile) = False Then
-					RevertPrep()
-				EndIf
-			EndIf
-			RevertPrep()
-		Else
-			'On Cancel
-			RevertPrep()
-		EndIf
-	EndFunction
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	'Save Output Content As Frames
-	Function SaveFileAsFrames()
-		Local exportedFile:String = RequestFile("Save graphic output", "", True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
-		'Foolproofing
-		If exportedFile = m_ImportedFile Then
-			Notify("Cannot overwrite source image!", True)
-		ElseIf exportedFile <> m_ImportedFile And exportedFile <> Null Then
-			'Writing new file
-			Local row:Int, frame:Int
-			For row = 0 To 3
-				'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
-				Local rowName:String
-				If row = 0 Then
-					rowName = "ArmFG"
-				ElseIf row = 1 Then
-					rowName = "ArmBG"
-				ElseIf row = 2 Then
-					rowName = "LegFG"
-				ElseIf row = 3 Then
-					rowName = "LegBG"
-				EndIf
-				For frame = 0 To GraphicsOutput.m_Frames - 1
-					Local exportedFileTempName:String
+				For Local frame:Int = 0 To frameCount - 1
+					Local leadingZeros:String = "00"
+					Local fullFilename:String = filename + rowName + leadingZeros + frame
 					If frame < 10 Then
-						exportedFileTempName = exportedFile + rowName + "00" + frame
-					Else
-						exportedFileTempName = exportedFile + rowName + "0" + frame
+						leadingZeros = "0"
 					EndIf
-					If m_SaveAsIndexed = True
-						If m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(m_TempOutputFrameCopy[row, frame], exportedFileTempName + ".bmp") = False Then
-							RevertPrep()
-						EndIf
+
+					Local saveSuccess:Int = True
+					If m_SaveAsIndexed = True Then
+						saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave[row, frame], fullFilename + ".bmp")
+						'saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[row, frame], fullFilename + ".png")
 					Else
-						If m_IndexedImageWriter.WriteIndexedPNGFromPixmap(m_TempOutputImageCopy, exportedFileTempName + ".png") = False Then
-							RevertPrep()
-						EndIf
+						saveSuccess = SavePixmapPNG(pixmapToSave[row, frame], fullFilename + ".png")
+					EndIf
+
+					If Not saveSuccess Then
+						Notify("Failed to save file: " + fullFilename + "~nFurther saving aborted!")
+						Return True
 					EndIf
 				Next
 			Next
-			RevertPrep()
-		Else
-			'On Cancel
-			RevertPrep()
 		EndIf
-	EndFunction
+		Return True 'Return something to indicate function finished so workspace can be reverted
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method CheckValidExportFileName:Int(filenameToCheck:String)
+		If filenameToCheck = m_ImportedFile Then
+			Notify("Cannot overwrite source image!", True)
+			Return False
+		ElseIf filenameToCheck <> m_ImportedFile And filenameToCheck <> Null Then
+			Return True
+		Else
+			Return False 'On RequestFile cancel
+		EndIf
+	EndMethod
 EndType

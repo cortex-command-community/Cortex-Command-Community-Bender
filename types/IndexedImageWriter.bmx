@@ -72,7 +72,7 @@ Type IndexedImageWriter
 			Local outputStream:TStream = LittleEndianStream(WriteFile(filename)) 'Bitmap file data is stored in little-endian format (least-significant byte first)
 
 			'Bitmap File Header
-			WriteShort(outputStream, 19778)				'File ID (2 bytes) - 19778 (deci) or 42 4D (hex) or BM (ascii) for bitmap
+			WriteShort(outputStream, 19778)				'File ID (2 bytes) - 19778 (decimal) or 42 4D (hex) or BM (ascii) for bitmap
 			WriteInt(outputStream, bmpSizeTotalM4)		'File Size (4 bytes)
 			WriteInt(outputStream, 0)					'Reserved (4 bytes)
 			WriteInt(outputStream, 1078)				'Pixel Array Offset (4 bytes) - pixel array starts at 1078th byte (14 bytes Header + 40 bytes DIB + 1024 (256 * 4) bytes Color Table)
