@@ -28,8 +28,6 @@ Include "Types/FileIO.bmx"
 Const g_AppVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + g_AppVersion
 
-
-
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Global g_UserInterface:UserInterface = New UserInterface
@@ -41,7 +39,6 @@ Global g_IndexedImageWriter:IndexedImageWriter = New IndexedImageWriter
 
 While True
 	g_UserInterface.InitializeUserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
-	g_IndexedImageWriter.LoadDefaultPalette()
 	g_GraphicsOutput.OutputBoot()
 
 	Repeat
