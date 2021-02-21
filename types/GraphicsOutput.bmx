@@ -148,6 +148,13 @@ Type GraphicsOutput
 				CreateJointMarker(m_JointX[i] + i * m_TileSize, m_JointY[i])
 				CreateJointMarker(m_JointX[i] + i * m_TileSize, m_JointY[i] + m_BoneLength[i])
 			Next
+			'Draw names of rows
+			SetColor(255, 230, 80)
+			DrawText("Arm FG", 8, 145)
+			DrawText("Arm BG", 8, 145 + 48)
+			DrawText("Leg FG", 8, 145 + (48 * 2))
+			DrawText("Leg BG", 8, 145 + (48 * 3))
+			SetColor(255, 255, 255)
 			'Draw bent limbs
 			LimbBend()
 			SetColor(255, 255, 255)
@@ -208,13 +215,6 @@ Type GraphicsOutput
 				For Local frame:Int = 0 To m_Frames - 1
 					'Draw a tile outline around all frames to see we are within bounds.
 					DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
-					'Draw names of rows
-					SetColor(255, 230, 80)
-					DrawText("Arm FG", 8, 145)
-					DrawText("Arm BG", 8, 145 + 48)
-					DrawText("Leg FG", 8, 145 + (48 * 2))
-					DrawText("Leg BG", 8, 145 + (48 * 3))
-					SetColor(255, 255, 255)
 					'Grab pixmap inside tile bounds for saving
 					FileIO.m_TempOutputFrameCopy[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
 					'HFlip the legs so they're facing right
