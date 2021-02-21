@@ -58,14 +58,9 @@ Type UserInterface
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
-		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
-		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
+	Method New(zoomValue:Int, framesValue:Int, bgRedValue:Int, bgGreenValue:Int, bgBlueValue:Int)
+		InitializeUserInterface(zoomValue, framesValue, bgRedValue, bgGreenValue, bgBlueValue)
+		InitializeCanvasGraphics()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +69,7 @@ Type UserInterface
 		m_MainWindow = CreateWindow(AppTitle, (DesktopWidth() / 2) - ((m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0]) / 2), (DesktopHeight() / 2) - (m_CanvasGraphicsSize[1] / 2), m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_RESIZABLE | WINDOW_CLIENTCOORDS)
 		m_HelpMenu = CreateMenu("Help", c_HelpMenuTag, WindowMenu(m_MainWindow))
 		m_AboutMenu = CreateMenu("About", c_AboutMenuTag, WindowMenu(m_MainWindow))
+		UpdateWindowMenu(m_MainWindow)
 
 		m_LeftColumn = CreatePanel(0, 0, m_LeftColumnSize[0], m_LeftColumnSize[1], m_MainWindow, Null)
 		SetGadgetLayout(m_LeftColumn, 0, m_LeftColumnSize[0], 0, m_LeftColumnSize[1])
@@ -126,14 +122,16 @@ Type UserInterface
 		m_LogoImagePanel = CreatePanel(m_LogoImagePanelAnchor[0], m_LogoImagePanelAnchor[1], m_LogoImagePanelSize[0], m_LogoImagePanelSize[1], m_LeftColumn, Null)
 		SetPanelPixmap(m_LogoImagePanel, m_LogoImage, PANELPIXMAP_CENTER)
 
-		'Initialize canvas graphics
-		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], m_MainWindow)
+		EnablePolledInput()
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method InitializeCanvasGraphics()
+		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], m_CanvasGraphicsSize[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[1])
 		SetGraphicsDriver(GLMax2DDriver())
 		SetGraphics(CanvasGraphics(m_CanvasGraphics))
-
-		UpdateWindowMenu(m_MainWindow)
-		EnablePolledInput()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,10 +142,25 @@ Type UserInterface
 
 		'Have to recreate the canvas because resizing verically shifts the origin point and no obvious way to reset it
 		FreeGadget(m_CanvasGraphics)
-		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
-		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], GadgetWidth(m_MainWindow), m_CanvasGraphicsAnchor[1], GadgetHeight(m_MainWindow))
-		SetGraphicsDriver(GLMax2DDriver())
-		SetGraphics(CanvasGraphics(m_CanvasGraphics))
+		InitializeCanvasGraphics()
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
+		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
+		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GetMaxWorkspaceWidth:Int()
+		Return DesktopWidth() - m_LeftColumnSize[0]
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

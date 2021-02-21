@@ -29,14 +29,13 @@ AppTitle = "CCCP Bender " + g_AppVersion
 
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Global g_UserInterface:UserInterface = New UserInterface
+Global g_UserInterface:UserInterface = New UserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
 Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput
 Global g_FileIO:FileIO = New FileIO
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
-	g_UserInterface.InitializeUserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
 	g_GraphicsOutput.OutputBoot()
 
 	Repeat
