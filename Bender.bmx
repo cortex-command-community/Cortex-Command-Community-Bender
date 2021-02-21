@@ -28,9 +28,7 @@ Include "Types/FileIO.bmx"
 Const g_AppVersion:String = "1.3.0"
 AppTitle = "CCCP Bender " + g_AppVersion
 
-Global g_ImportedFile:String = Null
-Global g_ExportedFile:String = Null
-Global g_FileFilters:String
+
 
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,7 +56,7 @@ While True
 				Select EventSource()
 					'Loading
 					Case g_UserInterface.m_LoadButton
-						g_FileIO.SetSourceImagePath()
+						g_FileIO.LoadFile()
 					'Saving
 					Case g_UserInterface.m_SaveButton
 						If g_GraphicsOutput.m_SourceImage <> Null Then
@@ -103,10 +101,10 @@ While True
 					'Save as Indexed
 					Case g_UserInterface.m_SettingsIndexedCheckbox
 						If ButtonState(g_UserInterface.m_SettingsIndexedCheckbox) = True Then
-							g_FileFilters = "Image Files:bmp"
+							g_FileIO.m_FileFilters = "Image Files:bmp"
 							g_FileIO.m_SaveAsIndexed = True
 						Else
-							g_FileFilters = "Image Files:png"
+							g_FileIO.m_FileFilters = "Image Files:png"
 							g_FileIO.m_SaveAsIndexed = False
 						EndIf
 				EndSelect
