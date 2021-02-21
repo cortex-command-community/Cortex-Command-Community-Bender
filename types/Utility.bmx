@@ -28,6 +28,7 @@ Type Utility
 		DrawLine(pos[0] + size[0], pos[1], pos[0] + size[0], pos[1] + size[1], True)
 		DrawLine(pos[0] + size[0], pos[1] + size[1], pos[0], pos[1] + size[1], True)
 		DrawLine(pos[0], pos[1] + size[1], pos[0], pos[1], True)
+		SetColor(255, 255, 255)
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -167,6 +167,7 @@ Type GraphicsOutput
 		Else
 			SetColor(255, 230, 80)
 			DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
+			SetColor(255, 255, 255)
 			Flip(1)
 		EndIf
 	EndFunction
@@ -180,6 +181,7 @@ Type GraphicsOutput
 		SetMaskColor(255, 0, 255)
 		SetColor(255, 230, 80)
 		DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
+		SetColor(255, 255, 255)
 		OutputUpdate()
 	EndFunction
 
@@ -212,6 +214,7 @@ Type GraphicsOutput
 					DrawText("Arm BG", 8, 145 + 48)
 					DrawText("Leg FG", 8, 145 + (48 * 2))
 					DrawText("Leg BG", 8, 145 + (48 * 3))
+					SetColor(255, 255, 255)
 					'Grab pixmap inside tile bounds for saving
 					FileIO.m_TempOutputFrameCopy[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
 					'HFlip the legs so they're facing right
