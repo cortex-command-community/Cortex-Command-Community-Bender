@@ -36,7 +36,7 @@ Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput()
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 While True
-	g_GraphicsOutput.OutputBoot()
+	g_GraphicsOutput.InitializeGraphicsOutput()
 
 	Repeat
 		PollEvent()

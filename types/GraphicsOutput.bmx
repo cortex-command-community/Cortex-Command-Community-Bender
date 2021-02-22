@@ -4,9 +4,9 @@ Type GraphicsOutput
 	'Draw Bools
 	Global m_RedoLimbTiles:Int = False
 	'Constants
-	Const c_MinZoom:Int = 1
-	Const c_MaxZoom:Int = 4
-	Const c_MinFrameCount:Int = 1
+	Const c_MinZoom:Int = 4
+	Const c_MaxZoom:Int = 11
+	Const c_MinFrameCount:Int = 3
 	Const c_MaxFrameCount:Int = 20
 	Const c_BoneCount:Int = 8
 	Const c_LimbCount:Int = c_BoneCount / 2
@@ -15,16 +15,17 @@ Type GraphicsOutput
 	Global m_BoneImage:TImage[c_BoneCount]
 	'Output Settings
 	Global m_InputZoom:Int = g_DefaultInputZoom
+	Global m_TileSize:Int = 24 * m_InputZoom
 	Global m_Frames:Int = g_DefaultFrameCount
 	Global m_BackgroundRed:Int = g_DefaultBackgroundRed
 	Global m_BackgroundGreen:Int = g_DefaultBackgroundGreen
 	Global m_BackgroundBlue:Int = g_DefaultBackgroundBlue
+
 	'Limb Parts
 	Global m_JointX:Float[c_BoneCount]
 	Global m_JointY:Float[c_BoneCount]
 	Global m_BoneLength:Float[c_BoneCount]
 	'Precalc for drawing
-	Global m_TileSize:Int = 24
 	Global m_BoneAngle:Int[c_BoneCount, c_MaxFrameCount]
 	Global m_BoneX:Int[c_BoneCount, c_MaxFrameCount]
 	Global m_BoneY:Int[c_BoneCount, c_MaxFrameCount]
@@ -34,6 +35,12 @@ Type GraphicsOutput
 	Global m_AngleC:Float
 
 	Global m_PrepForSave:Int
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function InitializeGraphicsOutput()
+		DrawNoSourceImageScreen()
+	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -214,38 +221,7 @@ Type GraphicsOutput
 			Else
 				Flip(1)
 			EndIf
-		Else
-			SetColor(255, 230, 80)
-			DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
-			SetColor(255, 255, 255)
-			Flip(1)
 		EndIf
-	EndFunction
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	'Create output window and draw assets
-	Function OutputBoot()
-		'Window background color
-		SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
-		SetMaskColor(255, 0, 255)
-		SetColor(255, 230, 80)
-		DrawText("NO IMAGE LOADED!", (GraphicsWidth() / 2) - (TextWidth("NO IMAGE LOADED!") / 2), GraphicsHeight() / 2)
-		SetColor(255, 255, 255)
-		OutputUpdate()
-	EndFunction
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	'Have to do all this so first loaded source image is zoomed in and has correct limb tiles and markers.
-	Function LoadingFirstTime()
-		DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
-		CreateLimbTiles()
-		m_InputZoom = 4
-		m_TileSize = 24 * GraphicsOutput.m_InputZoom
-		m_RedoLimbTiles = True
-		LimbBend()
-		OutputUpdate()
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,5 +255,20 @@ Type GraphicsOutput
 			Flip(1)
 		EndIf
 		m_PrepForSave = False
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function DrawNoSourceImageScreen()
+		SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
+		Cls()
+		SetMaskColor(255, 0, 255)
+		SetColor(255, 230, 80)
+		SetScale(2, 2)
+		Local textToDraw:String = "NO IMAGE LOADED!"
+		DrawText(textToDraw, (GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw))
+		SetColor(255, 255, 255)
+		SetScale(1, 1)
+		Flip(1)
 	EndFunction
 EndType
