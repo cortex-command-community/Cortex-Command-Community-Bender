@@ -16,11 +16,11 @@ Type GraphicsOutput
 	Global m_SourceImage:TImage
 	Global m_BoneImage:TImage[c_BoneCount]
 	'Output Settings
-	Global m_InputZoom:Int = 1
-	Global m_Frames:Int = 7
-	Global m_BackgroundRed:Int = 50
-	Global m_BackgroundGreen:Int = 170
-	Global m_BackgroundBlue:Int = 255
+	Global m_InputZoom:Int = g_DefaultInputZoom
+	Global m_Frames:Int = g_DefaultFrameCount
+	Global m_BackgroundRed:Int = g_DefaultBackgroundRed
+	Global m_BackgroundGreen:Int = g_DefaultBackgroundGreen
+	Global m_BackgroundBlue:Int = g_DefaultBackgroundBlue
 	'Limb Parts
 	Global m_JointX:Float[c_BoneCount]
 	Global m_JointY:Float[c_BoneCount]

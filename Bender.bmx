@@ -18,6 +18,7 @@ Import "Types/Utility.bmx"
 Import "Types/UserInterface.bmx"
 Import "Types/FileIO.bmx"
 
+Include "Types/SettingsManager.bmx"
 Include "Types/GraphicsOutput.bmx"
 
 
@@ -28,7 +29,7 @@ AppTitle = "CCCP Bender " + g_AppVersion
 
 '//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Global g_UserInterface:UserInterface = New UserInterface(g_GraphicsOutput.m_InputZoom, g_GraphicsOutput.m_Frames, g_GraphicsOutput.m_BackgroundRed, g_GraphicsOutput.m_BackgroundGreen, g_GraphicsOutput.m_BackgroundBlue)
+Global g_UserInterface:UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
 Global g_FileIO:FileIO = New FileIO()
 Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput()
 
