@@ -8,8 +8,6 @@ Type GraphicsOutput
 	Const c_MaxZoom:Int = 4
 	Const c_MinFrameCount:Int = 1
 	Const c_MaxFrameCount:Int = 20
-	Const c_MinBGColorValue:Int = 0
-	Const c_MaxBGColorValue:Int = 255
 	Const c_BoneCount:Int = 8
 	Const c_LimbCount:Int = c_BoneCount / 2
 	'Graphic Assets
@@ -146,6 +144,14 @@ Type GraphicsOutput
 	Function CreateJointMarker(x:Float, y:Float)
 		SetRotation(0)
 		DrawCross(Int(x), Int(y), m_InputZoom)
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function SetBackgroundColor(rgbValue:Int[])
+		m_BackgroundRed = rgbValue[0]
+		m_BackgroundGreen = rgbValue[1]
+		m_BackgroundBlue = rgbValue[2]
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

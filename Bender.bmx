@@ -78,21 +78,15 @@ While True
 						g_GraphicsOutput.m_Frames = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), g_GraphicsOutput.c_MinFrameCount, g_GraphicsOutput.c_MaxFrameCount)
 
 						SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_Frames)
-					'Red
-					Case g_UserInterface.m_SettingsColorRTextbox
-						g_GraphicsOutput.m_BackgroundRed = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorRTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
-
-						SetGadgetText(g_UserInterface.m_SettingsColorRTextbox, g_GraphicsOutput.m_BackgroundRed)
-					'Green
-					Case g_UserInterface.m_SettingsColorGTextbox
-						g_GraphicsOutput.m_BackgroundGreen = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorGTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
-
-						SetGadgetText(g_UserInterface.m_SettingsColorGTextbox, g_GraphicsOutput.m_BackgroundGreen)
-					'Blue
-					Case g_UserInterface.m_SettingsColorBTextbox
-						g_GraphicsOutput.m_BackgroundBlue = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorBTextbox).ToInt(), g_GraphicsOutput.c_MinBGColorValue, g_GraphicsOutput.c_MaxBGColorValue)
-
-						SetGadgetText(g_UserInterface.m_SettingsColorBTextbox, g_GraphicsOutput.m_BackgroundBlue)
+					'BG Color
+					Case g_UserInterface.m_SettingsColorRTextbox, g_UserInterface.m_SettingsColorGTextbox, g_UserInterface.m_SettingsColorBTextbox
+						Local newColorValues:Int[] = [	.. 'Line continuation
+							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorRTextbox).ToInt(), 0, 255),	..
+							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorGTextbox).ToInt(), 0, 255),	..
+							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorBTextbox).ToInt(), 0, 255)	..
+						]
+						g_GraphicsOutput.SetBackgroundColor(newColorValues)
+						g_UserInterface.SetColorTextboxValues(newColorValues)
 					'Save as Frames
 					Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
 						If ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox) = True Then

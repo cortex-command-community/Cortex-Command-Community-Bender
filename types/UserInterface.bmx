@@ -151,6 +151,14 @@ Type UserInterface
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method SetColorTextboxValues(newTextValues:Int[])
+		SetGadgetText(m_SettingsColorRTextbox, newTextValues[0])
+		SetGadgetText(m_SettingsColorGTextbox, newTextValues[1])
+		SetGadgetText(m_SettingsColorBTextbox, newTextValues[2])
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
 		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
 	EndMethod
