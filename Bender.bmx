@@ -8,11 +8,6 @@ EndRem
 
 SuperStrict
 
-Import BRL.Basic
-Import BRL.EventQueue
-'Import BRL.Vector
-Import BRL.PNGLoader
-
 Import "EmbeddedAssets.bmx"
 Import "Types/Utility.bmx"
 Import "Types/UserInterface.bmx"
@@ -21,26 +16,29 @@ Import "Types/FileIO.bmx"
 Include "Types/SettingsManager.bmx"
 Include "Types/GraphicsOutput.bmx"
 
-
-'//// GLOBAL VARIABLES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Const g_AppVersion:String = "1.3.0"
-AppTitle = "CCCP Bender " + g_AppVersion
-
-'//// BOOT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-Global g_UserInterface:UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
-Global g_FileIO:FileIO = New FileIO()
-Global g_GraphicsOutput:GraphicsOutput = New GraphicsOutput()
-
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-While True
+AppTitle = "CCCP Bender 1.3.0"
+
+Global g_UserInterface:UserInterface
+Global g_FileIO:FileIO
+Global g_GraphicsOutput:GraphicsOutput
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Repeat
+	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
+	g_FileIO = New FileIO()
+	g_GraphicsOutput = New GraphicsOutput()
 	g_GraphicsOutput.InitializeGraphicsOutput()
 
 	Repeat
 		PollEvent()
+
 		Select EventID()
+			'Case EVENT_WINDOWACTIVATE
+			'Case EVENT_GADGETLOSTFOCUS
+
 			Case EVENT_APPRESUME
 				ActivateWindow(g_UserInterface.m_MainWindow)
 			Case EVENT_WINDOWSIZE
@@ -52,12 +50,6 @@ While True
 					Case g_UserInterface.c_AboutMenuTag
 						Notify(g_UserInterface.m_AboutMenuText, False)
 				EndSelect
-			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
-				If Confirm("Quit program?") Then End
-
-
-			'Case EVENT_WINDOWACTIVATE
-			'Case EVENT_GADGETLOSTFOCUS
 			Case EVENT_GADGETACTION
 				Select EventSource()
 					'Loading
@@ -104,8 +96,10 @@ While True
 							g_FileIO.m_SaveAsIndexed = False
 						EndIf
 				EndSelect
+			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
+				If Confirm("Quit program?") Then End
 		EndSelect
 
 	g_GraphicsOutput.OutputUpdate()
 	Forever
-EndWhile
+Forever
