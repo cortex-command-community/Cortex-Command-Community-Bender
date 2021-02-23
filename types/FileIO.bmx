@@ -77,10 +77,10 @@ Type FileIO
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
-		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up.
+		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up
 		If CheckValidExportFileName(filename) Then
 			For Local row:Int = 0 To 3
-				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
+				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order
 				Select row
 					Case 0
 						rowName = "ArmFG"

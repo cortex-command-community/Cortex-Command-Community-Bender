@@ -101,12 +101,9 @@ Type GraphicsOutput
 			DrawNoSourceImageScreen()
 		Else
 			SetColor(255, 0, 255)
-			DrawRect(0, 0, GraphicsWidth(), ImageHeight(m_SourceImage) * m_InputZoom) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
+			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
 			ResetDrawColor()
-			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
-			'Draw names of rows
-			SetColor(255, 230, 80)
-			ResetDrawColor()
+			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)
 
 			m_LimbManager.DrawTileOutlines()
 			m_LimbManager.DrawJointMarkers()
@@ -140,7 +137,7 @@ Type GraphicsOutput
 				Local tile:TImage = LoadImage("Incbin::Assets/Tile")
 				For Local row:Int = 0 To 3
 					For Local frame:Int = 0 To m_FrameCount - 1
-						'Draw a tile outline around all frames to see we are within bounds.
+						'Draw a tile outline around all frames to see we are within bounds
 						DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
 						'Grab pixmap inside tile bounds for saving
 						framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)

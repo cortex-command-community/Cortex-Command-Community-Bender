@@ -1,11 +1,14 @@
+Include "Utility.bmx"
+
 '//// LIMB MANAGER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Const c_LimbPartCount:Int = 8
 Const c_LimbCount:Int = c_LimbPartCount / 2
-Const c_MinExtend:Float = 0.30	'Possibly make definable in settings (slider)
-Const c_MaxExtend:Float = 0.99	'Possibly make definable in settings (slider)
 
 Type LimbManager
+	Const c_MinExtend:Float = 0.30	'Possibly make definable in settings (slider)
+	Const c_MaxExtend:Float = 0.99	'Possibly make definable in settings (slider)
+
 	Field m_InputZoom:Int
 	Field m_TileSize:Int
 
@@ -15,10 +18,6 @@ Type LimbManager
 	Field m_LimbPartJointOffsetX:Float[c_LimbPartCount]
 	Field m_LimbPartJointOffsetY:Float[c_LimbPartCount]
 	Field m_LimbPartLength:Float[c_LimbPartCount]
-
-	'Global m_LimbPartAngle:Int[c_LimbPartCount, c_MaxFrameCount]
-	'Global m_LimbPartPosX:Int[c_LimbPartCount, c_MaxFrameCount]
-	'Global m_LimbPartPosY:Int[c_LimbPartCount, c_MaxFrameCount]
 
 	Global m_LimbPartAngle:Int[c_LimbPartCount, 20]
 	Global m_LimbPartPosX:Int[c_LimbPartCount, 20]
@@ -41,7 +40,6 @@ Type LimbManager
 			m_LimbPartJointOffsetY[part] = Null
 			m_LimbPartLength[part] = Null
 		Next
-		'DebugStop
 
 		For Local part:Int = 0 To c_LimbPartCount - 1
 			m_LimbPartImage[part] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
@@ -75,29 +73,29 @@ Type LimbManager
 			m_LimbPartJointOffsetX[part] = m_TileSize / 2 	'X is always at center, so kinda pointless to even bother - at the moment
 			m_LimbPartJointOffsetY[part] = ym				'Determines length
 			m_LimbPartLength[part] = ((m_TileSize / 2) - ym) * 2
-			SetImageHandle(m_LimbPartImage[part], m_LimbPartJointOffsetX[part] / m_InputZoom, m_LimbPartJointOffsetY[part] / m_InputZoom) 'Update rotation handle.
+			SetImageHandle(m_LimbPartImage[part], m_LimbPartJointOffsetX[part] / m_InputZoom, m_LimbPartJointOffsetY[part] / m_InputZoom) 'Update rotation handle
 		EndIf
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method BendLimbs(frameCount:Int)
-		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) ' -1 to make inclusive of last value (full range)
+		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) '-1 to make inclusive of last value (full range)
 		For Local limb:Float = 0 To c_LimbCount - 1
 			For Local frame:Int = 0 To frameCount - 1
 				Local limbPart:Int = limb * 2
-				Local posX:Float = (frame * 32)				'Drawing position X
-				Local posY:Float = ((limb * 32) * 1.5 )		'Drawing position Y
+				Local posX:Float = (frame * 32)			'Drawing position X
+				Local posY:Float = ((limb * 32) * 1.5 )	'Drawing position Y
 				Local upperLength:Float = m_LimbPartLength[limbPart] / m_InputZoom
 				Local lowerLength:Float = m_LimbPartLength[limbPart + 1] / m_InputZoom
-				Local airLength:Float = ((stepSize * frame) + c_MinExtend) * (upperLength + lowerLength)	'Sum of the two bones * step scaler for frame (hip-ankle)
+				Local airLength:Float = ((stepSize * frame) + c_MinExtend) * (upperLength + lowerLength) 'Sum of the two bones * step scaler for frame (hip-ankle)
 				LawOfCosines(airLength, upperLength, lowerLength)
 				m_LimbPartAngle[limbPart, frame] = m_AngleB
 				m_LimbPartPosX[limbPart, frame] = posX
 				m_LimbPartPosY[limbPart, frame] = posY
-				posX :- Sin(m_LimbPartAngle[limbPart, frame]) * upperLength			'Position of knee
-				posY :+ Cos(m_LimbPartAngle[limbPart, frame]) * upperLength			'Could just use another m_LimbPartAngle of the triangle though, but I (arne) didn't
-				m_LimbPartAngle[limbPart + 1, frame] = m_AngleC + m_AngleB + 180	'It looks correct on screen so i'm (arne) just gonna leave it at that!
+				posX :- Sin(m_LimbPartAngle[limbPart, frame]) * upperLength 'Position of knee
+				posY :+ Cos(m_LimbPartAngle[limbPart, frame]) * upperLength
+				m_LimbPartAngle[limbPart + 1, frame] = m_AngleC + m_AngleB + 180
 				m_LimbPartPosX[limbPart + 1, frame] = posX
 				m_LimbPartPosY[limbPart + 1, frame] = posY
 			Next
