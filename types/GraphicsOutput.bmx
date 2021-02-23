@@ -108,6 +108,7 @@ Type GraphicsOutput
 			SetColor(255, 230, 80)
 			ResetDrawColor()
 
+			m_LimbManager.DrawTileOutlines()
 			m_LimbManager.DrawJointMarkers()
 			ResetDrawColor()
 

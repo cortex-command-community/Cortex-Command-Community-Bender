@@ -28,12 +28,13 @@ Type Utility
 	Function DrawRectOutline(posX:Int, posY:Int, width:Int, height:Int, color:Int[])
 		Local pos:SVec2I = New SVec2I(posX, posY)
 		Local size:SVec2I = New SVec2I(width, height)
-		DrawRectOutline(pos, size)
+		DrawRectOutline(pos, size, color)
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function DrawRectOutline(pos:SVec2I, size:SVec2I)
+	Function DrawRectOutline(pos:SVec2I, size:SVec2I, color:Int[])
+		SetColor(color[0], color[1], color[2])
 		DrawLine(pos[0], pos[1], pos[0] + size[0], pos[1], True)
 		DrawLine(pos[0] + size[0], pos[1], pos[0] + size[0], pos[1] + size[1], True)
 		DrawLine(pos[0] + size[0], pos[1] + size[1], pos[0], pos[1] + size[1], True)

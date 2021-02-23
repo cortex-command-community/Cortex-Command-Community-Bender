@@ -106,6 +106,16 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method DrawTileOutlines()
+		Local frameSize:SVec2I = New SVec2I(m_TileSize, m_TileSize)
+		Local drawColor:Int[] = [0, 0, 80]
+		For Local part:Int = 0 To c_LimbPartCount - 1
+			Utility.DrawRectOutline(m_LimbPartTilePos[part], frameSize, drawColor)
+		Next
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method DrawJointMarker(centerPosX:Float, centerPosY:Float, radius:Int = 2, drawShadow:Int = True)
 		Local centerPos:SVec2F = New SVec2F(centerPosX, centerPosY)
 		DrawJointMarker(centerPos, radius, drawShadow)
