@@ -68,16 +68,16 @@ While True
 						g_GraphicsOutput.GrabOutputForSaving()
 					'Scale
 					Case g_UserInterface.m_SettingsZoomTextbox
-						g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), g_GraphicsOutput.c_MinZoom, g_GraphicsOutput.c_MaxZoom)
+						g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), 1, g_GraphicsOutput.c_MaxZoom)
 
 						SetGadgetText(g_UserInterface.m_SettingsZoomTextbox, g_GraphicsOutput.m_InputZoom)
 						g_GraphicsOutput.m_TileSize = 24 * g_GraphicsOutput.m_InputZoom
 						g_GraphicsOutput.m_RedoLimbTiles = True
 					'Frames
 					Case g_UserInterface.m_SettingsFramesTextbox
-						g_GraphicsOutput.m_Frames = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), g_GraphicsOutput.c_MinFrameCount, g_GraphicsOutput.c_MaxFrameCount)
+						g_GraphicsOutput.m_FrameCount = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), 1, g_GraphicsOutput.c_MaxFrameCount)
 
-						SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_Frames)
+						SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_FrameCount)
 					'BG Color
 					Case g_UserInterface.m_SettingsColorRTextbox, g_UserInterface.m_SettingsColorGTextbox, g_UserInterface.m_SettingsColorBTextbox
 						Local newColorValues:Int[] = [	.. 'Line continuation
