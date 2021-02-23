@@ -11,6 +11,7 @@ Type GraphicsOutput
 	Global c_Magenta:Int[] = [255, 0, 255]
 	'Graphic Assets
 	Global m_SourceImage:TImage
+	Global m_SourceImageSize:Svec2I
 	'Output Settings
 	Global m_InputZoom:Int = g_DefaultInputZoom
 	Global m_TileSize:Int = 24 * m_InputZoom
@@ -35,7 +36,8 @@ Type GraphicsOutput
 		m_SourceImage = LoadImage(fileToLoad, 0)
 
 		If m_SourceImage <> Null Then
-			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
+			m_SourceImageSize = New SVec2I(ImageWidth(m_SourceImage), ImageHeight(m_SourceImage))
+			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
 			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
 	EndFunction
@@ -104,12 +106,13 @@ Type GraphicsOutput
 			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
 			'Draw names of rows
 			SetColor(255, 230, 80)
-			Local textVertOffset:Int = 50 + (m_TileSize)
 			ResetDrawColor()
 
 			m_LimbManager.DrawJointMarkers()
 			ResetDrawColor()
-			m_LimbManager.DrawBentLimbs(m_FrameCount)
+
+			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 35
+			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount)
 
 			Local drawColor:Int[] = [255, 230, 80]
 			Utility.DrawTextWithShadow("Arm FG", New SVec2I(10, vertOffsetFromSource), drawColor)
