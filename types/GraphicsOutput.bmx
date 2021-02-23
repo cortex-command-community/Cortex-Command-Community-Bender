@@ -162,9 +162,11 @@ Type GraphicsOutput
 
 	Function DrawNoSourceImageScreen()
 		Cls()
-		SetColor(255, 230, 80)
 		SetScale(2, 2)
 		Local textToDraw:String = "NO IMAGE LOADED!"
+		SetColor(0, 0, 80)
+		DrawText(textToDraw, (GraphicsWidth() / 2) - TextWidth(textToDraw) + 1, (GraphicsHeight() / 2) - TextHeight(textToDraw) + 1) 'Shadow
+		SetColor(255, 230, 80)
 		DrawText(textToDraw, (GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw))
 		ResetDrawColor()
 		SetScale(1, 1)
