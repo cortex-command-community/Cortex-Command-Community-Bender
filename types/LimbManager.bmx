@@ -8,7 +8,6 @@ Const c_MaxExtend:Float = 0.99	'Possibly make definable in settings (slider)
 Type LimbManager
 	Field m_InputZoom:Int
 	Field m_TileSize:Int
-	Field m_FrameCount:Int
 
 	Field m_LimbPartTilePos:SVec2I[c_LimbPartCount]
 
@@ -31,15 +30,10 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method New(inputZoom:Int, tileSize:Int, frameCount:Int)
+	Method CreateLimbParts(inputZoom:Int, tileSize:Int)
 		m_InputZoom = inputZoom
 		m_TileSize = tileSize
-		m_FrameCount = frameCount
-	EndMethod
 
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method CreateLimbParts()
 		'Clear all the arrays before recreating
 		For Local part:Int = 0 To c_LimbPartCount - 1
 			m_LimbPartImage[part] = Null
@@ -87,10 +81,10 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method BendLimbs()
-		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (m_FrameCount - 1) ' -1 to make inclusive of last value (full range)
+	Method BendLimbs(frameCount:Int)
+		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) ' -1 to make inclusive of last value (full range)
 		For Local limb:Float = 0 To c_LimbCount - 1
-			For Local frame:Int = 0 To m_FrameCount - 1
+			For Local frame:Int = 0 To frameCount - 1
 				Local limbPart:Int = limb * 2
 				Local posX:Float = (frame * 32) + 80 				'Drawing position X
 				Local posY:Float = ((limb * 32) * 1.5 ) + 144		'Drawing position Y
@@ -145,9 +139,9 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method DrawBentLimbs()
-		BendLimbs()
-		For Local frame:Int = 0 To m_FrameCount - 1
+	Method DrawBentLimbs(frameCount:Int)
+		BendLimbs(frameCount)
+		For Local frame:Int = 0 To frameCount - 1
 			Local limbPart:Int
 			'DebugStop
 			'These might be in a specific draw-order for joint overlapping purposes

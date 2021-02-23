@@ -19,7 +19,7 @@ Type GraphicsOutput
 
 	Global m_PrepForSave:Int
 
-	Global m_LimbManager:LimbManager
+	Global m_LimbManager:LimbManager = New LimbManager()
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -27,8 +27,6 @@ Type GraphicsOutput
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
 		DrawNoSourceImageScreen()
-
-		m_LimbManager = New LimbManager(m_InputZoom, m_TileSize, m_FrameCount)
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +34,9 @@ Type GraphicsOutput
 	Function LoadFile(fileToLoad:String)
 		m_SourceImage = LoadImage(fileToLoad, 0)
 
+		If m_SourceImage <> Null Then
+			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
+			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
 	EndFunction
 
@@ -114,14 +115,9 @@ Type GraphicsOutput
 
 			m_LimbManager.DrawJointMarkers()
 			ResetDrawColor()
+			m_LimbManager.DrawBentLimbs(m_FrameCount)
 
-			m_LimbManager.DrawBentLimbs()
-
-			If m_PrepForSave
-				GrabOutputForSaving()
-			Else
-				Flip(1)
-			EndIf
+			Flip(1)
 		EndIf
 	EndFunction
 
