@@ -82,7 +82,6 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Update Output Window
 	Function OutputUpdate()
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
@@ -106,16 +105,17 @@ Type GraphicsOutput
 			'Draw names of rows
 			SetColor(255, 230, 80)
 			Local textVertOffset:Int = 50 + (m_TileSize)
-
-			DrawText("Arm FG", 8, textVertOffset)
-			DrawText("Arm BG", 8, textVertOffset + 48)
-			DrawText("Leg FG", 8, textVertOffset + (48 * 2))
-			DrawText("Leg BG", 8, textVertOffset + (48 * 3))
 			ResetDrawColor()
 
 			m_LimbManager.DrawJointMarkers()
 			ResetDrawColor()
 			m_LimbManager.DrawBentLimbs(m_FrameCount)
+
+			Local drawColor:Int[] = [255, 230, 80]
+			Utility.DrawTextWithShadow("Arm FG", New SVec2I(10, vertOffsetFromSource), drawColor)
+			Utility.DrawTextWithShadow("Arm BG", New SVec2I(10, vertOffsetFromSource + 48), drawColor)
+			Utility.DrawTextWithShadow("Leg FG", New SVec2I(10, vertOffsetFromSource + (48 * 2)), drawColor)
+			Utility.DrawTextWithShadow("Leg BG", New SVec2I(10, vertOffsetFromSource + (48 * 3)), drawColor)
 
 			Flip(1)
 		EndIf
@@ -123,7 +123,6 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Output copy for saving
 	Function GrabOutputForSaving()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
@@ -160,11 +159,8 @@ Type GraphicsOutput
 		Cls()
 		SetScale(2, 2)
 		Local textToDraw:String = "NO IMAGE LOADED!"
-		SetColor(0, 0, 80)
-		DrawText(textToDraw, (GraphicsWidth() / 2) - TextWidth(textToDraw) + 1, (GraphicsHeight() / 2) - TextHeight(textToDraw) + 1) 'Shadow
-		SetColor(255, 230, 80)
-		DrawText(textToDraw, (GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw))
-		ResetDrawColor()
+		Local drawColor:Int[] = [255, 230, 80]
+		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
 		SetScale(1, 1)
 		Flip(1)
 	EndFunction
