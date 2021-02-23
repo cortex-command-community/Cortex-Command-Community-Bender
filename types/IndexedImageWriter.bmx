@@ -59,7 +59,7 @@ Type IndexedImageWriter
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method WriteIndexedBitmapFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
-		If filename.Length = 0 Then
+		If filename = Null Then
 			Return False
 		Else
 			Local bmpWidth:Int = PixmapWidth(sourcePixmap)
@@ -122,7 +122,7 @@ Type IndexedImageWriter
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method WriteIndexedPNGFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
-		If filename.Length = 0 Then
+		If filename = Null Then
 			Return False
 		Else
 			Local pngWidth:Int = PixmapWidth(sourcePixmap)

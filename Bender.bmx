@@ -43,6 +43,8 @@ Repeat
 				ActivateWindow(g_UserInterface.m_MainWindow)
 			Case EVENT_WINDOWSIZE
 				g_UserInterface.ProcessWindowResize()
+			Case EVENT_WINDOWACCEPT
+				g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad(EventExtra().ToString()))
 			Case EVENT_MENUACTION
 				Select EventData()
 					Case g_UserInterface.c_HelpMenuTag

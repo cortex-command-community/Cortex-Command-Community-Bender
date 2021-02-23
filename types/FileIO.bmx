@@ -20,9 +20,19 @@ Type FileIO
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method SetFileToLoad:String()
-		Local newImportFile:String = RequestFile("Select graphic file to open", "Image Files:png,bmp")
-		If newImportFile <> m_ImportedFile And newImportFile <> Null Then
+	Method SetFileToLoad:String(pathFromDropEvent:String = Null)
+		Local newImportFile:String = Null
+		If pathFromDropEvent <> Null Then
+			If pathFromDropEvent.EndsWith(".png") Or pathFromDropEvent.EndsWith(".bmp") Then
+				newImportFile = pathFromDropEvent
+			Else
+				Notify("Can't load file with ~q." + ExtractExt(pathFromDropEvent) + "~q extension!~nValid extensions are ~q.bmp~q and ~q.png~q!")
+				Return m_ImportedFile
+			EndIf
+		Else
+			newImportFile = RequestFile("Select graphic file to open", "Image Files:png,bmp")
+		EndIf
+		If newImportFile <> Null And newImportFile <> m_ImportedFile Then
 			m_ImportedFile = newImportFile
 		EndIf
 		Return m_ImportedFile
