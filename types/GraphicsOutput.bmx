@@ -14,9 +14,7 @@ Type GraphicsOutput
 	Global m_InputZoom:Int = g_DefaultInputZoom
 	Global m_TileSize:Int = 24 * m_InputZoom
 	Global m_Frames:Int = g_DefaultFrameCount
-	Global m_BackgroundRed:Int = g_DefaultBackgroundRed
-	Global m_BackgroundGreen:Int = g_DefaultBackgroundGreen
-	Global m_BackgroundBlue:Int = g_DefaultBackgroundBlue
+	Global m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
 
 	Global m_PrepForSave:Int
 
@@ -40,10 +38,15 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Function SetBackgroundColor(rgbValue:Int[])
+		m_BackgroundColor = rgbValue
+		ChangeBackgroundColor(m_BackgroundColor)
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Function ChangeBackgroundColor(rgbValue:Int[])
+		SetClsColor(rgbValue[0], rgbValue[1], rgbValue[2])
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,9 +70,9 @@ Type GraphicsOutput
 		'Drawing Output
 		'Set background color
 		If m_PrepForSave
-			SetClsColor(255, 0, 255)
+			ChangeBackgroundColor(c_Magenta)
 		Else
-			SetClsColor(m_BackgroundRed, m_BackgroundGreen, m_BackgroundBlue)
+			ChangeBackgroundColor(m_BackgroundColor)
 		EndIf
 		'Draw source image
 		If m_SourceImage <> Null Then
