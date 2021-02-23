@@ -60,41 +60,19 @@ Repeat
 						g_GraphicsOutput.GrabOutputForSaving()
 					'Scale
 					Case g_UserInterface.m_SettingsZoomTextbox
-						g_GraphicsOutput.m_InputZoom = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsZoomTextbox).ToInt(), 1, g_GraphicsOutput.c_MaxZoom)
-
-						SetGadgetText(g_UserInterface.m_SettingsZoomTextbox, g_GraphicsOutput.m_InputZoom)
-						g_GraphicsOutput.m_TileSize = 24 * g_GraphicsOutput.m_InputZoom
-						g_GraphicsOutput.m_RedoLimbTiles = True
+						g_UserInterface.SetZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetZoomTextboxValue()))
 					'Frames
 					Case g_UserInterface.m_SettingsFramesTextbox
-						g_GraphicsOutput.m_FrameCount = Utility.Clamp(GadgetText(g_UserInterface.m_SettingsFramesTextbox).ToInt(), 1, g_GraphicsOutput.c_MaxFrameCount)
-
-						SetGadgetText(g_UserInterface.m_SettingsFramesTextbox, g_GraphicsOutput.m_FrameCount)
+						g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_UserInterface.GetFramesTextboxValue()))
 					'BG Color
 					Case g_UserInterface.m_SettingsColorRTextbox, g_UserInterface.m_SettingsColorGTextbox, g_UserInterface.m_SettingsColorBTextbox
-						Local newColorValues:Int[] = [	.. 'Line continuation
-							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorRTextbox).ToInt(), 0, 255),	..
-							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorGTextbox).ToInt(), 0, 255),	..
-							Utility.Clamp(GadgetText(g_UserInterface.m_SettingsColorBTextbox).ToInt(), 0, 255)	..
-						]
-						g_GraphicsOutput.SetBackgroundColor(newColorValues)
-						g_UserInterface.SetColorTextboxValues(newColorValues)
+						g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(g_UserInterface.GetColorTextboxValues()))
 					'Save as Frames
 					Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
-						If ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox) = True Then
-							g_FileIO.m_SaveAsFrames = True
-						Else
-							g_FileIO.m_SaveAsFrames = False
-						EndIf
+						g_FileIO.SetSaveAsFrames(ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox))
 					'Save as Indexed
 					Case g_UserInterface.m_SettingsIndexedCheckbox
-						If ButtonState(g_UserInterface.m_SettingsIndexedCheckbox) = True Then
-							g_FileIO.m_FileFilters = "Image Files:bmp"
-							g_FileIO.m_SaveAsIndexed = True
-						Else
-							g_FileIO.m_FileFilters = "Image Files:png"
-							g_FileIO.m_SaveAsIndexed = False
-						EndIf
+						g_FileIO.SetSaveAsIndexed(ButtonState(g_UserInterface.m_SettingsIndexedCheckbox))
 				EndSelect
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				If Confirm("Quit program?") Then End
