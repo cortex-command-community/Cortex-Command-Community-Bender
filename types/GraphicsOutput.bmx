@@ -77,6 +77,9 @@ Type GraphicsOutput
 		If m_SourceImage = Null Then
 			DrawNoSourceImageScreen()
 		Else
+			SetColor(255, 0, 255)
+			DrawRect(0, 0, GraphicsWidth(), ImageHeight(m_SourceImage) * m_InputZoom) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
+			ResetDrawColor()
 			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
 			'Draw names of rows
 			SetColor(255, 230, 80)
