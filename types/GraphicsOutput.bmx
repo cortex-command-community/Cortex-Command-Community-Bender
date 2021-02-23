@@ -80,11 +80,13 @@ Type GraphicsOutput
 			DrawImageRect(m_SourceImage, 0, 0, ImageWidth(m_SourceImage) * m_InputZoom, ImageHeight(m_SourceImage) * m_InputZoom)
 			'Draw names of rows
 			SetColor(255, 230, 80)
-			DrawText("Arm FG", 8, 145)
-			DrawText("Arm BG", 8, 145 + 48)
-			DrawText("Leg FG", 8, 145 + (48 * 2))
-			DrawText("Leg BG", 8, 145 + (48 * 3))
-			SetColor(255, 255, 255)
+			Local textVertOffset:Int = 50 + (m_TileSize)
+
+			DrawText("Arm FG", 8, textVertOffset)
+			DrawText("Arm BG", 8, textVertOffset + 48)
+			DrawText("Leg FG", 8, textVertOffset + (48 * 2))
+			DrawText("Leg BG", 8, textVertOffset + (48 * 3))
+			ResetDrawColor()
 
 			m_LimbManager.DrawJointMarkers()
 			ResetDrawColor()
