@@ -132,8 +132,8 @@ Type LimbManager
 
 	Method DrawJointMarkers()
 		For Local limbPart:Int = 0 To c_LimbPartCount - 1
-			DrawJointMarker(New SVec2F(m_LimbPartPosX[limbPart] + limbPart * m_TileSize, m_LimbPartPosY[limbPart]), m_InputZoom)
-			DrawJointMarker(New SVec2F(m_LimbPartPosX[limbPart] + limbPart * m_TileSize, m_LimbPartPosY[limbPart] + m_LimbPartLength[limbPart]), m_InputZoom)
+			DrawJointMarker(New SVec2F(m_LimbPartJointOffsetX[limbPart] + (limbPart * m_TileSize), m_LimbPartJointOffsetY[limbPart]), m_InputZoom)
+			DrawJointMarker(New SVec2F(m_LimbPartJointOffsetX[limbPart] + (limbPart * m_TileSize), m_LimbPartJointOffsetY[limbPart] + m_LimbPartLength[limbPart]), m_InputZoom)
 		Next
 	EndMethod
 
