@@ -21,7 +21,7 @@ Type Utility
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function DrawTextWithShadow(text:String, pos:Svec2I, color:Int[])
+	Function DrawTextWithShadow(text:String, pos:SVec2I, color:Int[])
 		SetColor(0, 0, 80)
 		DrawText(text, pos[0] + 1, pos[1] + 1)
 		SetColor(color[0], color[1], color[2])
@@ -52,5 +52,39 @@ Type Utility
 
 	Function PointIsWithinBox:Int(point:SVec2I, boxPos:SVec2I, boxSize:SVec2I)
 		Return point[0] >= boxPos[0] And point[0] < (boxPos[0] + boxSize[0]) And point[1] >= boxPos[1] And point[1] < (boxPos[1] + boxSize[1])
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function RotatePixmap:TPixmap(sourcePixmap:TPixmap, angle:Int)
+		Local outputPixmap:TPixmap
+
+		'This is pretty garbage but BlitzMax life is hard
+		Select angle
+			Case 90
+				outputPixmap = CreatePixmap(sourcePixmap.Height, sourcePixmap.Width, sourcePixmap.Format)
+				For Local x:Int = 0 Until sourcePixmap.Width
+					For Local y:Int = 0 Until sourcePixmap.Height
+						WritePixel(outputPixmap, sourcePixmap.Height - y - 1, x, ReadPixel(sourcePixmap, x, y))
+					Next
+				Next
+			Case 180
+				outputPixmap = CreatePixmap(sourcePixmap.Width, sourcePixmap.Height, sourcePixmap.Format)
+				For Local x:Int = 0 Until sourcePixmap.Width
+					For Local y:Int = 0 Until sourcePixmap.Height
+						WritePixel(outputPixmap, sourcePixmap.Width - x - 1, sourcePixmap.Height - y - 1, ReadPixel(sourcePixmap, x, y))
+					Next
+				Next
+			Case 270, -90
+				outputPixmap = CreatePixmap(sourcePixmap.Height, sourcePixmap.Width, sourcePixmap.Format)
+				For Local x:Int = 0 Until sourcePixmap.Width
+					For Local y:Int = 0 Until sourcePixmap.Height
+						WritePixel(outputPixmap, y, sourcePixmap.Width - x - 1, ReadPixel(sourcePixmap, x, y))
+					Next
+				Next
+			Default
+				outputPixmap = sourcePixmap
+		EndSelect
+		Return outputPixmap
 	EndFunction
 EndType
