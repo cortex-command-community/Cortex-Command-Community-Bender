@@ -85,6 +85,7 @@ Type LimbManager
 			ElseIf Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, (m_TileSize / 2) + m_InputZoom), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) = True Then
 				selectedMarker = 1
 			Else
+				FlushMouse() 'Reset mouse input so markers don't snap when leaving vertical bounds and entering bounds of another marker
 				Return
 			EndIf
 		EndIf
