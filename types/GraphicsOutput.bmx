@@ -11,6 +11,8 @@ Type GraphicsOutput
 	Const c_MaxFrameCount:Int = 20
 	Field c_Magenta:Int[] = [255, 0, 255]
 	'Graphic Assets
+
+	Field m_MaxZoom:Int = 5 'Assume 1366px is the lowest resolution because it's not 1999. 1366px - 260px (left column) = 1106 / 192 (source image width) = 5 (floored)
 	Field m_SourceImage:TImage
 	Field m_SourceImageSize:SVec2I
 	'Output Settings
@@ -28,9 +30,11 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method New()
+	Method New(maxWorkspaceWidth:Int)
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
+
+		m_MaxZoom = Int(FloorF(maxWorkspaceWidth / 192))
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +60,7 @@ Type GraphicsOutput
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method SetInputZoom:Int(newZoom:Int)
-		Local clampedNewZoom:Int = Utility.Clamp(newZoom, 1, c_MaxZoom)
+		Local clampedNewZoom:Int = Utility.Clamp(newZoom, 1, m_MaxZoom)
 		If m_InputZoom <> clampedNewZoom Then
 			m_InputZoom = clampedNewZoom
 			m_TileSize = 24 * m_InputZoom
