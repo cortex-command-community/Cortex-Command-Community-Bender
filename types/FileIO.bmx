@@ -78,7 +78,7 @@ Type FileIO
 				Notify("Failed to save file: " + filename)
 			EndIf
 		EndIf
-		Return True 'Retrun something to indicate function finished so workspace can be reverted
+		Return True 'Return something to indicate function finished so workspace can be reverted
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

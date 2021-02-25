@@ -175,11 +175,14 @@ Type GraphicsOutput
 			Flip(1) 'Have to flip again for background color to actually change, not sure why but whatever
 
 			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
-			For Local row:Int = 0 To 3
+			For Local row:Int = 0 Until c_LimbCount
+				Local rotationAngle:Int = -90
+				If row >= 2 Then
+					rotationAngle = 90
+				EndIf
 				For Local frame:Int = 0 Until m_FrameCount
-					'Grab pixmap inside tile bounds for saving
-					framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
-					'HFlip the legs so they're facing right
+					framesToSave[row, frame] = Utility.RotatePixmap(GrabPixmap(m_FrameBoundingBoxPosX[row, frame] + 1, m_FrameBoundingBoxPosY[row, frame] + 1, m_FrameBoundingBoxSize[0] - 1, m_FrameBoundingBoxSize[1] - 1), rotationAngle)
+					'HFlip the legs so they're facing the right direction
 					If row >= 2 Then
 						framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
 					EndIf

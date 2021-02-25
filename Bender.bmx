@@ -27,6 +27,7 @@ Repeat
 	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput()
+	EnablePolledInput()
 
 	Repeat
 		PollEvent()
