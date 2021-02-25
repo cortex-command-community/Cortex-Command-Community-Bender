@@ -65,6 +65,8 @@ Type GraphicsOutput
 			m_InputZoom = clampedNewZoom
 			m_TileSize = 24 * m_InputZoom
 
+			m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
+			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
 			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
 		Return m_InputZoom
