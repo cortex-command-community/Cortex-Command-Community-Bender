@@ -137,6 +137,7 @@ Type UserInterface
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], m_CanvasGraphicsSize[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[1])
 		SetGraphicsDriver(GLMax2DDriver())
 		SetGraphics(CanvasGraphics(m_CanvasGraphics))
+		SetClsColor(GadgetText(m_SettingsColorRTextbox).ToInt(), GadgetText(m_SettingsColorGTextbox).ToInt(), GadgetText(m_SettingsColorBTextbox).ToInt())
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

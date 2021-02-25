@@ -65,6 +65,12 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method GetFrameCount:Int()
+		Return m_FrameCount
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method SetFrameCount:Int(newCount:Int)
 		m_FrameCount = Utility.Clamp(newCount, 1, c_MaxFrameCount)
 		Return m_FrameCount
@@ -74,6 +80,14 @@ Type GraphicsOutput
 
 	Method ChangeBackgroundColor(rgbValue:Int[])
 		SetClsColor(rgbValue[0], rgbValue[1], rgbValue[2])
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method RevertBackgroundColorAfterSave(revertOrNot:Int)
+		If revertOrNot Then
+			ChangeBackgroundColor(m_BackgroundColor)
+		EndIf
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +106,6 @@ Type GraphicsOutput
 				m_LimbManager.SetJointMarker(mousePos)
 			EndIf
 		EndIf
-		ChangeBackgroundColor(m_BackgroundColor)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,36 +149,40 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method GrabOutputForSaving()
-		Rem
-
+	Method GrabOutputForSaving:TPixmap()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
 		Else
 			ChangeBackgroundColor(c_Magenta)
 			Draw()
-
-			If Not g_FileIO.m_SaveAsFrames Then
-				g_FileIO.SaveFile(GrabPixmap(55, 120, 34 * m_FrameCount, 210))
-			Else
-				Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
-				For Local row:Int = 0 To 3
-					For Local frame:Int = 0 To m_FrameCount - 1
-						'Grab pixmap inside tile bounds for saving
-						framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
-						'HFlip the legs so they're facing right
-						If row >= 2 Then
-							framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
-						EndIf
-					Next
-				Next
-				g_FileIO.SaveFileAsFrames(framesToSave, m_FrameCount)
-			EndIf
-
-			ChangeBackgroundColor(m_BackgroundColor)
+			Flip(1) 'Have to flip again for background color to actually change, not sure why but whatever
+			Return GrabPixmap(55, 120, 34 * m_FrameCount, 210)
 		EndIf
+	EndMethod
 
-		EndRem
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GrabOutputFramesForSaving:TPixmap[,]()
+		If m_SourceImage = Null Then
+			Notify("Nothing to save!", False)
+		Else
+			ChangeBackgroundColor(c_Magenta)
+			Draw()
+			Flip(1) 'Have to flip again for background color to actually change, not sure why but whatever
+
+			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
+			For Local row:Int = 0 To 3
+				For Local frame:Int = 0 Until m_FrameCount
+					'Grab pixmap inside tile bounds for saving
+					framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
+					'HFlip the legs so they're facing right
+					If row >= 2 Then
+						framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
+					EndIf
+				Next
+			Next
+			Return framesToSave
+		EndIf
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -55,7 +55,12 @@ Repeat
 						g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad())
 					'Saving
 					Case g_UserInterface.m_SaveButton
-						g_GraphicsOutput.GrabOutputForSaving()
+						If g_FileIO.GetSaveAsFrames() Then
+							g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFileAsFrames(g_GraphicsOutput.GrabOutputFramesForSaving(), g_GraphicsOutput.GetFrameCount()))
+						Else
+							g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFile(g_GraphicsOutput.GrabOutputForSaving()))
+						EndIf
+						Continue
 					'Scale
 					Case g_UserInterface.m_SettingsZoomTextbox
 						g_UserInterface.SetZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetZoomTextboxValue()))
