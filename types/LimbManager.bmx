@@ -1,5 +1,5 @@
-Include "Utility.bmx"
-Include "JointMarker.bmx"
+Import "Utility.bmx"
+Import "JointMarker.bmx"
 
 '//// LIMB MANAGER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -17,13 +17,13 @@ Type LimbManager
 	Field m_LimbPartTilePos:SVec2I[c_LimbPartCount]
 	Field m_LimbPartImage:TImage[c_LimbPartCount]
 	Field m_LimbPartLength:Float[c_LimbPartCount]
-	Global m_LimbPartAngle:Int[c_LimbPartCount, 20]
-	Global m_LimbPartPosX:Int[c_LimbPartCount, 20]
-	Global m_LimbPartPosY:Int[c_LimbPartCount, 20]
+	Field m_LimbPartAngle:Int[c_LimbPartCount, 20]
+	Field m_LimbPartPosX:Int[c_LimbPartCount, 20]
+	Field m_LimbPartPosY:Int[c_LimbPartCount, 20]
 
-	Global m_JointMarkers:JointMarker[c_JointMarkerCount]
+	Field m_JointMarkers:JointMarker[c_JointMarkerCount]
 
-	Global m_DrawJointMarkerBounds:Int[] = Null
+	Field m_DrawJointMarkerBounds:Int[] = Null
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

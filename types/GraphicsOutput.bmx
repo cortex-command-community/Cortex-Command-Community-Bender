@@ -1,37 +1,38 @@
-Include "LimbManager.bmx"
+Import "SettingsManager.bmx"
+Import "LimbManager.bmx"
 
 '//// GRAPHICS OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type GraphicsOutput
 	'Draw Bools
-	Global m_RedoLimbTiles:Int = False
+	Field m_RedoLimbTiles:Int = False
 	'Constants
 	Const c_MaxZoom:Int = 11
 	Const c_MaxFrameCount:Int = 20
-	Global c_Magenta:Int[] = [255, 0, 255]
+	Field c_Magenta:Int[] = [255, 0, 255]
 	'Graphic Assets
-	Global m_SourceImage:TImage
-	Global m_SourceImageSize:Svec2I
+	Field m_SourceImage:TImage
+	Field m_SourceImageSize:Svec2I
 	'Output Settings
-	Global m_InputZoom:Int = g_DefaultInputZoom
-	Global m_TileSize:Int = 24 * m_InputZoom
-	Global m_FrameCount:Int = g_DefaultFrameCount
-	Global m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
+	Field m_InputZoom:Int = g_DefaultInputZoom
+	Field m_TileSize:Int = 24 * m_InputZoom
+	Field m_FrameCount:Int = g_DefaultFrameCount
+	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
 
-	Global m_DrawOutputFrameBounds:Int
+	Field m_DrawOutputFrameBounds:Int
 
-	Global m_LimbManager:LimbManager = New LimbManager()
+	Field m_LimbManager:LimbManager = New LimbManager()
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function InitializeGraphicsOutput()
+	Method New()
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function LoadFile(fileToLoad:String)
+	Method LoadFile(fileToLoad:String)
 		m_SourceImage = LoadImage(fileToLoad, 0)
 
 		If m_SourceImage <> Null Then
@@ -39,19 +40,19 @@ Type GraphicsOutput
 			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
 			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function SetBackgroundColor:Int[](rgbValue:Int[])
+	Method SetBackgroundColor:Int[](rgbValue:Int[])
 		m_BackgroundColor = rgbValue
 		ChangeBackgroundColor(m_BackgroundColor)
 		Return m_BackgroundColor
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function SetInputZoom:Int(newZoom:Int)
+	Method SetInputZoom:Int(newZoom:Int)
 		Local clampedNewZoom:Int = Utility.Clamp(newZoom, 1, c_MaxZoom)
 		If m_InputZoom <> clampedNewZoom Then
 			m_InputZoom = clampedNewZoom
@@ -60,30 +61,30 @@ Type GraphicsOutput
 			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
 		Return m_InputZoom
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function SetFrameCount:Int(newCount:Int)
+	Method SetFrameCount:Int(newCount:Int)
 		m_FrameCount = Utility.Clamp(newCount, 1, c_MaxFrameCount)
 		Return m_FrameCount
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function ChangeBackgroundColor(rgbValue:Int[])
+	Method ChangeBackgroundColor(rgbValue:Int[])
 		SetClsColor(rgbValue[0], rgbValue[1], rgbValue[2])
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function SetDrawOutputFrameBounds(drawOrNot:Int)
+	Method SetDrawOutputFrameBounds(drawOrNot:Int)
 		m_DrawOutputFrameBounds = drawOrNot
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function Update()
+	Method Update()
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
 			Local mousePos:SVec2I = New SVec2I(MouseX(), MouseY())
@@ -92,11 +93,11 @@ Type GraphicsOutput
 			EndIf
 		EndIf
 		ChangeBackgroundColor(m_BackgroundColor)
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function Draw()
+	Method Draw()
 		If m_SourceImage = Null Then
 			DrawNoSourceImageScreen()
 		Else
@@ -131,11 +132,11 @@ Type GraphicsOutput
 			EndIf
 			Flip(1)
 		EndIf
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function GrabOutputForSaving()
+	Method GrabOutputForSaving()
 		Rem
 
 		If m_SourceImage = Null Then
@@ -165,11 +166,11 @@ Type GraphicsOutput
 		EndIf
 
 		EndRem
-	EndFunction
+	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function DrawNoSourceImageScreen()
+	Method DrawNoSourceImageScreen()
 		Cls()
 		SetScale(2, 2)
 		Local textToDraw:String = "NO IMAGE LOADED!"
@@ -177,5 +178,5 @@ Type GraphicsOutput
 		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
 		SetScale(1, 1)
 		Flip(1)
-	EndFunction
+	EndMethod
 EndType

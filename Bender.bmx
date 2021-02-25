@@ -9,12 +9,9 @@ EndRem
 SuperStrict
 
 Import "EmbeddedAssets.bmx"
-Import "Types/Utility.bmx"
 Import "Types/UserInterface.bmx"
 Import "Types/FileIO.bmx"
-
-Include "Types/SettingsManager.bmx"
-Include "Types/GraphicsOutput.bmx"
+Import "Types/GraphicsOutput.bmx"
 
 '//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -30,7 +27,6 @@ Repeat
 	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput()
-	g_GraphicsOutput.InitializeGraphicsOutput()
 
 	Repeat
 		PollEvent()
