@@ -32,16 +32,16 @@ Type LimbManager
 		m_TileSize = tileSize
 
 		'Clear all the arrays before recreating
-		For Local part:Int = 0 To c_LimbPartCount - 1
+		For Local part:Int = 0 Until c_LimbPartCount
 			m_LimbPartTilePos[part] = Null
 			m_LimbPartImage[part] = Null
 			m_LimbPartLength[part] = Null
 		Next
-		For Local marker:Int = 0 To c_JointMarkerCount - 1
+		For Local marker:Int = 0 Until c_JointMarkerCount
 			m_JointMarkers[marker] = Null
 		Next
 
-		For Local part:Int = 0 To c_LimbPartCount - 1
+		For Local part:Int = 0 Until c_LimbPartCount
 			m_LimbPartTilePos[part] = New SVec2I(part * m_TileSize, 0)
 			m_LimbPartImage[part] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
 			GrabImage(m_LimbPartImage[part], part * m_TileSize, 0)
@@ -70,7 +70,7 @@ Type LimbManager
 		Local selectedPart:Int = -1
 		Local selectedMarker:Int = -1
 
-		For Local part:Int = 0 To c_LimbPartCount - 1
+		For Local part:Int = 0 Until c_LimbPartCount
 			If Utility.PointIsWithinBox(mousePos, New SVec2I(part * (m_TileSize), 0), New SVec2I(m_TileSize, m_TileSize)) = True Then
 				selectedPart = part
 				Exit
@@ -107,8 +107,8 @@ Type LimbManager
 
 	Method BendLimbs(frameCount:Int)
 		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) '-1 to make inclusive of last value (full range)
-		For Local limb:Float = 0 To c_LimbCount - 1
-			For Local frame:Int = 0 To frameCount - 1
+		For Local limb:Float = 0 Until c_LimbCount
+			For Local frame:Int = 0 Until frameCount
 				Local limbPart:Int = limb * 2
 				Local posX:Float = (frame * 32)			'Drawing position X
 				Local posY:Float = ((limb * 32) * 1.5 )	'Drawing position Y
@@ -164,7 +164,7 @@ Type LimbManager
 
 	Method DrawBentLimbs(drawPos:SVec2I, frameCount:Int)
 		BendLimbs(frameCount)
-		For Local frame:Int = 0 To frameCount - 1
+		For Local frame:Int = 0 Until frameCount
 			'These might be in a specific draw-order for joint overlapping purposes
 			'Arm FG
 			Local limbPart:Int = 0

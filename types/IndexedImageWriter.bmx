@@ -100,7 +100,7 @@ Type IndexedImageWriter
 
 			'Pixel Array
 			For Local pixelY:Int = bmpHeight - 1 To 0 Step -1
-				For Local pixelX:Int = 0 To bmpWidthM4 - 1
+				For Local pixelX:Int = 0 Until bmpWidthM4
 					If pixelX < bmpWidth Then
 						WriteByte(outputStream, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
 					Else
