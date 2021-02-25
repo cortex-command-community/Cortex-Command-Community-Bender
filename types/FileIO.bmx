@@ -49,7 +49,7 @@ Type FileIO
 
 	Method SetSaveAsIndexed(indexedOrNot:Int)
 		m_SaveAsIndexed = indexedOrNot
-		If m_SaveAsIndexed = True Then
+		If m_SaveAsIndexed Then
 			m_FileFilters = "Image Files:bmp"
 		Else
 			m_FileFilters = "Image Files:png"
@@ -62,7 +62,7 @@ Type FileIO
 		Local filename:String = RequestFile("Save graphic output", m_FileFilters, True)
 		If CheckValidExportFileName(filename) Then
 			Local saveSuccess:Int = True
-			If m_SaveAsIndexed = True Then
+			If m_SaveAsIndexed Then
 				saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave, filename)
 				'saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave, filename)
 			Else
@@ -101,7 +101,7 @@ Type FileIO
 					EndIf
 
 					Local saveSuccess:Int = True
-					If m_SaveAsIndexed = True Then
+					If m_SaveAsIndexed Then
 						saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave[row, frame], fullFilename + ".bmp")
 						'saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[row, frame], fullFilename + ".png")
 					Else

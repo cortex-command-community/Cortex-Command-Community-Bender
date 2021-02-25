@@ -79,7 +79,7 @@ Type JointMarker
 		DrawLine(m_PosOnCanvasX - m_Radius + shadowOffset, m_PosOnCanvasY + shadowOffset, m_PosOnCanvasX + m_Radius + shadowOffset, m_PosOnCanvasY + shadowOffset, True)
 		DrawLine(m_PosOnCanvasX + shadowOffset, m_PosOnCanvasY - m_Radius + shadowOffset, m_PosOnCanvasX + shadowOffset, m_PosOnCanvasY + m_Radius + shadowOffset, True)
 
-		If m_Selected = True Then
+		If m_Selected Then
 			SetColor(50, 255, 0)
 		Else
 			SetColor(255, 230, 80)

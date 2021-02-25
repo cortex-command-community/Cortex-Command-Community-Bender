@@ -71,7 +71,7 @@ Type LimbManager
 		Local selectedMarker:Int = -1
 
 		For Local part:Int = 0 Until c_LimbPartCount
-			If Utility.PointIsWithinBox(mousePos, New SVec2I(part * (m_TileSize), 0), New SVec2I(m_TileSize, m_TileSize)) = True Then
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(part * (m_TileSize), 0), New SVec2I(m_TileSize, m_TileSize)) Then
 				selectedPart = part
 				Exit
 			EndIf
@@ -80,9 +80,9 @@ Type LimbManager
 		If selectedPart = -1 Then
 			Return
 		Else
-			If Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, 0), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) = True Then
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, 0), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) Then
 				selectedMarker = 0
-			ElseIf Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, (m_TileSize / 2) + m_InputZoom), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) = True Then
+			ElseIf Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, (m_TileSize / 2) + m_InputZoom), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) Then
 				selectedMarker = 1
 			Else
 				FlushMouse() 'Reset mouse input so markers don't snap when leaving vertical bounds and entering bounds of another marker

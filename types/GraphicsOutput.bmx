@@ -88,7 +88,7 @@ Type GraphicsOutput
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
 			Local mousePos:SVec2I = New SVec2I(MouseX(), MouseY())
-			If Utility.PointIsWithinBox(mousePos, New SVec2I(0, 0), m_SourceImageSize * m_InputZoom) = True Then
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(0, 0), m_SourceImageSize * m_InputZoom) Then
 				m_LimbManager.SetJointMarker(mousePos)
 			EndIf
 		EndIf
@@ -120,7 +120,7 @@ Type GraphicsOutput
 			Utility.DrawTextWithShadow("Leg FG", New SVec2I(10, vertOffsetFromSource + (48 * 2)), drawColor)
 			Utility.DrawTextWithShadow("Leg BG", New SVec2I(10, vertOffsetFromSource + (48 * 3)), drawColor)
 
-			If m_DrawOutputFrameBounds = True Then
+			If m_DrawOutputFrameBounds Then
 				For Local row:Int = 0 To 3
 					For Local frame:Int = 0 To m_FrameCount - 1
 						Local tile:TImage = LoadImage("Incbin::Assets/Tile")
