@@ -10,6 +10,8 @@ Type JointMarker
 
 	Field m_Radius:Int
 
+	Field m_Selected:Int
+
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method New(parentTilePos:SVec2I, centerPosX:Int, centerPosY:Int, radius:Int)
@@ -65,14 +67,25 @@ Type JointMarker
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method SetSelected()
+		m_Selected = True
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method Draw()
 		Local shadowOffset:Int = 1
 		SetColor(0, 0, 80)
 		DrawLine(m_PosOnCanvasX - m_Radius + shadowOffset, m_PosOnCanvasY + shadowOffset, m_PosOnCanvasX + m_Radius + shadowOffset, m_PosOnCanvasY + shadowOffset, True)
 		DrawLine(m_PosOnCanvasX + shadowOffset, m_PosOnCanvasY - m_Radius + shadowOffset, m_PosOnCanvasX + shadowOffset, m_PosOnCanvasY + m_Radius + shadowOffset, True)
 
-		SetColor(255, 230, 80)
+		If m_Selected = True Then
+			SetColor(50, 255, 0)
+		Else
+			SetColor(255, 230, 80)
+		EndIf
 		DrawLine(m_PosOnCanvasX - m_Radius, m_PosOnCanvasY, m_PosOnCanvasX + m_Radius, m_PosOnCanvasY, True)
 		DrawLine(m_PosOnCanvasX, m_PosOnCanvasY - m_Radius, m_PosOnCanvasX, m_PosOnCanvasY + m_Radius, True)
+		m_Selected = False
 	EndMethod
 EndType

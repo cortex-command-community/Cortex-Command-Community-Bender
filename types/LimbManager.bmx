@@ -91,6 +91,7 @@ Type LimbManager
 		EndIf
 
 		Local marker:JointMarker = m_JointMarkers[(selectedPart * 2) + selectedMarker]
+		marker.SetSelected()
 		marker.SetPosOnTile(mousePos[0] - marker.GetParentTilePosOnCanvas()[0], mousePos[1] - marker.GetParentTilePosOnCanvas()[1])
 
 		'Adjust limb part properties to new joint position
