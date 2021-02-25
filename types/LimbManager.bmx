@@ -130,10 +130,10 @@ Type LimbManager
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method DrawTileOutlines()
-		Local outlineSize:SVec2I = New SVec2I(m_TileSize, m_TileSize)
+		Local outlineSize:SVec2I = New SVec2I(m_TileSize, m_TileSize + 1)
 		Local drawColor:Int[] = [0, 0, 80]
 		For Local tilePos:SVec2I = EachIn m_LimbPartTilePos
-			Utility.DrawRectOutline(tilePos, outlineSize, drawColor)
+			Utility.DrawRectOutline(New SVec2I(tilePos[0], tilePos[1] - 1), outlineSize, drawColor)
 		Next
 
 		'Draw lines to show where joint adjustment cuts off vertically
