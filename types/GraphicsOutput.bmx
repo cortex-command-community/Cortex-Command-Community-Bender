@@ -106,7 +106,7 @@ Type GraphicsOutput
 		If m_SourceImage <> Null Then
 			Cls()
 
-			SetColor(255, 0, 255)
+			SetColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
 			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
 			ResetDrawColor()
 			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)

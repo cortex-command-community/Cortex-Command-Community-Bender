@@ -21,9 +21,6 @@ Type LimbManager
 	Global m_LimbPartPosX:Int[c_LimbPartCount, 20]
 	Global m_LimbPartPosY:Int[c_LimbPartCount, 20]
 
-	Field m_AngleA:Float
-	Field m_AngleB:Float
-	Field m_AngleC:Float
 	Global m_JointMarkers:JointMarker[c_JointMarkerCount]
 
 	Global m_DrawJointMarkerBounds:Int[] = Null
@@ -59,10 +56,12 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method LawOfCosines(ab:Float, bc:Float, ca:Float)
-		m_AngleA = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
-		m_AngleB = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
-		m_AngleC = (180 - (m_AngleA + m_AngleB))
+	Method LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
+		Local angleA:Float = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
+		Local angleB:Float = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
+		Local angleC:Float = (180 - (angleA + angleB))
+		Local result:Float[] = [angleA, angleB, angleC]
+		Return result
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,13 +113,13 @@ Type LimbManager
 				Local upperLength:Float = m_LimbPartLength[limbPart] / m_InputZoom
 				Local lowerLength:Float = m_LimbPartLength[limbPart + 1] / m_InputZoom
 				Local airLength:Float = ((stepSize * frame) + c_MinExtend) * (upperLength + lowerLength) 'Sum of the two bones * step scaler for frame (hip-ankle)
-				LawOfCosines(airLength, upperLength, lowerLength)
-				m_LimbPartAngle[limbPart, frame] = m_AngleB
+				Local bendAngle:Float[] = LawOfCosines(airLength, upperLength, lowerLength)
+				m_LimbPartAngle[limbPart, frame] = bendAngle[1]
 				m_LimbPartPosX[limbPart, frame] = posX
 				m_LimbPartPosY[limbPart, frame] = posY
 				posX :- Sin(m_LimbPartAngle[limbPart, frame]) * upperLength 'Position of knee
 				posY :+ Cos(m_LimbPartAngle[limbPart, frame]) * upperLength
-				m_LimbPartAngle[limbPart + 1, frame] = m_AngleC + m_AngleB + 180
+				m_LimbPartAngle[limbPart + 1, frame] = bendAngle[1] + bendAngle[2] + 180
 				m_LimbPartPosX[limbPart + 1, frame] = posX
 				m_LimbPartPosY[limbPart + 1, frame] = posY
 			Next
@@ -130,10 +129,10 @@ Type LimbManager
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method DrawTileOutlines()
-		Local frameSize:SVec2I = New SVec2I(m_TileSize, m_TileSize)
+		Local outlineSize:SVec2I = New SVec2I(m_TileSize, m_TileSize)
 		Local drawColor:Int[] = [0, 0, 80]
-		For Local part:Int = 0 To c_LimbPartCount - 1
-			Utility.DrawRectOutline(m_LimbPartTilePos[part], frameSize, drawColor)
+		For Local tilePos:SVec2I = EachIn m_LimbPartTilePos
+			Utility.DrawRectOutline(tilePos, outlineSize, drawColor)
 		Next
 
 		'Draw lines to show where joint adjustment cuts off vertically
@@ -164,10 +163,9 @@ Type LimbManager
 	Method DrawBentLimbs(drawPos:SVec2I, frameCount:Int)
 		BendLimbs(frameCount)
 		For Local frame:Int = 0 To frameCount - 1
-			Local limbPart:Int
 			'These might be in a specific draw-order for joint overlapping purposes
 			'Arm FG
-			limbPart = 0
+			Local limbPart:Int = 0
 			SetRotation(m_LimbPartAngle[limbPart, frame])
 			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
 			limbPart = 1
