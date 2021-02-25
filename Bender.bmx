@@ -71,7 +71,7 @@ Repeat
 						g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(g_UserInterface.GetColorTextboxValues()))
 					'Save as Frames
 					Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
-						g_FileIO.SetSaveAsFrames(ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox))
+						g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox)))
 					'Save as Indexed
 					Case g_UserInterface.m_SettingsIndexedCheckbox
 						g_FileIO.SetSaveAsIndexed(ButtonState(g_UserInterface.m_SettingsIndexedCheckbox))

@@ -18,7 +18,7 @@ Type GraphicsOutput
 	Global m_FrameCount:Int = g_DefaultFrameCount
 	Global m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
 
-	Global m_PrepForSave:Int
+	Global m_DrawOutputFrameBounds:Int
 
 	Global m_LimbManager:LimbManager = New LimbManager()
 
@@ -27,7 +27,6 @@ Type GraphicsOutput
 	Function InitializeGraphicsOutput()
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
-		DrawNoSourceImageScreen()
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +77,12 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Function SetDrawOutputFrameBounds(drawOrNot:Int)
+		m_DrawOutputFrameBounds = drawOrNot
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Function Update()
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
@@ -86,18 +91,15 @@ Type GraphicsOutput
 				m_LimbManager.SetJointMarker(mousePos)
 			EndIf
 		EndIf
-
-		If m_PrepForSave
-			ChangeBackgroundColor(c_Magenta)
-		Else
-			ChangeBackgroundColor(m_BackgroundColor)
-		EndIf
+		ChangeBackgroundColor(m_BackgroundColor)
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function Draw()
-		If m_SourceImage <> Null Then
+		If m_SourceImage = Null Then
+			DrawNoSourceImageScreen()
+		Else
 			Cls()
 
 			SetColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
@@ -117,6 +119,16 @@ Type GraphicsOutput
 			Utility.DrawTextWithShadow("Leg FG", New SVec2I(10, vertOffsetFromSource + (48 * 2)), drawColor)
 			Utility.DrawTextWithShadow("Leg BG", New SVec2I(10, vertOffsetFromSource + (48 * 3)), drawColor)
 
+			If m_DrawOutputFrameBounds = True Then
+				For Local row:Int = 0 To 3
+					For Local frame:Int = 0 To m_FrameCount - 1
+						Local tile:TImage = LoadImage("Incbin::Assets/Tile")
+
+						'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
+						DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48))
+					Next
+				Next
+			EndIf
 			Flip(1)
 		EndIf
 	EndFunction
@@ -124,20 +136,20 @@ Type GraphicsOutput
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function GrabOutputForSaving()
+		Rem
+
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
 		Else
-			m_PrepForSave = True
+			ChangeBackgroundColor(c_Magenta)
+			Draw()
 
 			If Not g_FileIO.m_SaveAsFrames Then
 				g_FileIO.SaveFile(GrabPixmap(55, 120, 34 * m_FrameCount, 210))
 			Else
 				Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
-				Local tile:TImage = LoadImage("Incbin::Assets/Tile")
 				For Local row:Int = 0 To 3
 					For Local frame:Int = 0 To m_FrameCount - 1
-						'Draw a tile outline around all frames to see we are within bounds
-						DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48)) 'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
 						'Grab pixmap inside tile bounds for saving
 						framesToSave[row, frame] = GrabPixmap(63 + (frame * (m_TileSize / m_InputZoom + 8)), 139 + (row * 48), m_TileSize / m_InputZoom, m_TileSize / m_InputZoom)
 						'HFlip the legs so they're facing right
@@ -148,9 +160,11 @@ Type GraphicsOutput
 				Next
 				g_FileIO.SaveFileAsFrames(framesToSave, m_FrameCount)
 			EndIf
-			Flip(1)
+
+			ChangeBackgroundColor(m_BackgroundColor)
 		EndIf
-		m_PrepForSave = False
+
+		EndRem
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

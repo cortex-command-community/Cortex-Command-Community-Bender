@@ -57,10 +57,10 @@ Type LimbManager
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
-		Local angleA:Float = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
-		Local angleB:Float = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
-		Local angleC:Float = (180 - (angleA + angleB))
-		Local result:Float[] = [angleA, angleB, angleC]
+		Local result:Float[] = [0, 0, 0]
+		result[0] = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
+		result[1] = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
+		result[2] = (180 - (result[0] + result[1]))
 		Return result
 	EndMethod
 
