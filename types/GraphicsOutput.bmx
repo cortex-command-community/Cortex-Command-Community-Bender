@@ -12,7 +12,7 @@ Type GraphicsOutput
 	Field c_Magenta:Int[] = [255, 0, 255]
 	'Graphic Assets
 	Field m_SourceImage:TImage
-	Field m_SourceImageSize:Svec2I
+	Field m_SourceImageSize:SVec2I
 	'Output Settings
 	Field m_InputZoom:Int = g_DefaultInputZoom
 	Field m_TileSize:Int = 24 * m_InputZoom
@@ -20,6 +20,9 @@ Type GraphicsOutput
 	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
 
 	Field m_DrawOutputFrameBounds:Int
+	Field m_FrameBoundingBoxPosX:Int[c_LimbCount, c_MaxFrameCount]
+	Field m_FrameBoundingBoxPosY:Int[c_LimbCount, c_MaxFrameCount]
+	Field m_FrameBoundingBoxSize:SVec2I
 
 	Field m_LimbManager:LimbManager = New LimbManager()
 
@@ -124,22 +127,23 @@ Type GraphicsOutput
 			m_LimbManager.DrawTileOutlines()
 			m_LimbManager.DrawJointMarkers()
 
-			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 35
+			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 34
 			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount)
 
 			Local drawColor:Int[] = [255, 230, 80]
 			Utility.DrawTextWithShadow("Arm FG", New SVec2I(10, vertOffsetFromSource), drawColor)
-			Utility.DrawTextWithShadow("Arm BG", New SVec2I(10, vertOffsetFromSource + 48), drawColor)
-			Utility.DrawTextWithShadow("Leg FG", New SVec2I(10, vertOffsetFromSource + (48 * 2)), drawColor)
-			Utility.DrawTextWithShadow("Leg BG", New SVec2I(10, vertOffsetFromSource + (48 * 3)), drawColor)
+			Utility.DrawTextWithShadow("Arm BG", New SVec2I(10, vertOffsetFromSource + 50 - 2), drawColor)
+			Utility.DrawTextWithShadow("Leg FG", New SVec2I(10, vertOffsetFromSource + (50 * 2) - 4), drawColor)
+			Utility.DrawTextWithShadow("Leg BG", New SVec2I(10, vertOffsetFromSource + (50 * 3) - 6), drawColor)
 
 			If m_DrawOutputFrameBounds Then
-				For Local row:Int = 0 To 3
-					For Local frame:Int = 0 To m_FrameCount - 1
-						Local tile:TImage = LoadImage("Incbin::Assets/Tile")
-
-						'Doing this with an image because cba doing the math with DrawLine. Offsets are -1px because tile image is 26x26 for outline and tile is 24x24.
-						DrawImage(tile, 62 + (frame * (m_TileSize / m_InputZoom + 8)), 138 + (row * 48))
+				drawColor = [0, 0, 80]
+				m_FrameBoundingBoxSize = New SVec2I(32, 48)
+				For Local row:Int = 0 Until c_LimbCount
+					For Local frame:Int = 0 Until m_FrameCount
+						m_FrameBoundingBoxPosX[row, frame] = 100 - 20 + (frame * (m_TileSize / m_InputZoom + 8))
+						m_FrameBoundingBoxPosY[row, frame] = vertOffsetFromSource - 12 + (row * 48)
+						Utility.DrawRectOutline(New SVec2I(m_FrameBoundingBoxPosX[row, frame], m_FrameBoundingBoxPosY[row, frame]), m_FrameBoundingBoxSize, drawColor)
 					Next
 				Next
 			EndIf
