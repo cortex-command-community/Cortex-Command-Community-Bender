@@ -84,7 +84,7 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function OutputUpdate()
+	Function Update()
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
 			m_LimbManager.SetJointMarker()
@@ -95,11 +95,14 @@ Type GraphicsOutput
 		Else
 			ChangeBackgroundColor(m_BackgroundColor)
 		EndIf
+	EndFunction
 
-		Cls()
-		If m_SourceImage = Null Then
-			DrawNoSourceImageScreen()
-		Else
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function Draw()
+		If m_SourceImage <> Null Then
+			Cls()
+
 			SetColor(255, 0, 255)
 			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
 			ResetDrawColor()

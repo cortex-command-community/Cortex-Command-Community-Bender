@@ -80,6 +80,7 @@ Repeat
 				If Confirm("Quit program?") Then End
 		EndSelect
 
-	g_GraphicsOutput.OutputUpdate()
+	g_GraphicsOutput.Update()
+	g_GraphicsOutput.Draw()
 	Forever
 Forever
