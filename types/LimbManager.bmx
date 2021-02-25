@@ -26,6 +26,8 @@ Type LimbManager
 	Field m_AngleC:Float
 	Global m_JointMarkers:JointMarker[c_JointMarkerCount]
 
+	Global m_DrawJointMarkerBounds:Int[] = Null
+
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method CreateLimbParts(inputZoom:Int, tileSize:Int)
@@ -65,17 +67,39 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	'Set Joint Marker
-	Method SetJointMarker()
-		Local xm:Int = MouseX()
-		Local ym:Int = MouseY()
-		If ym < ((m_TileSize / 2) - 2) And ym > 0 And xm > 0 And xm < (m_TileSize * c_LimbPartCount) Then
-			Local part:Int = xm / m_TileSize
-			m_LimbPartJointOffsetX[part] = m_TileSize / 2 	'X is always at center, so kinda pointless to even bother - at the moment
-			m_LimbPartJointOffsetY[part] = ym				'Determines length
-			m_LimbPartLength[part] = ((m_TileSize / 2) - ym) * 2
-			SetImageHandle(m_LimbPartImage[part], m_LimbPartJointOffsetX[part] / m_InputZoom, m_LimbPartJointOffsetY[part] / m_InputZoom) 'Update rotation handle
+	Method SetJointMarker(mousePos:SVec2I)
+		Local selectedPart:Int = -1
+		Local selectedMarker:Int = -1
+
+		For Local part:Int = 0 To c_LimbPartCount - 1
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(part * (m_TileSize), 0), New SVec2I(m_TileSize, m_TileSize)) = True Then
+				selectedPart = part
+				Exit
+			EndIf
+		Next
+
+		If selectedPart = -1 Then
+			Return
+		Else
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, 0), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) = True Then
+				selectedMarker = 0
+			ElseIf Utility.PointIsWithinBox(mousePos, New SVec2I(selectedPart * m_TileSize, (m_TileSize / 2) + m_InputZoom), New SVec2I(m_TileSize, (m_TileSize / 2) - m_InputZoom)) = True Then
+				selectedMarker = 1
+			Else
+				Return
+			EndIf
 		EndIf
+
+		Local marker:JointMarker = m_JointMarkers[(selectedPart * 2) + selectedMarker]
+		marker.SetPosOnTile(mousePos[0] - marker.GetParentTilePosOnCanvas()[0], mousePos[1] - marker.GetParentTilePosOnCanvas()[1])
+
+		'Adjust limb part properties to new joint position
+		Local topMarkerPos:SVec2I = m_JointMarkers[selectedPart * 2].GetPosOnTile()
+		Local bottomMarkerPos:SVec2I = m_JointMarkers[(selectedPart * 2) + 1].GetPosOnTile()
+		m_LimbPartLength[selectedPart] = topMarkerPos.DistanceTo(bottomMarkerPos)
+		SetImageHandle(m_LimbPartImage[selectedPart], topMarkerPos[0] / m_InputZoom, topMarkerPos[1] / m_InputZoom)
+
+		m_DrawJointMarkerBounds = [True, selectedPart, selectedMarker]
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,6 +135,18 @@ Type LimbManager
 		For Local part:Int = 0 To c_LimbPartCount - 1
 			Utility.DrawRectOutline(m_LimbPartTilePos[part], frameSize, drawColor)
 		Next
+
+		'Draw lines to show where joint adjustment cuts off vertically
+		SetColor(drawColor[0], drawColor[1], drawColor[2])
+		If m_DrawJointMarkerBounds <> Null And m_DrawJointMarkerBounds[0] = True Then
+			If m_DrawJointMarkerBounds[2] = 0 Then
+				DrawLine(m_DrawJointMarkerBounds[1] * m_TileSize, (m_TileSize / 2) - m_InputZoom, m_DrawJointMarkerBounds[1] * m_TileSize + m_TileSize, (m_TileSize / 2) - m_InputZoom)
+			ElseIf m_DrawJointMarkerBounds[2] = 1 Then
+				DrawLine(m_DrawJointMarkerBounds[1] * m_TileSize, (m_TileSize / 2) + m_InputZoom, m_DrawJointMarkerBounds[1] * m_TileSize + m_TileSize, (m_TileSize / 2) + m_InputZoom)
+			EndIf
+			m_DrawJointMarkerBounds = Null
+		EndIf
+		SetColor(255, 255, 255)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

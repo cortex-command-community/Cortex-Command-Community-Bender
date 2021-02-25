@@ -87,7 +87,10 @@ Type GraphicsOutput
 	Function Update()
 		'Left mouse to adjust joint markers, click or hold and drag
 		If MouseDown(1) Then
-			m_LimbManager.SetJointMarker()
+			Local mousePos:SVec2I = New SVec2I(MouseX(), MouseY())
+			If Utility.PointIsWithinBox(mousePos, New SVec2I(0, 0), m_SourceImageSize * m_InputZoom) = True Then
+				m_LimbManager.SetJointMarker(mousePos)
+			EndIf
 		EndIf
 
 		If m_PrepForSave
