@@ -1,9 +1,11 @@
 Include "Utility.bmx"
+Include "JointMarker.bmx"
 
 '//// LIMB MANAGER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Const c_LimbPartCount:Int = 8
 Const c_LimbCount:Int = c_LimbPartCount / 2
+Const c_JointMarkerCount:Int = c_LimbPartCount * 2
 
 Type LimbManager
 	Const c_MinExtend:Float = 0.30	'Possibly make definable in settings (slider)
@@ -13,12 +15,8 @@ Type LimbManager
 	Field m_TileSize:Int
 
 	Field m_LimbPartTilePos:SVec2I[c_LimbPartCount]
-
 	Field m_LimbPartImage:TImage[c_LimbPartCount]
-	Field m_LimbPartJointOffsetX:Float[c_LimbPartCount]
-	Field m_LimbPartJointOffsetY:Float[c_LimbPartCount]
 	Field m_LimbPartLength:Float[c_LimbPartCount]
-
 	Global m_LimbPartAngle:Int[c_LimbPartCount, 20]
 	Global m_LimbPartPosX:Int[c_LimbPartCount, 20]
 	Global m_LimbPartPosY:Int[c_LimbPartCount, 20]
@@ -26,6 +24,7 @@ Type LimbManager
 	Field m_AngleA:Float
 	Field m_AngleB:Float
 	Field m_AngleC:Float
+	Global m_JointMarkers:JointMarker[c_JointMarkerCount]
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,22 +34,24 @@ Type LimbManager
 
 		'Clear all the arrays before recreating
 		For Local part:Int = 0 To c_LimbPartCount - 1
+			m_LimbPartTilePos[part] = Null
 			m_LimbPartImage[part] = Null
-			m_LimbPartJointOffsetX[part] = Null
-			m_LimbPartJointOffsetY[part] = Null
 			m_LimbPartLength[part] = Null
+		Next
+		For Local marker:Int = 0 To c_JointMarkerCount - 1
+			m_JointMarkers[marker] = Null
 		Next
 
 		For Local part:Int = 0 To c_LimbPartCount - 1
+			m_LimbPartTilePos[part] = New SVec2I(part * m_TileSize, 0)
 			m_LimbPartImage[part] = CreateImage(m_TileSize, m_TileSize, 1, DYNAMICIMAGE | MASKEDIMAGE)
 			GrabImage(m_LimbPartImage[part], part * m_TileSize, 0)
-			m_LimbPartTilePos[part] = New SVec2I(part * m_TileSize, 0)
 
 			'Set up default limb part sizes
-			m_LimbPartJointOffsetX[part] = m_TileSize / 2
-			m_LimbPartJointOffsetY[part] = m_TileSize / 3.3 '3.6
-			m_LimbPartLength[part] = ((m_TileSize / 2) - m_LimbPartJointOffsetY[part]) * 2
-			SetImageHandle(m_LimbPartImage[part], m_LimbPartJointOffsetX[part] / m_InputZoom, m_LimbPartJointOffsetY[part] / m_InputZoom)
+			m_LimbPartLength[part] = ((m_TileSize / 2.0) - (m_TileSize / 3.3)) * 2
+			m_JointMarkers[part * 2] = New JointMarker(m_LimbPartTilePos[part], Int(m_TileSize / 2.0), Int(m_TileSize / 3.3), m_InputZoom) 'Top marker
+			m_JointMarkers[(part * 2) + 1] = New JointMarker(m_LimbPartTilePos[part], Int(m_TileSize / 2.0), Int(m_JointMarkers[part * 2].GetPosOnCanvasY() + m_LimbPartLength[part]), m_InputZoom) 'Bottom marker
+			SetImageHandle(m_LimbPartImage[part], m_JointMarkers[part * 2].GetPosOnTileX() / m_InputZoom, m_JointMarkers[part * 2].GetPosOnCanvasY() / m_InputZoom)
 		Next
 	EndMethod
 
@@ -114,35 +115,12 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method DrawJointMarker(centerPosX:Float, centerPosY:Float, radius:Int = 2, drawShadow:Int = True)
-		Local centerPos:SVec2F = New SVec2F(centerPosX, centerPosY)
-		DrawJointMarker(centerPos, radius, drawShadow)
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method DrawJointMarker(centerPos:SVec2F, radius:Int = 2, drawShadow:Int = True)
-		SetRotation(0)
-
-		If drawShadow = True Then
-			Local shadowOffset:Int = 1
-			SetColor(0, 0, 80)
-			DrawLine(centerPos[0] - radius + shadowOffset, centerPos[1] + shadowOffset, centerPos[0] + radius + shadowOffset, centerPos[1] + shadowOffset)
-			DrawLine(centerPos[0] + shadowOffset, centerPos[1] - radius + shadowOffset, centerPos[0] + shadowOffset, centerPos[1] + radius + shadowOffset)
-		EndIf
-
-		SetColor(255, 230, 80)
-		DrawLine(centerPos[0] - radius, centerPos[1], centerPos[0] + radius, centerPos[1])
-		DrawLine(centerPos[0], centerPos[1] - radius, centerPos[0], centerPos[1] + radius)
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	Method DrawJointMarkers()
-		For Local limbPart:Int = 0 To c_LimbPartCount - 1
-			DrawJointMarker(New SVec2F(m_LimbPartJointOffsetX[limbPart] + (limbPart * m_TileSize), m_LimbPartJointOffsetY[limbPart]), m_InputZoom)
-			DrawJointMarker(New SVec2F(m_LimbPartJointOffsetX[limbPart] + (limbPart * m_TileSize), m_LimbPartJointOffsetY[limbPart] + m_LimbPartLength[limbPart]), m_InputZoom)
+		SetRotation(0)
+		For Local marker:JointMarker = EachIn m_JointMarkers
+			marker.Draw()
 		Next
+		SetColor(255, 255, 255)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
