@@ -62,9 +62,9 @@ Type IndexedImageWriter
 		If filename = Null Then
 			Return False
 		Else
-			Local bmpWidth:Int = PixmapWidth(sourcePixmap)
+			Local bmpWidth:Int = sourcePixmap.Width
 			Local bmpWidthM4:Int = ((bmpWidth + 3) / 4) * 4 'bmpWidth adjusted to be divisible by 4. Written file is spaghetti if not adjusted!
-			Local bmpHeight:Int = PixmapHeight(sourcePixmap)
+			Local bmpHeight:Int = sourcePixmap.Height
 			Local bmpSizeTotal:Int = (14 + 40) + (256 * 4) + (bmpWidthM4 * bmpHeight) 'File header size + DIB header size + color table size + dimensions (with adjusted width)
 			Local bmpSizeTotalM4:Int = ((bmpSizeTotal + 3) / 4) * 4 'bmpSizeTotal adjusted to be divisible by 4. Written file is spaghetti if not adjusted!
 
@@ -125,8 +125,8 @@ Type IndexedImageWriter
 		If filename = Null Then
 			Return False
 		Else
-			Local pngWidth:Int = PixmapWidth(sourcePixmap)
-			Local pngHeight:Int = PixmapHeight(sourcePixmap)
+			Local pngWidth:Int = sourcePixmap.Width
+			Local pngHeight:Int = sourcePixmap.Height
 
 			'Begin writing PNG file manually
 			Local outputStream:TStream = BigEndianStream(WriteFile(filename)) 'PNG file data is stored in network byte order (big-endian, most-significant byte first)

@@ -169,31 +169,31 @@ Type LimbManager
 			'Arm FG
 			Local limbPart:Int = 0
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			limbPart = 1
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			'Arm BG
 			limbPart = 2
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			limbPart = 3
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			'Leg FG
 			limbPart = 4
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			limbPart = 5
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			'Leg BG
 			limbPart = 6
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 			limbPart = 7
 			SetRotation(m_LimbPartAngle[limbPart, frame])
-			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], ImageWidth(m_LimbPartImage[limbPart]) / m_InputZoom, ImageHeight(m_LimbPartImage[limbPart]) / m_InputZoom)
+			DrawImageRect(m_LimbPartImage[limbPart], m_LimbPartPosX[limbPart, frame] + drawPos[0], m_LimbPartPosY[limbPart, frame] + drawPos[1], m_LimbPartImage[limbPart].Width / m_InputZoom, m_LimbPartImage[limbPart].Height / m_InputZoom)
 		Next
 		SetRotation(0)
 	EndMethod

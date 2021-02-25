@@ -58,8 +58,8 @@ Type UserInterface
 
 	Field m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
 	Field m_LogoImagePanel:TGadget
-	Field m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - PixmapHeight(m_LogoImage))
-	Field m_LogoImagePanelSize:SVec2I = New SVec2I(PixmapWidth(m_LogoImage), PixmapHeight(m_LogoImage))
+	Field m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - m_LogoImage.Height)
+	Field m_LogoImagePanelSize:SVec2I = New SVec2I(m_LogoImage.Width, m_LogoImage.Height)
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
