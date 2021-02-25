@@ -41,4 +41,10 @@ Type Utility
 		DrawLine(pos[0], pos[1] + size[1], pos[0], pos[1], True)
 		SetColor(255, 255, 255)
 	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function PointIsWithinBox:Int(point:SVec2I, boxPos:SVec2I, boxSize:SVec2I)
+		Return point[0] >= boxPos[0] And point[0] < (boxPos[0] + boxSize[0]) And point[1] >= boxPos[1] And point[1] < (boxPos[1] + boxSize[1])
+	EndFunction
 EndType
