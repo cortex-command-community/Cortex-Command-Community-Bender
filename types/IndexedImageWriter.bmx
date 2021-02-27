@@ -1,5 +1,5 @@
 Import "Utility.bmx"
-Import "UtilityPNG.bmx"
+Import "IndexedPixmap.bmx"
 
 '//// INDEXED IMAGE WRITER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -246,40 +246,47 @@ EndRem
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method WriteIndexedPNGFromPixmap:Int(sourcePixmap:TPixmap, filename:String, compression:Int = 5)
-		Local outputStream:TStream = WriteStream(filename)
+		If filename = Null Then
+			Return False
+		Else
+			'Begin writing PNG file manually
+			Local outputStream:TStream = WriteStream(filename)
 
-		Try
-			Local pngPtr:Byte Ptr = png_create_write_struct("1.6.37", Null, Null, Null)
-			Local pngInfoPtr:Byte Ptr = png_create_info_struct(pngPtr)
+			Try
+				Local pngPtr:Byte Ptr = png_create_write_struct("1.6.37", Null, Null, Null)
+				Local pngInfoPtr:Byte Ptr = png_create_info_struct(pngPtr)
 
-			png_set_write_fn(pngPtr, outputStream, UtilityPNG.PNGWrite, UtilityPNG.PNGFlush)
+				png_set_write_fn(pngPtr, outputStream, Utility.PNGWriteStream, Utility.PNGFlushStream)
 
-			png_set_compression_level(pngPtr, Utility.Clamp(compression, 0, 9))
-			png_set_IHDR(pngPtr, pngInfoPtr, sourcePixmap.Width, sourcePixmap.Height, 8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT)
+				png_set_compression_level(pngPtr, Utility.Clamp(compression, 0, 9))
+				png_set_IHDR(pngPtr, pngInfoPtr, sourcePixmap.Width, sourcePixmap.Height, 8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT)
 
-			Local palettePtr:Byte Ptr = m_Palette
-			png_set_PLTE(pngPtr, pngInfoPtr, palettePtr, 256);
+				Local palettePtr:Byte Ptr = m_Palette
+				png_set_PLTE(pngPtr, pngInfoPtr, palettePtr, 256);
 
-			'sourcePixmap = sourcePixmap.Convert(PF_I8)
-			For Local pixelY:Int = 0 Until sourcePixmap.Height
-				For Local pixelX:Int = 0 Until sourcePixmap.Width
-					WritePixel(sourcePixmap, pixelX, pixelY, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
+				Local convertingPixmap:IndexedPixmap = New IndexedPixmap(sourcePixmap.Width, sourcePixmap.Height)
+				For Local pixelY:Int = 0 Until sourcePixmap.Height
+					For Local pixelX:Int = 0 Until sourcePixmap.Width
+						convertingPixmap.WritePixel(pixelX, pixelY, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
+					Next
 				Next
-			Next
 
-			Local rows:Byte Ptr[sourcePixmap.Height]
-			For Local i = 0 Until sourcePixmap.Height
-				rows[i] = sourcePixmap.PixelPtr(0, i)
-			Next
-			png_set_rows(pngPtr, pngInfoPtr, rows)
+				Local rows:Byte Ptr[sourcePixmap.Height]
+				For Local i = 0 Until sourcePixmap.Height
+					rows[i] = convertingPixmap.PixelPtr(0, i)
+				Next
+				png_set_rows(pngPtr, pngInfoPtr, rows)
 
-			png_write_png(pngPtr, pngInfoPtr, 0, Null)
-			png_destroy_write_struct(Varptr pngPtr, Varptr pngInfoPtr, Null)
+				png_write_png(pngPtr, pngInfoPtr, 0, Null)
+				png_destroy_write_struct(Varptr pngPtr, Varptr pngInfoPtr, Null)
 
-			CloseStream(outputStream)
-			Return True
-		Catch error:String
-			If error <> "PNG ERROR" Throw error
-		EndTry
+				CloseStream(outputStream)
+				Return True
+			Catch error:String
+				If error <> "PNG ERROR" Then
+					Throw error
+				EndIf
+			EndTry
+		EndIf
 	EndMethod
 EndType
