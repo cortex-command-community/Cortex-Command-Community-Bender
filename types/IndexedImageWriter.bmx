@@ -1,3 +1,5 @@
+Import BRL.Bank
+
 '//// INDEXED IMAGE WRITER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type IndexedImageWriter
@@ -5,10 +7,35 @@ Type IndexedImageWriter
 	Field m_PalG:Byte[256]
 	Field m_PalB:Byte[256]
 
+	Field m_CRCTable:Int[256]
+
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method New()
 		LoadDefaultPalette()
+
+		'Initialize CRC table
+		For Local i:Int = 0 To 255
+			Local value:Int = i
+			For Local j:Int = 0 To 7
+				If (value & $1) Then
+					value = (value Shr 1) ~ $EDB88320 '~ for XOR
+				Else
+					value = (value Shr 1)
+				EndIf
+			Next
+			m_CRCTable[i] = value
+		Next
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GenerateCRC32FromBank:Int(bank:TBank)
+		Local crcResult:Int = $FFFFFFFF
+		For Local i:Int = 0 Until BankSize(bank)
+			crcResult = (crcResult Shr 8) ~ m_CRCTable[PeekByte(bank, i) ~ (crcResult & $FF)]
+		Next
+		Return ~crcResult '~ for bitwise complement
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,10 +153,82 @@ Type IndexedImageWriter
 			Return False
 		Else
 			Local pngWidth:Int = sourcePixmap.Width
+			Local pngWidthM4:Int = ((pngWidth + 3) / 4) * 4 'pngWidth adjusted to be divisible by 4. Written file is spaghetti if not adjusted!
 			Local pngHeight:Int = sourcePixmap.Height
+			Local pngSizeTotal:Int = pngWidthM4 * pngHeight 'dimensions (with adjusted width)
+			Local pngSizeTotalM4:Int = ((pngSizeTotal + 3) / 4) * 4 'bmpSizeTotal adjusted to be divisible by 4. Written file is spaghetti if not adjusted!
 
 			'Begin writing PNG file manually
-			Local outputStream:TStream = BigEndianStream(WriteFile(filename)) 'PNG file data is stored in network byte order (big-endian, most-significant byte first)
+			Local outputStream:TStream = BigEndianStream(WriteFile(filename)) 'PNG file data is stored in network byte order (big-endian)
+
+			'PNG file header
+			WriteByte(outputStream, 137)				'Has the high bit set to detect transmission systems that do not support 8-bit data and to reduce the chance that a text file is mistakenly interpreted as a PNG, or vice versa. 89 (hex) (1 byte)
+			WriteByte(outputStream, 80)					'File ID (in ASCII, the letters PNG). 50 4E 47 (hex) (3 bytes)
+			WriteByte(outputStream, 78)
+			WriteByte(outputStream, 71)
+			WriteShort(outputStream, 3338)				'A DOS-style line ending (CRLF) to detect DOS-Unix line ending conversion of the data. 0D 0A (hex) (2 bytes)
+			WriteByte(outputStream, 26)					'A byte that stops display of the file under DOS when the command type has been used—the end-of-file character. 1A (hex) (1 byte)
+			WriteByte(outputStream, 10)					'A Unix-style line ending (LF) to detect Unix-DOS line ending conversion. 0A (hex) (1 byte)
+
+			'IHDR chunk (file properties)
+			WriteInt(outputStream, 13)					'Chunk Length (4 bytes) - 13 bytes for IHDR
+			WriteInt(outputStream, 1229472850)			'Chunk Type (4 bytes) -  1229472850 (decimal) or 49 48 44 52 (hex) or IHDR (ascii)
+
+			WriteInt(outputStream, pngWidth)			'Image Width (4 bytes)
+			WriteInt(outputStream, pngHeight)			'Image Height (4 bytes)
+			WriteByte(outputStream, 4)					'Bit Depth (1 byte) - BYTES per pixel not BITS per pixel
+			WriteByte(outputStream, 3)					'Color Type (1 byte) - 3 for indexed color
+			WriteByte(outputStream, 0)					'Compression Method (1 byte)
+			WriteByte(outputStream, 0)					'Filter Method (1 byte)
+			WriteByte(outputStream, 0)					'Interlace Method (1 byte) - 0 for no interlace
+
+			Rem
+			Figure out how to generate correct CRC
+			EndRem
+			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
+
+			'PLTE chunk (color table)
+			WriteInt(outputStream, 768)					'Chunk Length (4 bytes) - 4 bytes (ARGB) times the amount of colors in the palette = 1024 bytes
+			WriteInt(outputStream, 1347179589)			'Chunk Type (4 bytes) - 1347179589 (decimal) or 50 4C 54 45 (hex) or PLTE (ascii)
+
+			For Local index:Int = 0 To 255
+				WriteByte(outputStream, m_PalB[index])	'Blue (1 byte)
+				WriteByte(outputStream, m_PalG[index])	'Green (1 byte)
+				WriteByte(outputStream, m_PalR[index])	'Red (1 byte)
+			Next
+
+			Rem
+			Figure out how to generate correct CRC
+			EndRem
+			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
+
+			'IDAT chunk (pixel array)
+			WriteInt(outputStream, pngSizeTotal)		'Chunk Length (4 bytes) - width times height of the image + padding
+			WriteInt(outputStream, 1229209940)			'Chunk Type (4 bytes) - 1229209940 (decimal) or 49 44 41 54 (hex) or IDAT (ascii)
+
+			For Local pixelY:Int = pngHeight - 1 To 0 Step -1
+				For Local pixelX:Int = 0 Until pngWidth
+					If pixelX < pngWidth Then
+						WriteByte(outputStream, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
+					'Else
+					'	WriteByte(outputStream, 0) 		'Line padding
+					EndIf
+				Next
+			Next
+
+			Rem
+			Figure out how to generate correct CRC
+			EndRem
+			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
+
+			'IEND chunk (EOF)
+			WriteInt(outputStream, 0)					'Chunk Length (4 bytes) - 0 for IEND
+			WriteInt(outputStream, 1229278788)			'Chunk Type (4 bytes) - 1229278788 (decimal) or 49 45 4E 44 (hex) or IEND (ascii)
+
+			Rem
+			Figure out how to generate correct CRC
+			EndRem
+			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
 
 			CloseStream(outputStream)
 			Return True
