@@ -1,19 +1,30 @@
-Import BRL.Bank
+Import "Utility.bmx"
+Import "UtilityPNG.bmx"
 
 '//// INDEXED IMAGE WRITER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Struct RGBColor
+	Field m_R:Byte
+	Field m_G:Byte
+	Field m_B:Byte
+EndStruct
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type IndexedImageWriter
 	Field m_PalR:Byte[256]
 	Field m_PalG:Byte[256]
 	Field m_PalB:Byte[256]
 
-	Field m_CRCTable:Int[256]
+	Field m_Palette:RGBColor[256]
+
+	'Field m_CRCTable:Int[256]
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method New()
 		LoadDefaultPalette()
-
+Rem
 		'Initialize CRC table
 		For Local i:Int = 0 To 255
 			Local value:Int = i
@@ -26,10 +37,11 @@ Type IndexedImageWriter
 			Next
 			m_CRCTable[i] = value
 		Next
+EndRem
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+Rem
 	Method GenerateCRC32FromBank:Int(bank:TBank)
 		Local crcResult:Int = $FFFFFFFF
 		For Local i:Int = 0 Until BankSize(bank)
@@ -37,7 +49,7 @@ Type IndexedImageWriter
 		Next
 		Return ~crcResult '~ for bitwise complement
 	EndMethod
-
+EndRem
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method LoadDefaultPalette()
@@ -50,6 +62,10 @@ Type IndexedImageWriter
 			m_PalR[index] = ReadByte(paletteStream)
 			m_PalG[index] = ReadByte(paletteStream)
 			m_PalB[index] = ReadByte(paletteStream)
+
+			m_Palette[index].m_R = m_PalR[index]
+			m_Palette[index].m_G = m_PalG[index]
+			m_Palette[index].m_B = m_PalB[index]
 		Next
 		CloseStream(paletteStream)
 	EndMethod
@@ -147,7 +163,7 @@ Type IndexedImageWriter
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+Rem
 	Method WriteIndexedPNGFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
 		If filename = Null Then
 			Return False
@@ -176,15 +192,13 @@ Type IndexedImageWriter
 
 			WriteInt(outputStream, pngWidth)			'Image Width (4 bytes)
 			WriteInt(outputStream, pngHeight)			'Image Height (4 bytes)
-			WriteByte(outputStream, 4)					'Bit Depth (1 byte) - BYTES per pixel not BITS per pixel
+			WriteByte(outputStream, 8)					'Bit Depth (1 byte)
 			WriteByte(outputStream, 3)					'Color Type (1 byte) - 3 for indexed color
 			WriteByte(outputStream, 0)					'Compression Method (1 byte)
 			WriteByte(outputStream, 0)					'Filter Method (1 byte)
 			WriteByte(outputStream, 0)					'Interlace Method (1 byte) - 0 for no interlace
 
-			Rem
-			Figure out how to generate correct CRC
-			EndRem
+			'Figure out how to generate correct CRC
 			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
 
 			'PLTE chunk (color table)
@@ -197,9 +211,7 @@ Type IndexedImageWriter
 				WriteByte(outputStream, m_PalR[index])	'Red (1 byte)
 			Next
 
-			Rem
-			Figure out how to generate correct CRC
-			EndRem
+			'Figure out how to generate correct CRC
 			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
 
 			'IDAT chunk (pixel array)
@@ -216,22 +228,58 @@ Type IndexedImageWriter
 				Next
 			Next
 
-			Rem
-			Figure out how to generate correct CRC
-			EndRem
+			'Figure out how to generate correct CRC
 			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
 
 			'IEND chunk (EOF)
 			WriteInt(outputStream, 0)					'Chunk Length (4 bytes) - 0 for IEND
 			WriteInt(outputStream, 1229278788)			'Chunk Type (4 bytes) - 1229278788 (decimal) or 49 45 4E 44 (hex) or IEND (ascii)
 
-			Rem
-			Figure out how to generate correct CRC
-			EndRem
+			'Figure out how to generate correct CRC
 			WriteInt(outputStream, 0)					'CRC-32 checksum (4 bytes)
 
 			CloseStream(outputStream)
 			Return True
 		EndIf
+	EndMethod
+EndRem
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method WriteIndexedPNGFromPixmap:Int(sourcePixmap:TPixmap, filename:String, compression:Int = 5)
+		Local outputStream:TStream = WriteStream(filename)
+
+		Try
+			Local pngPtr:Byte Ptr = png_create_write_struct("1.6.37", Null, Null, Null)
+			Local pngInfoPtr:Byte Ptr = png_create_info_struct(pngPtr)
+
+			png_set_write_fn(pngPtr, outputStream, UtilityPNG.PNGWrite, UtilityPNG.PNGFlush)
+
+			png_set_compression_level(pngPtr, Utility.Clamp(compression, 0, 9))
+			png_set_IHDR(pngPtr, pngInfoPtr, sourcePixmap.Width, sourcePixmap.Height, 8, PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT)
+
+			Local palettePtr:Byte Ptr = m_Palette
+			png_set_PLTE(pngPtr, pngInfoPtr, palettePtr, 256);
+
+			'sourcePixmap = sourcePixmap.Convert(PF_I8)
+			For Local pixelY:Int = 0 Until sourcePixmap.Height
+				For Local pixelX:Int = 0 Until sourcePixmap.Width
+					WritePixel(sourcePixmap, pixelX, pixelY, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
+				Next
+			Next
+
+			Local rows:Byte Ptr[sourcePixmap.Height]
+			For Local i = 0 Until sourcePixmap.Height
+				rows[i] = sourcePixmap.PixelPtr(0, i)
+			Next
+			png_set_rows(pngPtr, pngInfoPtr, rows)
+
+			png_write_png(pngPtr, pngInfoPtr, 0, Null)
+			png_destroy_write_struct(Varptr pngPtr, Varptr pngInfoPtr, Null)
+
+			CloseStream(outputStream)
+			Return True
+		Catch error:String
+			If error <> "PNG ERROR" Throw error
+		EndTry
 	EndMethod
 EndType
