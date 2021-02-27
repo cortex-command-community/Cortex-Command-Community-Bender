@@ -92,6 +92,7 @@ Type UserInterface
 
 		m_LoadButton = CreateButton("Load", horizMargin, 0, buttonSize[0], buttonSize[1], m_ButtonPanel, BUTTON_PUSH)
 		m_SaveButton = CreateButton("Save", horizMargin + buttonSize[0] + vertMargin, 0, buttonSize[0], buttonSize[1], m_ButtonPanel, BUTTON_PUSH)
+		DisableGadget(m_SaveButton)
 
 		m_SettingsPanel = CreatePanel(m_SettingsPanelAnchor[0], m_SettingsPanelAnchor[1], m_SettingsPanelSize[0], m_SettingsPanelSize[1], m_LeftColumn, PANEL_GROUP, "  Settings :  ")
 		SetGadgetLayout(m_SettingsPanel, m_SettingsPanelAnchor[0], m_SettingsPanelSize[0], m_SettingsPanelAnchor[1], m_SettingsPanelSize[1])
@@ -207,5 +208,15 @@ Type UserInterface
 
 	Method GetMaxWorkspaceWidth:Int()
 		Return DesktopWidth() - m_LeftColumnSize[0]
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetSaveButtonEnabled(enabledOrNot:Int)
+		If enabledOrNot Then
+			EnableGadget(m_SaveButton)
+		Else
+			DisableGadget(m_SaveButton)
+		EndIf
 	EndMethod
 EndType

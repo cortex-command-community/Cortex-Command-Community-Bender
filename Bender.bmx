@@ -53,7 +53,7 @@ Repeat
 				Select EventSource()
 					'Loading
 					Case g_UserInterface.m_LoadButton
-						g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad())
+						g_UserInterface.SetSaveButtonEnabled(g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad()))
 					'Saving
 					Case g_UserInterface.m_SaveButton
 						If g_FileIO.GetSaveAsFrames() Then
