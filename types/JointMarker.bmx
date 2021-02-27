@@ -2,14 +2,11 @@
 
 Type JointMarker
 	Field m_ParentTilePosOnCanvas:SVec2I
-
 	Field m_PosOnTileX:Int
 	Field m_PosOnTileY:Int
 	Field m_PosOnCanvasX:Int
 	Field m_PosOnCanvasY:Int
-
 	Field m_Radius:Int
-
 	Field m_Selected:Int
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

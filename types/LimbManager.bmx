@@ -56,16 +56,6 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
-		Local result:Float[] = [0, 0, 0]
-		result[0] = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
-		result[1] = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
-		result[2] = (180 - (result[0] + result[1]))
-		Return result
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	Method SetJointMarker(mousePos:SVec2I)
 		Local selectedPart:Int = -1
 		Local selectedMarker:Int = -1
@@ -105,27 +95,12 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method BendLimbs(frameCount:Int)
-		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) '-1 to make inclusive of last value (full range)
-		For Local limb:Float = 0 Until c_LimbCount
-			For Local frame:Int = 0 Until frameCount
-				Local limbPart:Int = limb * 2
-				Local posX:Float = (frame * 32)			'Drawing position X
-				Local posY:Float = ((limb * 32) * 1.5 )	'Drawing position Y
-				Local upperLength:Float = m_LimbPartLength[limbPart] / m_InputZoom
-				Local lowerLength:Float = m_LimbPartLength[limbPart + 1] / m_InputZoom
-				Local airLength:Float = ((stepSize * frame) + c_MinExtend) * (upperLength + lowerLength) 'Sum of the two bones * step scaler for frame (hip-ankle)
-				Local bendAngle:Float[] = LawOfCosines(airLength, upperLength, lowerLength)
-				m_LimbPartAngle[limbPart, frame] = bendAngle[1]
-				m_LimbPartPosX[limbPart, frame] = posX
-				m_LimbPartPosY[limbPart, frame] = posY
-				posX :- Sin(m_LimbPartAngle[limbPart, frame]) * upperLength 'Position of knee
-				posY :+ Cos(m_LimbPartAngle[limbPart, frame]) * upperLength
-				m_LimbPartAngle[limbPart + 1, frame] = bendAngle[1] + bendAngle[2] + 180
-				m_LimbPartPosX[limbPart + 1, frame] = posX
-				m_LimbPartPosY[limbPart + 1, frame] = posY
-			Next
+	Method DrawJointMarkers()
+		SetRotation(0)
+		For Local marker:JointMarker = EachIn m_JointMarkers
+			marker.Draw()
 		Next
+		Utility.ResetDrawColor()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,12 +127,27 @@ Type LimbManager
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method DrawJointMarkers()
-		SetRotation(0)
-		For Local marker:JointMarker = EachIn m_JointMarkers
-			marker.Draw()
+	Method BendLimbs(frameCount:Int)
+		Local stepSize:Float = (c_MaxExtend - c_MinExtend) / (frameCount - 1) '-1 to make inclusive of last value (full range)
+		For Local limb:Float = 0 Until c_LimbCount
+			For Local frame:Int = 0 Until frameCount
+				Local limbPart:Int = limb * 2
+				Local posX:Float = (frame * 32)			'Drawing position X
+				Local posY:Float = ((limb * 32) * 1.5 )	'Drawing position Y
+				Local upperLength:Float = m_LimbPartLength[limbPart] / m_InputZoom
+				Local lowerLength:Float = m_LimbPartLength[limbPart + 1] / m_InputZoom
+				Local airLength:Float = ((stepSize * frame) + c_MinExtend) * (upperLength + lowerLength) 'Sum of the two bones * step scaler for frame (hip-ankle)
+				Local bendAngle:Float[] = Utility.LawOfCosines(airLength, upperLength, lowerLength)
+				m_LimbPartAngle[limbPart, frame] = bendAngle[1]
+				m_LimbPartPosX[limbPart, frame] = posX
+				m_LimbPartPosY[limbPart, frame] = posY
+				posX :- Sin(m_LimbPartAngle[limbPart, frame]) * upperLength 'Position of knee
+				posY :+ Cos(m_LimbPartAngle[limbPart, frame]) * upperLength
+				m_LimbPartAngle[limbPart + 1, frame] = bendAngle[1] + bendAngle[2] + 180
+				m_LimbPartPosX[limbPart + 1, frame] = posX
+				m_LimbPartPosY[limbPart + 1, frame] = posY
+			Next
 		Next
-		Utility.ResetDrawColor()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

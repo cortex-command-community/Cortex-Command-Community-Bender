@@ -4,18 +4,14 @@ Import "LimbManager.bmx"
 '//// GRAPHICS OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type GraphicsOutput
-	'Draw Bools
-	Field m_RedoLimbTiles:Int = False
-	'Constants
-	Const c_MaxZoom:Int = 11
 	Const c_MaxFrameCount:Int = 20
-	Field c_Magenta:Int[] = [255, 0, 255]
-	'Graphic Assets
 
 	Field m_MaxZoom:Int = 5 'Assume 1366px is the lowest resolution because it's not 1999. 1366px - 260px (left column) = 1106 / 192 (source image width) = 5 (floored)
+	Field m_Magenta:Int[] = [255, 0, 255]
+
 	Field m_SourceImage:TImage
 	Field m_SourceImageSize:SVec2I
-	'Output Settings
+
 	Field m_InputZoom:Int = g_DefaultInputZoom
 	Field m_TileSize:Int = 24 * m_InputZoom
 	Field m_FrameCount:Int = g_DefaultFrameCount
@@ -32,7 +28,7 @@ Type GraphicsOutput
 
 	Method New(maxWorkspaceWidth:Int)
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
-		SetMaskColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
+		SetMaskColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 
 		m_MaxZoom = Int(FloorF(maxWorkspaceWidth / 192))
 	EndMethod
@@ -47,14 +43,6 @@ Type GraphicsOutput
 			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
 			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 		EndIf
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method SetBackgroundColor:Int[](rgbValue:Int[])
-		m_BackgroundColor = rgbValue
-		ChangeBackgroundColor(m_BackgroundColor)
-		Return m_BackgroundColor
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,15 +62,10 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method GetFrameCount:Int()
-		Return m_FrameCount
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method SetFrameCount:Int(newCount:Int)
-		m_FrameCount = Utility.Clamp(newCount, 1, c_MaxFrameCount)
-		Return m_FrameCount
+	Method SetBackgroundColor:Int[](rgbValue:Int[])
+		m_BackgroundColor = rgbValue
+		ChangeBackgroundColor(m_BackgroundColor)
+		Return m_BackgroundColor
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,8 +84,62 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method GetFrameCount:Int()
+		Return m_FrameCount
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetFrameCount:Int(newCount:Int)
+		m_FrameCount = Utility.Clamp(newCount, 1, c_MaxFrameCount)
+		Return m_FrameCount
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method SetDrawOutputFrameBounds(drawOrNot:Int)
 		m_DrawOutputFrameBounds = drawOrNot
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GrabOutputForSaving:TPixmap()
+		If m_SourceImage = Null Then
+			Notify("Nothing to save!", False)
+		Else
+			ChangeBackgroundColor(m_Magenta)
+			Draw()
+			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmap, not the canvas), not sure why but whatever
+			Return GrabPixmap(55, 120, 34 * m_FrameCount, 210)
+		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GrabOutputFramesForSaving:TPixmap[,]()
+		If m_SourceImage = Null Then
+			Notify("Nothing to save!", False)
+		Else
+			ChangeBackgroundColor(m_Magenta)
+			Draw()
+			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmaps, not the canvas), not sure why but whatever
+
+			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
+			For Local row:Int = 0 Until c_LimbCount
+				Local rotationAngle:Int = -90
+				If row >= 2 Then
+					rotationAngle = 90
+				EndIf
+				For Local frame:Int = 0 Until m_FrameCount
+					framesToSave[row, frame] = Utility.RotatePixmap(GrabPixmap(m_FrameBoundingBoxPosX[row, frame] + 1, m_FrameBoundingBoxPosY[row, frame] + 1, m_FrameBoundingBoxSize[0] - 1, m_FrameBoundingBoxSize[1] - 1), rotationAngle)
+					'HFlip the legs so they're facing the right direction
+					If row >= 2 Then
+						framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
+					EndIf
+				Next
+			Next
+			Return framesToSave
+		EndIf
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,13 +156,25 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method DrawNoSourceImageScreen()
+		Cls()
+		SetScale(2, 2)
+		Local textToDraw:String = "NO IMAGE LOADED!"
+		Local drawColor:Int[] = [255, 230, 80]
+		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
+		SetScale(1, 1)
+		Flip(1)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method Draw()
 		If m_SourceImage = Null Then
 			DrawNoSourceImageScreen()
 		Else
 			Cls()
 
-			SetColor(c_Magenta[0], c_Magenta[1], c_Magenta[2])
+			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
 			Utility.ResetDrawColor()
 			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)
@@ -155,58 +204,5 @@ Type GraphicsOutput
 			EndIf
 			Flip(1)
 		EndIf
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method GrabOutputForSaving:TPixmap()
-		If m_SourceImage = Null Then
-			Notify("Nothing to save!", False)
-		Else
-			ChangeBackgroundColor(c_Magenta)
-			Draw()
-			Flip(1) 'Have to flip again for background color to actually change, not sure why but whatever
-			Return GrabPixmap(55, 120, 34 * m_FrameCount, 210)
-		EndIf
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method GrabOutputFramesForSaving:TPixmap[,]()
-		If m_SourceImage = Null Then
-			Notify("Nothing to save!", False)
-		Else
-			ChangeBackgroundColor(c_Magenta)
-			Draw()
-			Flip(1) 'Have to flip again for background color to actually change, not sure why but whatever
-
-			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
-			For Local row:Int = 0 Until c_LimbCount
-				Local rotationAngle:Int = -90
-				If row >= 2 Then
-					rotationAngle = 90
-				EndIf
-				For Local frame:Int = 0 Until m_FrameCount
-					framesToSave[row, frame] = Utility.RotatePixmap(GrabPixmap(m_FrameBoundingBoxPosX[row, frame] + 1, m_FrameBoundingBoxPosY[row, frame] + 1, m_FrameBoundingBoxSize[0] - 1, m_FrameBoundingBoxSize[1] - 1), rotationAngle)
-					'HFlip the legs so they're facing the right direction
-					If row >= 2 Then
-						framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
-					EndIf
-				Next
-			Next
-			Return framesToSave
-		EndIf
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method DrawNoSourceImageScreen()
-		Cls()
-		SetScale(2, 2)
-		Local textToDraw:String = "NO IMAGE LOADED!"
-		Local drawColor:Int[] = [255, 230, 80]
-		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
-		SetScale(1, 1)
-		Flip(1)
 	EndMethod
 EndType

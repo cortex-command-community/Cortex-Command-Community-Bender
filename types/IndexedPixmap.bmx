@@ -43,7 +43,7 @@ Type IndexedPixmap
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method WritePixel(x:Int, y:Int, index:Byte)
-		Assert x >= 0 And x < m_Width And y>=0 And y < m_Height Else "Pixmap coordinates out of bounds!"
+		Assert x >= 0 And x < m_Width And y >= 0 And y < m_Height Else "Pixmap coordinates out of bounds!"
 		Local pixel:Byte Ptr = PixelPtr(x, y)
 		pixel[0] = index
 	EndMethod
