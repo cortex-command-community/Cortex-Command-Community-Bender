@@ -178,6 +178,9 @@ Type GraphicsOutput
 		Else
 			Cls()
 
+			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 34
+			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount)
+
 			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
 			Utility.ResetDrawColor()
@@ -185,9 +188,6 @@ Type GraphicsOutput
 
 			m_LimbManager.DrawTileOutlines()
 			m_LimbManager.DrawJointMarkers()
-
-			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 34
-			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount)
 
 			Local drawColor:Int[] = [255, 230, 80]
 			Utility.DrawTextWithShadow("Arm FG", New SVec2I(10, vertOffsetFromSource), drawColor)
