@@ -38,13 +38,18 @@ Type GraphicsOutput
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method LoadFile:Int(fileToLoad:String)
-		m_SourceImage = LoadImage(fileToLoad, 0)
+		Local loadedImage:TImage = LoadImage(fileToLoad, 0)
 
-		If m_SourceImage <> Null Then
-			m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
-			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
-			m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
-			Return True
+		If loadedImage <> Null Then
+			If loadedImage.Width = 192 And loadedImage.Height = 24 Then
+				m_SourceImage = loadedImage
+				m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
+				DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
+				m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
+				Return True
+			Else
+				Notify("Attempting to load image with incorrect dimensions!~n~nMake sure the dimensions are exactly 192x24px!~nUse ~qInputTemplate~q for reference.", True)
+			EndIf
 		EndIf
 		Return False
 	EndMethod

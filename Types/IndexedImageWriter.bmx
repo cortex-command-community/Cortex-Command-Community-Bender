@@ -158,14 +158,14 @@ Type IndexedImageWriter
 				Local convertingPixmap:IndexedPixmap = New IndexedPixmap(sourcePixmap.Width, sourcePixmap.Height)
 				For Local pixelY:Int = 0 Until sourcePixmap.Height
 					For Local pixelX:Int = 0 Until sourcePixmap.Width
-						'Convert the 32bit RGBA color value from the source pixmap to a 8bit index value and write it to the converting bitmap
+						'Convert the 32bit RGBA color value from the source pixmap to a 8bit index value and write it to the converting pixmap
 						convertingPixmap.WritePixel(pixelX, pixelY, ConvertColorToClosestIndex(ReadPixel(sourcePixmap, pixelX, pixelY)))
 					Next
 				Next
 
 				Local rows:Byte Ptr[sourcePixmap.Height]
 				For Local i = 0 Until sourcePixmap.Height
-					rows[i] = convertingPixmap.PixelPtr(0, i) 'Get row pointers from the converting bitmap (1 byte aligned so won't be spaghettified)
+					rows[i] = convertingPixmap.PixelPtr(0, i) 'Get row pointers from the converting pixmap (1 byte aligned so won't be spaghettified)
 				Next
 				png_set_rows(pngPtr, pngInfoPtr, rows)
 
