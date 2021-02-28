@@ -102,11 +102,11 @@ Type IndexedImageWriter
 			WriteInt(outputStream, 256)					'Number of colors in the color palette (4 bytes)
 			WriteInt(outputStream, 0)					'Number of important colors (4 bytes) - 0 when every color is important
 
-			'Color Table (4 bytes (RGBA) times the amount of colors in the palette)
+			'Color Table (4 bytes (BGRA (little-endian)) times the amount of colors in the palette)
 			For Local paletteIndex:RGBColor = EachIn m_Palette
-				WriteByte(outputStream, paletteIndex.m_R)	'Blue (1 byte)
+				WriteByte(outputStream, paletteIndex.m_B)	'Blue (1 byte)
 				WriteByte(outputStream, paletteIndex.m_G)	'Green (1 byte)
-				WriteByte(outputStream, paletteIndex.m_B)	'Red (1 byte)
+				WriteByte(outputStream, paletteIndex.m_R)	'Red (1 byte)
 				WriteByte(outputStream, 0)					'Reserved (1 byte) - Alpha channel, irrelevant for indexed bitmaps
 			Next
 
