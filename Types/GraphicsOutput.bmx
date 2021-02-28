@@ -122,6 +122,7 @@ Type GraphicsOutput
 	Method GrabOutputForSaving:TPixmap()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
+			Return Null
 		Else
 			ChangeBackgroundColor(m_Magenta)
 			Draw()
@@ -135,6 +136,7 @@ Type GraphicsOutput
 	Method GrabOutputFramesForSaving:TPixmap[,]()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
+			Return Null
 		Else
 			ChangeBackgroundColor(m_Magenta)
 			Draw()

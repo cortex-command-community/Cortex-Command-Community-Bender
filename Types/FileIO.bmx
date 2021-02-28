@@ -70,7 +70,7 @@ Type FileIO
 
 	Method SaveFile:Int(pixmapToSave:TPixmap)
 		Local filename:String = RequestFile("Save graphic output", m_FileFilters, True)
-		If CheckValidExportFileName(filename) Then
+		If pixmapToSave <> Null And CheckValidExportFileName(filename) Then
 			Local saveSuccess:Int = True
 			If m_SaveAsIndexed Then
 				Select m_IndexedFileType
@@ -97,7 +97,7 @@ Type FileIO
 
 	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
 		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up
-		If CheckValidExportFileName(filename) Then
+		If pixmapToSave <> Null And CheckValidExportFileName(filename) Then
 			Local saveSuccess:Int = True
 			For Local row:Int = 0 To 3
 				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order

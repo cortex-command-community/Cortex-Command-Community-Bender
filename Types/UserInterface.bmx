@@ -88,6 +88,7 @@ Type UserInterface
 
 		m_LeftColumn = CreatePanel(0, 0, m_LeftColumnSize[0], m_LeftColumnSize[1], m_MainWindow, Null)
 		SetGadgetLayout(m_LeftColumn, 0, m_LeftColumnSize[0], 0, m_LeftColumnSize[1])
+		SetGadgetSensitivity(m_LeftColumn, SENSITIZE_KEYS)
 
 		Local horizMargin:Int = 5
 		Local vertMargin:Int = 10
@@ -99,6 +100,7 @@ Type UserInterface
 
 		m_ButtonPanel = CreatePanel(m_ButtonPanelAnchor[0], m_ButtonPanelAnchor[1], m_ButtonPanelSize[0], m_ButtonPanelSize[1], m_LeftColumn, PANEL_GROUP)
 		SetGadgetLayout(m_ButtonPanel, m_ButtonPanelAnchor[0], m_ButtonPanelSize[0], m_ButtonPanelAnchor[1], m_ButtonPanelSize[1])
+		SetGadgetSensitivity(m_ButtonPanel, SENSITIZE_KEYS)
 
 		m_LoadButton = CreateButton("Load", horizMargin, 0, buttonSize[0], buttonSize[1], m_ButtonPanel, BUTTON_PUSH)
 		m_SaveButton = CreateButton("Save", horizMargin + buttonSize[0] + vertMargin, 0, buttonSize[0], buttonSize[1], m_ButtonPanel, BUTTON_PUSH)
@@ -106,6 +108,7 @@ Type UserInterface
 
 		m_SettingsPanel = CreatePanel(m_SettingsPanelAnchor[0], m_SettingsPanelAnchor[1], m_SettingsPanelSize[0], m_SettingsPanelSize[1], m_LeftColumn, PANEL_GROUP, "  Settings :  ")
 		SetGadgetLayout(m_SettingsPanel, m_SettingsPanelAnchor[0], m_SettingsPanelSize[0], m_SettingsPanelAnchor[1], m_SettingsPanelSize[1])
+		SetGadgetSensitivity(m_SettingsPanel, SENSITIZE_KEYS)
 
 		m_SettingsColorLabel = CreateLabel("BG Color", horizMargin, vertMargin, 50, labelHeight, m_SettingsPanel, LABEL_LEFT)
 
@@ -141,6 +144,7 @@ Type UserInterface
 
 		m_LayeringPanel = CreatePanel(m_LayeringPanelAnchor[0], m_LayeringPanelAnchor[1], m_LayeringPanelSize[0], m_LayeringPanelSize[1], m_LeftColumn, PANEL_GROUP, "  Layering Controls :  ")
 		SetGadgetLayout(m_LayeringPanel, m_LayeringPanelAnchor[0], m_LayeringPanelSize[0], m_LayeringPanelAnchor[1], m_LayeringPanelSize[1])
+		SetGadgetSensitivity(m_LayeringPanel, SENSITIZE_KEYS)
 
 		m_LayeringArmFGCheckbox = CreateButton(" Arm FG  —  Lower Arm on top", horizMargin, vertMargin, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
 		m_LayeringArmBGCheckbox = CreateButton(" Arm BG  —  Lower Arm on top", horizMargin, GadgetY(m_LayeringArmFGCheckbox) + labelVertOffset, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
