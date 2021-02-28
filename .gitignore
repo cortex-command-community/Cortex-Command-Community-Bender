@@ -8,5 +8,5 @@
 *.code-workspace
 .vscode/
 
-!test-image.bmp
-!input-template.bmp
+!TestImage.png
+!InputTemplate.png
