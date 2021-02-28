@@ -114,7 +114,7 @@ Type GraphicsOutput
 			ChangeBackgroundColor(m_Magenta)
 			Draw()
 			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmap, not the canvas), not sure why but whatever
-			Return GrabPixmap(55, 120, 34 * m_FrameCount, 210)
+			Return GrabPixmap(0, 12 + (m_SourceImageSize[1] * m_InputZoom), 100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 200)
 		EndIf
 	EndMethod
 
@@ -200,7 +200,7 @@ Type GraphicsOutput
 				m_FrameBoundingBoxSize = New SVec2I(32, 48)
 				For Local row:Int = 0 Until c_LimbCount
 					For Local frame:Int = 0 Until m_FrameCount
-						m_FrameBoundingBoxPosX[row, frame] = 100 - 20 + (frame * (m_TileSize / m_InputZoom + 8))
+						m_FrameBoundingBoxPosX[row, frame] = 100 - 20 + (frame * ((m_TileSize / m_InputZoom) + 8))
 						m_FrameBoundingBoxPosY[row, frame] = vertOffsetFromSource - 12 + (row * 48)
 						Utility.DrawRectOutline(New SVec2I(m_FrameBoundingBoxPosX[row, frame], m_FrameBoundingBoxPosY[row, frame]), m_FrameBoundingBoxSize, drawColor)
 					Next
