@@ -67,7 +67,7 @@ Type IndexedImageWriter
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method WriteIndexedBitmapFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
+	Method WriteIndexedBMPFromPixmap:Int(sourcePixmap:TPixmap, filename:String)
 		If filename = Null Then
 			Return False
 		Else

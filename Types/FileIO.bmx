@@ -1,13 +1,15 @@
+Import "SettingsManager.bmx"
 Import "IndexedImageWriter.bmx"
 
 '//// FILE IO ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type FileIO
 	Field m_ImportedFile:String = Null
-	Field m_FileFilters:String = "Image Files:png"
 
-	Field m_SaveAsIndexed:Int = False
 	Field m_SaveAsFrames:Int = False
+	Field m_SaveAsIndexed:Int = False
+	Field m_IndexedFileType:String = g_DefaultIndexedFileType
+	Field m_FileFilters:String = "Image Files:" + m_IndexedFileType
 
 	Field m_IndexedImageWriter:IndexedImageWriter = Null
 
@@ -52,15 +54,16 @@ Type FileIO
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method SetSaveAsIndexed(indexedOrNot:Int)
+	Method SetSaveAsIndexed:Int(indexedOrNot:Int)
 		m_SaveAsIndexed = indexedOrNot
-		Rem
-		If m_SaveAsIndexed Then
-			m_FileFilters = "Image Files:bmp"
-		Else
-			m_FileFilters = "Image Files:png"
-		EndIf
-		EndRem
+		Return m_SaveAsIndexed
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetIndexedFileType(fileType:String)
+		m_IndexedFileType = fileType.ToLower()
+		m_FileFilters = "Image Files:" + m_IndexedFileType
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +73,14 @@ Type FileIO
 		If CheckValidExportFileName(filename) Then
 			Local saveSuccess:Int = True
 			If m_SaveAsIndexed Then
-				'saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave, filename)
-				saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave, filename)
+				Select m_IndexedFileType
+					Case "png"
+						saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave, filename)
+					Case "bmp"
+						saveSuccess = m_IndexedImageWriter.WriteIndexedBMPFromPixmap(pixmapToSave, filename)
+					Default
+						saveSuccess = False
+				EndSelect
 			Else
 				saveSuccess = SavePixmapPNG(pixmapToSave, filename)
 			EndIf
@@ -109,8 +118,14 @@ Type FileIO
 
 					Local saveSuccess:Int = True
 					If m_SaveAsIndexed Then
-						'saveSuccess = m_IndexedImageWriter.WriteIndexedBitmapFromPixmap(pixmapToSave[row, frame], fullFilename + ".bmp")
-						saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[row, frame], fullFilename + ".png")
+						Select m_IndexedFileType
+							Case "png"
+								saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[row, frame], fullFilename + ".png")
+							Case "bmp"
+								saveSuccess = m_IndexedImageWriter.WriteIndexedBMPFromPixmap(pixmapToSave[row, frame], fullFilename + ".bmp")
+							Default
+								saveSuccess = False
+						EndSelect
 					Else
 						saveSuccess = SavePixmapPNG(pixmapToSave[row, frame], fullFilename + ".png")
 					EndIf

@@ -76,7 +76,10 @@ Repeat
 						g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox)))
 					'Save as Indexed
 					Case g_UserInterface.m_SettingsIndexedCheckbox
-						g_FileIO.SetSaveAsIndexed(ButtonState(g_UserInterface.m_SettingsIndexedCheckbox))
+						g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(ButtonState(g_UserInterface.m_SettingsIndexedCheckbox)))
+					'Indexed Filetype
+					Case g_UserInterface.m_SettingsIndexedFileTypeComboBox
+						g_FileIO.SetIndexedFileType(GadgetText(g_UserInterface.m_SettingsIndexedFileTypeComboBox))
 				EndSelect
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				If Confirm("Quit program?") Then End

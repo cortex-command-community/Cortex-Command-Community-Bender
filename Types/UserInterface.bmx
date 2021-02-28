@@ -34,7 +34,7 @@ Type UserInterface
 
 	Field m_SettingsPanel:TGadget = Null
 	Field m_SettingsPanelAnchor:SVec2I = New SVec2I(10, m_ButtonPanelSize[1] + 15)
-	Field m_SettingsPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 175)
+	Field m_SettingsPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 180)
 
 	Field m_SettingsZoomLabel:TGadget = Null
 	Field m_SettingsZoomTextbox:TGadget = Null
@@ -52,6 +52,7 @@ Type UserInterface
 
 	Field m_SettingsIndexedLabel:TGadget = Null
 	Field m_SettingsIndexedCheckbox:TGadget = Null
+	Field m_SettingsIndexedFileTypeComboBox:TGadget = Null
 
 	Field m_SettingsSaveAsFramesLabel:TGadget = Null
 	Field m_SettingsSaveAsFramesCheckbox:TGadget = Null
@@ -124,6 +125,10 @@ Type UserInterface
 
 		m_SettingsIndexedLabel = CreateLabel("Save as Indexed", horizMargin, GadgetY(m_SettingsSaveAsFramesLabel) + labelVertOffset, 87, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsIndexedCheckbox = CreateButton(Null, vertMargin + GadgetWidth(m_SettingsIndexedLabel), GadgetY(m_SettingsIndexedLabel), 20, 20, m_SettingsPanel, BUTTON_CHECKBOX)
+		m_SettingsIndexedFileTypeComboBox = CreateComboBox(120, GadgetY(m_SettingsIndexedLabel) - 3, 50, 15, m_SettingsPanel)
+		AddGadgetItem(m_SettingsIndexedFileTypeComboBox, "PNG", GADGETITEM_DEFAULT)
+		AddGadgetItem(m_SettingsIndexedFileTypeComboBox, "BMP", GADGETITEM_NORMAL)
+		HideGadget(m_SettingsIndexedFileTypeComboBox)
 
 		m_LogoImagePanel = CreatePanel(m_LogoImagePanelAnchor[0], m_LogoImagePanelAnchor[1], m_LogoImagePanelSize[0], m_LogoImagePanelSize[1], m_LeftColumn, Null)
 		SetPanelPixmap(m_LogoImagePanel, m_LogoImage, PANELPIXMAP_CENTER)
@@ -217,6 +222,16 @@ Type UserInterface
 			EnableGadget(m_SaveButton)
 		Else
 			DisableGadget(m_SaveButton)
+		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetFileTypeComboBoxVisible(visibleOrNot:Int)
+		If visibleOrNot Then
+			ShowGadget(m_SettingsIndexedFileTypeComboBox)
+		Else
+			HideGadget(m_SettingsIndexedFileTypeComboBox)
 		EndIf
 	EndMethod
 EndType
