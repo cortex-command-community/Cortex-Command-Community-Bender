@@ -34,6 +34,7 @@ Repeat
 
 		Select EventID()
 			'Case EVENT_WINDOWACTIVATE
+			'Case EVENT_GADGETSELECT
 			'Case EVENT_GADGETLOSTFOCUS
 
 			Case EVENT_APPRESUME
@@ -84,11 +85,21 @@ Repeat
 					Case g_UserInterface.m_LayeringArmFGCheckbox, g_UserInterface.m_LayeringArmBGCheckbox, g_UserInterface.m_LayeringLegFGCheckbox, g_UserInterface.m_LayeringLegBGCheckbox
 						g_GraphicsOutput.SetBentLimbPartDrawOrder(g_UserInterface.SetLayerCheckboxLabels(g_UserInterface.GetLayerCheckboxValues()))
 				EndSelect
+			Case EVENT_KEYDOWN
+				If Not GadgetDisabled(g_UserInterface.m_SaveButton) And (KeyDown(KEY_LCONTROL) Or KeyDown(KEY_RCONTROL)) And KeyDown(KEY_S) Then
+					If g_FileIO.GetSaveAsFrames() Then
+						g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFileAsFrames(g_GraphicsOutput.GrabOutputFramesForSaving(), g_GraphicsOutput.GetFrameCount()))
+					Else
+						g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFile(g_GraphicsOutput.GrabOutputForSaving()))
+					EndIf
+					FlushKeys()
+					Continue
+				EndIf
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				If Confirm("Quit program?") Then End
 		EndSelect
 
-	g_GraphicsOutput.Update()
-	g_GraphicsOutput.Draw()
+		g_GraphicsOutput.Update()
+		g_GraphicsOutput.Draw()
 	Forever
 Forever
