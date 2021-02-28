@@ -57,6 +57,15 @@ Type UserInterface
 	Field m_SettingsSaveAsFramesLabel:TGadget = Null
 	Field m_SettingsSaveAsFramesCheckbox:TGadget = Null
 
+	Field m_LayeringPanel:TGadget = Null
+	Field m_LayeringPanelAnchor:SVec2I = New SVec2I(10, m_ButtonPanelSize[1] + m_SettingsPanelSize[1] + 25)
+	Field m_LayeringPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 150)
+
+	Field m_LayeringArmFGCheckbox:TGadget = Null
+	Field m_LayeringArmBGCheckbox:TGadget = Null
+	Field m_LayeringLegFGCheckbox:TGadget = Null
+	Field m_LayeringLegBGCheckbox:TGadget = Null
+
 	Field m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
 	Field m_LogoImagePanel:TGadget = Null
 	Field m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - m_LogoImage.Height)
@@ -130,6 +139,14 @@ Type UserInterface
 		AddGadgetItem(m_SettingsIndexedFileTypeComboBox, "BMP", GADGETITEM_NORMAL)
 		HideGadget(m_SettingsIndexedFileTypeComboBox)
 
+		m_LayeringPanel = CreatePanel(m_LayeringPanelAnchor[0], m_LayeringPanelAnchor[1], m_LayeringPanelSize[0], m_LayeringPanelSize[1], m_LeftColumn, PANEL_GROUP, "  Layering Controls :  ")
+		SetGadgetLayout(m_LayeringPanel, m_LayeringPanelAnchor[0], m_LayeringPanelSize[0], m_LayeringPanelAnchor[1], m_LayeringPanelSize[1])
+
+		m_LayeringArmFGCheckbox = CreateButton(" Arm FG  —  Lower Arm on top", horizMargin, vertMargin, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
+		m_LayeringArmBGCheckbox = CreateButton(" Arm BG  —  Lower Arm on top", horizMargin, GadgetY(m_LayeringArmFGCheckbox) + labelVertOffset, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
+		m_LayeringLegFGCheckbox = CreateButton(" Leg FG  —  Lower Leg on top", horizMargin, GadgetY(m_LayeringArmBGCheckbox) + labelVertOffset, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
+		m_LayeringLegBGCheckbox = CreateButton(" Leg BG  —  Lower Leg on top", horizMargin, GadgetY(m_LayeringLegFGCheckbox) + labelVertOffset, m_LayeringPanelSize[0] - 20, 20, m_LayeringPanel, BUTTON_CHECKBOX)
+
 		m_LogoImagePanel = CreatePanel(m_LogoImagePanelAnchor[0], m_LogoImagePanelAnchor[1], m_LogoImagePanelSize[0], m_LogoImagePanelSize[1], m_LeftColumn, Null)
 		SetPanelPixmap(m_LogoImagePanel, m_LogoImage, PANELPIXMAP_CENTER)
 	EndMethod
@@ -195,6 +212,43 @@ Type UserInterface
 
 	Method SetZoomTextboxValue(newValue:Int)
 		SetGadgetText(m_SettingsZoomTextbox, newValue)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GetLayerCheckboxValues:Int[,]()
+		Local checkboxValues:Int[4, 1]
+		checkboxValues[0, 0] = ButtonState(m_LayeringArmFGCheckbox)
+		checkboxValues[1, 0] = ButtonState(m_LayeringArmBGCheckbox)
+		checkboxValues[2, 0] = ButtonState(m_LayeringLegFGCheckbox)
+		checkboxValues[3, 0] = ButtonState(m_LayeringLegBGCheckbox)
+		Return checkboxValues
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetLayerCheckboxLabels:Int[,](checkboxValues:Int[,])
+		If checkboxValues[0, 0] = False Then
+			SetGadgetText(m_LayeringArmFGCheckbox, " Arm FG  —  Lower Arm on top")
+		Else
+			SetGadgetText(m_LayeringArmFGCheckbox, " Arm FG  —  Upper Arm on top")
+		EndIf
+		If checkboxValues[1, 0] = False Then
+			SetGadgetText(m_LayeringArmBGCheckbox, " Arm BG  —  Lower Arm on top")
+		Else
+			SetGadgetText(m_LayeringArmBGCheckbox, " Arm BG  —  Upper Arm on top")
+		EndIf
+		If checkboxValues[2, 0] = False Then
+			SetGadgetText(m_LayeringLegFGCheckbox, " Leg FG  —  Lower Leg on top")
+		Else
+			SetGadgetText(m_LayeringLegFGCheckbox, " Leg FG  —  Upper Leg on top")
+		EndIf
+		If checkboxValues[3, 0] = False Then
+			SetGadgetText(m_LayeringLegBGCheckbox, " Leg BG  —  Lower Leg on top")
+		Else
+			SetGadgetText(m_LayeringLegBGCheckbox, " Leg BG  —  Upper Leg on top")
+		EndIf
+		Return checkboxValues
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

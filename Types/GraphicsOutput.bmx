@@ -16,6 +16,7 @@ Type GraphicsOutput
 	Field m_TileSize:Int = 24 * m_InputZoom
 	Field m_FrameCount:Int = g_DefaultFrameCount
 	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
+	Field m_BentLimbPartDrawOrder:Int[c_LimbCount, 1]
 
 	Field m_DrawOutputFrameBounds:Int = False
 	Field m_FrameBoundingBoxPosX:Int[c_LimbCount, c_MaxFrameCount]
@@ -112,6 +113,12 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method SetBentLimbPartDrawOrder(drawOrder:Int[,])
+		m_BentLimbPartDrawOrder = drawOrder
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method GrabOutputForSaving:TPixmap()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
@@ -184,7 +191,7 @@ Type GraphicsOutput
 			Cls()
 
 			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 34
-			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount)
+			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount, m_BentLimbPartDrawOrder)
 
 			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom

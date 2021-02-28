@@ -80,6 +80,9 @@ Repeat
 					'Indexed Filetype
 					Case g_UserInterface.m_SettingsIndexedFileTypeComboBox
 						g_FileIO.SetIndexedFileType(GadgetText(g_UserInterface.m_SettingsIndexedFileTypeComboBox))
+					'Layering Controls
+					Case g_UserInterface.m_LayeringArmFGCheckbox, g_UserInterface.m_LayeringArmBGCheckbox, g_UserInterface.m_LayeringLegFGCheckbox, g_UserInterface.m_LayeringLegBGCheckbox
+						g_GraphicsOutput.SetBentLimbPartDrawOrder(g_UserInterface.SetLayerCheckboxLabels(g_UserInterface.GetLayerCheckboxValues()))
 				EndSelect
 			Case EVENT_WINDOWCLOSE, EVENT_APPTERMINATE
 				If Confirm("Quit program?") Then End
