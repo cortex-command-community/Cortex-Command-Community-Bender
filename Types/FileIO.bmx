@@ -85,7 +85,9 @@ Type FileIO
 				saveSuccess = SavePixmapPNG(pixmapToSave, filename)
 			EndIf
 			If Not saveSuccess Then
-				Notify("Failed to save file: " + filename)
+				Notify("Failed to save file: " + filename, True)
+			Else
+				Notify("File saved successfully!")
 			EndIf
 		EndIf
 		Return True 'Return something to indicate function finished so workspace can be reverted
@@ -96,6 +98,7 @@ Type FileIO
 	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
 		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up
 		If CheckValidExportFileName(filename) Then
+			Local saveSuccess:Int = True
 			For Local row:Int = 0 To 3
 				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order
 				Select row
@@ -116,7 +119,6 @@ Type FileIO
 						leadingZeros = "0"
 					EndIf
 
-					Local saveSuccess:Int = True
 					If m_SaveAsIndexed Then
 						Select m_IndexedFileType
 							Case "png"
@@ -131,11 +133,14 @@ Type FileIO
 					EndIf
 
 					If Not saveSuccess Then
-						Notify("Failed to save file: " + fullFilename + "~nFurther saving aborted!")
+						Notify("Failed to save file: " + fullFilename + "~nFurther saving aborted!", True)
 						Return True
 					EndIf
 				Next
 			Next
+			If saveSuccess Then
+				Notify("Files saved successfully!")
+			EndIf
 		EndIf
 		Return True 'Return something to indicate function finished so workspace can be reverted
 	EndMethod
