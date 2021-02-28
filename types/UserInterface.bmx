@@ -6,58 +6,58 @@ Import "Utility.bmx"
 '//// USER INTERFACE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type UserInterface
-	Field m_MainWindow:TGadget
+	Field m_MainWindow:TGadget = Null
 
-	Field m_LeftColumn:TGadget
+	Field m_LeftColumn:TGadget = Null
 	Field m_LeftColumnSize:SVec2I = New SVec2I(260, 480)
 
 	'Canvas for graphics output
-	Field m_CanvasGraphics:TGadget
+	Field m_CanvasGraphics:TGadget = Null
 	Field m_CanvasGraphicsAnchor:SVec2I = New SVec2I(m_LeftColumnSize[0], 0)
 	Field m_CanvasGraphicsSize:SVec2I = New SVec2I(768, 480)
 
 	'Title bar buttons
-	Field m_HelpMenu:TGadget
+	Field m_HelpMenu:TGadget = Null
 	Field m_HelpMenuText:String = LoadText("Incbin::Assets/TextHelp")
 	Const c_HelpMenuTag:Int = 100
 
-	Field m_AboutMenu:TGadget
+	Field m_AboutMenu:TGadget = Null
 	Field m_AboutMenuText:String = LoadText("Incbin::Assets/TextAbout")
 	Const c_AboutMenuTag:Int = 101
 
-	Field m_ButtonPanel:TGadget
+	Field m_ButtonPanel:TGadget = Null
 	Field m_ButtonPanelAnchor:SVec2I = New SVec2I(10, 5)
 	Field m_ButtonPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 55)
 
-	Field m_LoadButton:TGadget
-	Field m_SaveButton:TGadget
+	Field m_LoadButton:TGadget = Null
+	Field m_SaveButton:TGadget = Null
 
-	Field m_SettingsPanel:TGadget
+	Field m_SettingsPanel:TGadget = Null
 	Field m_SettingsPanelAnchor:SVec2I = New SVec2I(10, m_ButtonPanelSize[1] + 15)
 	Field m_SettingsPanelSize:SVec2I = New SVec2I(m_CanvasGraphicsAnchor[0] - 20, 175)
 
-	Field m_SettingsZoomLabel:TGadget
-	Field m_SettingsZoomTextbox:TGadget
+	Field m_SettingsZoomLabel:TGadget = Null
+	Field m_SettingsZoomTextbox:TGadget = Null
 
-	Field m_SettingsFramesLabel:TGadget
-	Field m_SettingsFramesTextbox:TGadget
+	Field m_SettingsFramesLabel:TGadget = Null
+	Field m_SettingsFramesTextbox:TGadget = Null
 
-	Field m_SettingsColorLabel:TGadget
-	Field m_SettingsColorRLabel:TGadget
-	Field m_SettingsColorRTextbox:TGadget
-	Field m_SettingsColorGLabel:TGadget
-	Field m_SettingsColorGTextbox:TGadget
-	Field m_SettingsColorBLabel:TGadget
-	Field m_SettingsColorBTextbox:TGadget
+	Field m_SettingsColorLabel:TGadget = Null
+	Field m_SettingsColorRLabel:TGadget = Null
+	Field m_SettingsColorRTextbox:TGadget = Null
+	Field m_SettingsColorGLabel:TGadget = Null
+	Field m_SettingsColorGTextbox:TGadget = Null
+	Field m_SettingsColorBLabel:TGadget = Null
+	Field m_SettingsColorBTextbox:TGadget = Null
 
-	Field m_SettingsIndexedLabel:TGadget
-	Field m_SettingsIndexedCheckbox:TGadget
+	Field m_SettingsIndexedLabel:TGadget = Null
+	Field m_SettingsIndexedCheckbox:TGadget = Null
 
-	Field m_SettingsSaveAsFramesLabel:TGadget
-	Field m_SettingsSaveAsFramesCheckbox:TGadget
+	Field m_SettingsSaveAsFramesLabel:TGadget = Null
+	Field m_SettingsSaveAsFramesCheckbox:TGadget = Null
 
 	Field m_LogoImage:TPixmap = LoadPixmap("Incbin::Assets/Logo")
-	Field m_LogoImagePanel:TGadget
+	Field m_LogoImagePanel:TGadget = Null
 	Field m_LogoImagePanelAnchor:SVec2I = New SVec2I(0, m_LeftColumnSize[1] - m_LogoImage.Height)
 	Field m_LogoImagePanelSize:SVec2I = New SVec2I(m_LogoImage.Width, m_LogoImage.Height)
 

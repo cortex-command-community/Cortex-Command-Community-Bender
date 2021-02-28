@@ -5,7 +5,7 @@ Type Utility
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
-		Local result:Float[] = [0, 0, 0]
+		Local result:Float[3]
 		result[0] = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
 		result[1] = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
 		result[2] = 180 - (result[0] + result[1])
@@ -67,7 +67,7 @@ Type Utility
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Function RotatePixmap:TPixmap(sourcePixmap:TPixmap, angle:Int)
-		Local outputPixmap:TPixmap
+		Local outputPixmap:TPixmap = Null
 
 		'This is pretty garbage but BlitzMax life is hard
 		Select angle

@@ -3,10 +3,10 @@
 'Since TPixmap does not support RGB332 format gotta set up this custom one
 'Otherwise indexed PNG output is spaghetti because bad byte alignment (with RGB888/RGBA8888) or incorrect indexing (with I8)
 Type IndexedPixmap
-	Field m_Pixels:Byte Ptr
-	Field m_Width:Int
-	Field m_Height:Int
-	Field m_Capacity:Size_T
+	Field m_Pixels:Byte Ptr = Null
+	Field m_Width:Int = 0
+	Field m_Height:Int = 0
+	Field m_Capacity:Size_T = 0
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

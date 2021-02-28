@@ -17,9 +17,9 @@ Import "Types/GraphicsOutput.bmx"
 
 AppTitle = "CCCP Bender 1.3.0"
 
-Global g_UserInterface:UserInterface
-Global g_FileIO:FileIO
-Global g_GraphicsOutput:GraphicsOutput
+Global g_UserInterface:UserInterface = Null
+Global g_FileIO:FileIO = Null
+Global g_GraphicsOutput:GraphicsOutput = Null
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

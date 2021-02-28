@@ -9,20 +9,20 @@ Type GraphicsOutput
 	Field m_MaxZoom:Int = 5 'Assume 1366px is the lowest resolution because it's not 1999. 1366px - 260px (left column) = 1106 / 192 (source image width) = 5 (floored)
 	Field m_Magenta:Int[] = [255, 0, 255]
 
-	Field m_SourceImage:TImage
-	Field m_SourceImageSize:SVec2I
+	Field m_SourceImage:TImage = Null
+	Field m_SourceImageSize:SVec2I = Null
 
 	Field m_InputZoom:Int = g_DefaultInputZoom
 	Field m_TileSize:Int = 24 * m_InputZoom
 	Field m_FrameCount:Int = g_DefaultFrameCount
 	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
 
-	Field m_DrawOutputFrameBounds:Int
+	Field m_DrawOutputFrameBounds:Int = False
 	Field m_FrameBoundingBoxPosX:Int[c_LimbCount, c_MaxFrameCount]
 	Field m_FrameBoundingBoxPosY:Int[c_LimbCount, c_MaxFrameCount]
-	Field m_FrameBoundingBoxSize:SVec2I
+	Field m_FrameBoundingBoxSize:SVec2I = Null
 
-	Field m_LimbManager:LimbManager = New LimbManager()
+	Field m_LimbManager:LimbManager = Null
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +31,8 @@ Type GraphicsOutput
 		SetMaskColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 
 		m_MaxZoom = Int(FloorF(maxWorkspaceWidth / 192))
+
+		m_LimbManager = New LimbManager()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

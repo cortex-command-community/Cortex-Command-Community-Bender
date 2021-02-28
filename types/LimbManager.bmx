@@ -11,8 +11,8 @@ Type LimbManager
 	Const c_MinExtend:Float = 0.30	'Possibly make definable in settings (slider)
 	Const c_MaxExtend:Float = 0.99	'Possibly make definable in settings (slider)
 
-	Field m_InputZoom:Int
-	Field m_TileSize:Int
+	Field m_InputZoom:Int = 0
+	Field m_TileSize:Int = 0
 
 	Field m_LimbPartTilePos:SVec2I[c_LimbPartCount]
 	Field m_LimbPartImage:TImage[c_LimbPartCount]

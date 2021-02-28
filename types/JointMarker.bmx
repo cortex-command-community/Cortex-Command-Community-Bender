@@ -1,13 +1,13 @@
 '//// JOINT MARKER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type JointMarker
-	Field m_ParentTilePosOnCanvas:SVec2I
-	Field m_PosOnTileX:Int
-	Field m_PosOnTileY:Int
-	Field m_PosOnCanvasX:Int
-	Field m_PosOnCanvasY:Int
-	Field m_Radius:Int
-	Field m_Selected:Int
+	Field m_ParentTilePosOnCanvas:SVec2I = Null
+	Field m_PosOnTileX:Int = 0
+	Field m_PosOnTileY:Int = 0
+	Field m_PosOnCanvasX:Int = 0
+	Field m_PosOnCanvasY:Int = 0
+	Field m_Radius:Int = 0
+	Field m_Selected:Int = False
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
