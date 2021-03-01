@@ -24,7 +24,7 @@ Global g_GraphicsOutput:GraphicsOutput = Null
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Repeat
-	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
+	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultOutputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
 	EnablePolledInput()
@@ -63,9 +63,12 @@ Repeat
 							g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFile(g_GraphicsOutput.GrabOutputForSaving()))
 						EndIf
 						Continue
-					'Scale
-					Case g_UserInterface.m_SettingsZoomTextbox
-						g_UserInterface.SetZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetZoomTextboxValue()))
+					'Input Scale
+					Case g_UserInterface.m_SettingsInputZoomTextbox
+						g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetInputZoomTextboxValue()))
+					'Output Scale
+					Case g_UserInterface.m_SettingsOutputZoomTextbox
+						g_UserInterface.SetOutputZoomTextboxValue(g_UserInterface.GetOutputZoomTextboxValue())
 					'Frames
 					Case g_UserInterface.m_SettingsFramesTextbox
 						g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_UserInterface.GetFramesTextboxValue()))

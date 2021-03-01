@@ -1,6 +1,7 @@
 '//// SETTINGS MANAGER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Global g_DefaultInputZoom:Int = 4
+Global g_DefaultOutputZoom:Int = 1
 Global g_DefaultFrameCount:Int = 7
 Global g_DefaultBackgroundRed:Int = 50
 Global g_DefaultBackgroundGreen:Int = 170
