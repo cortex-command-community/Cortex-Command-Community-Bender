@@ -68,7 +68,7 @@ Repeat
 						g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetInputZoomTextboxValue()))
 					'Output Scale
 					Case g_UserInterface.m_SettingsOutputZoomTextbox
-						g_UserInterface.SetOutputZoomTextboxValue(g_UserInterface.GetOutputZoomTextboxValue())
+						g_UserInterface.SetOutputZoomTextboxValue(g_GraphicsOutput.SetOutputZoom(g_UserInterface.GetOutputZoomTextboxValue()))
 					'Frames
 					Case g_UserInterface.m_SettingsFramesTextbox
 						g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_UserInterface.GetFramesTextboxValue()))

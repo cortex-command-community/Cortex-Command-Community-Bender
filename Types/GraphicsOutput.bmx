@@ -13,6 +13,7 @@ Type GraphicsOutput
 	Field m_SourceImageSize:SVec2I = Null
 
 	Field m_InputZoom:Int = g_DefaultInputZoom
+	Field m_OutputZoom:Int = g_DefaultOutputZoom
 	Field m_TileSize:Int = 24 * m_InputZoom
 	Field m_FrameCount:Int = g_DefaultFrameCount
 	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
@@ -70,6 +71,13 @@ Type GraphicsOutput
 			EndIf
 		EndIf
 		Return m_InputZoom
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetOutputZoom:Int(newZoom:Int)
+		m_OutputZoom = Utility.Clamp(newZoom, 1, 5)
+		Return m_OutputZoom
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,14 +205,6 @@ Type GraphicsOutput
 			Local vertOffsetFromSource:Int = (m_SourceImageSize[1] * m_InputZoom) + 34
 			m_LimbManager.DrawBentLimbs(New SVec2I(100, vertOffsetFromSource), m_FrameCount, m_BentLimbPartDrawOrder)
 
-			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
-			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
-			Utility.ResetDrawColor()
-			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)
-
-			m_LimbManager.DrawTileOutlines()
-			m_LimbManager.DrawJointMarkers()
-
 			Local drawColor:Int[] = [255, 230, 80]
 			Utility.DrawTextWithShadow("Arm FG", New SVec2I(10, vertOffsetFromSource), drawColor)
 			Utility.DrawTextWithShadow("Arm BG", New SVec2I(10, vertOffsetFromSource + 50 - 2), drawColor)
@@ -222,6 +222,21 @@ Type GraphicsOutput
 					Next
 				Next
 			EndIf
+
+			If m_OutputZoom > 1 Then
+				Local outputCopyForZoom:TImage = CreateImage(100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 230, 1, DYNAMICIMAGE)
+				GrabImage(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom)
+				DrawImageRect(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom, outputCopyForZoom.Width * m_OutputZoom, outputCopyForZoom.Height * m_OutputZoom)
+			EndIf
+
+			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
+			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
+			Utility.ResetDrawColor()
+			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)
+
+			m_LimbManager.DrawTileOutlines()
+			m_LimbManager.DrawJointMarkers()
+
 			Flip(1)
 		EndIf
 	EndMethod
