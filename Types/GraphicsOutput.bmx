@@ -24,6 +24,9 @@ Type GraphicsOutput
 	Field m_FrameBoundingBoxPosY:Int[c_LimbCount, c_MaxFrameCount]
 	Field m_FrameBoundingBoxSize:SVec2I = Null
 
+	Field m_OutputPanOffsetX:Int = 0
+	Field m_OutputPanOffsetY:Int = 0
+
 	Field m_LimbManager:LimbManager = Null
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,6 +80,8 @@ Type GraphicsOutput
 
 	Method SetOutputZoom:Int(newZoom:Int)
 		m_OutputZoom = Utility.Clamp(newZoom, 1, 5)
+		m_OutputPanOffsetX = 0
+		m_OutputPanOffsetY = 0
 		Return m_OutputZoom
 	EndMethod
 
@@ -129,6 +134,16 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method SetOutputPanOffset(mouseMovement:SVec2I)
+		m_OutputPanOffsetX :- mouseMovement[0]
+		m_OutputPanOffsetX = Utility.Clamp(m_OutputPanOffsetX, 0, 100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)) * m_OutputZoom)
+
+		m_OutputPanOffsetY :- mouseMovement[1]
+		m_OutputPanOffsetY = Utility.Clamp(m_OutputPanOffsetY, 0, 150 * m_OutputZoom)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method GrabOutputForSaving:TPixmap()
 		If m_SourceImage = Null Then
 			Notify("Nothing to save!", False)
@@ -173,11 +188,17 @@ Type GraphicsOutput
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method Update()
-		'Left mouse to adjust joint markers, click or hold and drag
-		If MouseDown(1) Then
-			Local mousePos:SVec2I = New SVec2I(MouseX(), MouseY())
-			If Utility.PointIsWithinBox(mousePos, New SVec2I(0, 0), m_SourceImageSize * m_InputZoom) Then
-				m_LimbManager.SetJointMarker(mousePos)
+		If m_SourceImage <> Null Then
+			'Getting these on mouse click is screwy so get them here
+			Local mouseMovement:SVec2I = New SVec2I(MouseXSpeed(), MouseYSpeed())
+
+			If MouseDown(1) Then
+				Local mousePos:SVec2I = New SVec2I(MouseX(), MouseY())
+				If Utility.PointIsWithinBox(mousePos, New SVec2I(0, 0), m_SourceImageSize * m_InputZoom) Then
+					m_LimbManager.SetJointMarker(mousePos)
+				Else
+					SetOutputPanOffset(mouseMovement)
+				EndIf
 			EndIf
 		EndIf
 	EndMethod
@@ -192,6 +213,22 @@ Type GraphicsOutput
 		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
 		SetScale(1, 1)
 		Flip(1)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method DrawZoomedOutput()
+		Local outputUnzoomedSize:SVec2I = New SVec2I(100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 230)
+		Local outputCopyForZoom:TImage = CreateImage(outputUnzoomedSize[0], outputUnzoomedSize[1], 1, DYNAMICIMAGE)
+		GrabImage(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom)
+
+		'Hide the unzoomed output
+		SetColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
+		DrawRect(0, m_SourceImageSize[1] * m_InputZoom, outputUnzoomedSize[0] + 20, outputUnzoomedSize[1] + 20)
+		Utility.ResetDrawColor()
+
+		SetImageHandle(outputCopyForZoom, m_OutputPanOffsetX, m_OutputPanOffsetY)
+		DrawImageRect(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom, outputCopyForZoom.Width * m_OutputZoom, outputCopyForZoom.Height * m_OutputZoom)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -224,9 +261,7 @@ Type GraphicsOutput
 			EndIf
 
 			If m_OutputZoom > 1 Then
-				Local outputCopyForZoom:TImage = CreateImage(100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 230, 1, DYNAMICIMAGE)
-				GrabImage(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom)
-				DrawImageRect(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom, outputCopyForZoom.Width * m_OutputZoom, outputCopyForZoom.Height * m_OutputZoom)
+				DrawZoomedOutput()
 			EndIf
 
 			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
