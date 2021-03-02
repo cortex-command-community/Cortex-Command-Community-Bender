@@ -17,13 +17,16 @@ Type UserInterface
 	Field m_CanvasGraphicsSize:SVec2I = New SVec2I(768, 480)
 
 	'Title bar buttons
+	Field m_SaveSettingsMenu:TGadget = Null
+	Const c_SaveSettingsMenuTag:Int = 100
+
 	Field m_HelpMenu:TGadget = Null
 	Field m_HelpMenuText:String = LoadText("Incbin::Assets/TextHelp")
-	Const c_HelpMenuTag:Int = 100
+	Const c_HelpMenuTag:Int = 101
 
 	Field m_AboutMenu:TGadget = Null
 	Field m_AboutMenuText:String = LoadText("Incbin::Assets/TextAbout")
-	Const c_AboutMenuTag:Int = 101
+	Const c_AboutMenuTag:Int = 102
 
 	Field m_ButtonPanel:TGadget = Null
 	Field m_ButtonPanelAnchor:SVec2I = New SVec2I(10, 5)
@@ -86,6 +89,7 @@ Type UserInterface
 		m_MainWindow = CreateWindow(AppTitle, (DesktopWidth() / 2) - ((m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0]) / 2), (DesktopHeight() / 2) - (m_CanvasGraphicsSize[1] / 2), m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_RESIZABLE | WINDOW_CLIENTCOORDS | WINDOW_ACCEPTFILES)
 		SetMinWindowSize(m_MainWindow, m_LeftColumnSize[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1])
 
+		m_SaveSettingsMenu = CreateMenu("Save Settings", c_SaveSettingsMenuTag, WindowMenu(m_MainWindow))
 		m_HelpMenu = CreateMenu("Help", c_HelpMenuTag, WindowMenu(m_MainWindow))
 		m_AboutMenu = CreateMenu("About", c_AboutMenuTag, WindowMenu(m_MainWindow))
 		UpdateWindowMenu(m_MainWindow)
@@ -311,5 +315,21 @@ Type UserInterface
 		Else
 			HideGadget(m_SettingsIndexedFileTypeComboBox)
 		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GetSettingsValuesForSaving:String[]()
+		Return [	.. 'Line continuation
+			GadgetText(m_SettingsColorRTextbox),							..
+			GadgetText(m_SettingsColorGTextbox),							..
+			GadgetText(m_SettingsColorBTextbox),							..
+			GadgetText(m_SettingsInputZoomTextbox),							..
+			GadgetText(m_SettingsOutputZoomTextbox),						..
+			GadgetText(m_SettingsFramesTextbox),							..
+			String.FromInt(ButtonState(m_SettingsSaveAsFramesCheckbox)),	..
+			String.FromInt(ButtonState(m_SettingsIndexedCheckbox)),			..
+			GadgetText(m_SettingsIndexedFileTypeComboBox)					..
+		]
 	EndMethod
 EndType

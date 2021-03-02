@@ -17,6 +17,7 @@ Import "Types/GraphicsOutput.bmx"
 
 AppTitle = "CCCP Bender 1.3.0"
 
+Global g_SettingsManager:SettingsManager = Null
 Global g_UserInterface:UserInterface = Null
 Global g_FileIO:FileIO = Null
 Global g_GraphicsOutput:GraphicsOutput = Null
@@ -24,10 +25,20 @@ Global g_GraphicsOutput:GraphicsOutput = Null
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Repeat
+	g_SettingsManager = New SettingsManager()
 	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultOutputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
 	EnablePolledInput()
+
+	'Set user settings/defaults
+	g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_DefaultInputZoom))
+	g_UserInterface.SetOutputZoomTextboxValue(g_GraphicsOutput.SetOutputZoom(g_DefaultOutputZoom))
+	g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_DefaultFrameCount))
+	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
+	g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(g_DefaultSaveAsFrames))
+	g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(g_DefaultSaveAsIndexed))
+	g_FileIO.SetIndexedFileType(g_DefaultIndexedFileType)
 
 	Repeat
 		PollEvent()
@@ -45,6 +56,8 @@ Repeat
 				g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad(EventExtra().ToString()))
 			Case EVENT_MENUACTION
 				Select EventData()
+					Case g_UserInterface.c_SaveSettingsMenuTag
+						g_SettingsManager.WriteSettingsFile(g_UserInterface.GetSettingsValuesForSaving())
 					Case g_UserInterface.c_HelpMenuTag
 						Notify(g_UserInterface.m_HelpMenuText, False)
 					Case g_UserInterface.c_AboutMenuTag

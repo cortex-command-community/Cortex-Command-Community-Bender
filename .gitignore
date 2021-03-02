@@ -8,5 +8,6 @@
 *.code-workspace
 .vscode/
 
+BenderUserSettings.ini
 !TestImage.png
 !InputTemplate.png
