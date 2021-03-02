@@ -26,7 +26,7 @@ Global g_GraphicsOutput:GraphicsOutput = Null
 
 Repeat
 	g_SettingsManager = New SettingsManager()
-	g_UserInterface = New UserInterface()
+	g_UserInterface = New UserInterface(g_DefaultMaximizeWindow)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
 	EnablePolledInput()

@@ -2,6 +2,7 @@ Import "Utility.bmx"
 
 '//// SETTINGS MANAGER //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Global g_DefaultMaximizeWindow:Int = False
 Global g_DefaultBackgroundRed:Int = 50
 Global g_DefaultBackgroundGreen:Int = 170
 Global g_DefaultBackgroundBlue:Int = 255
@@ -42,6 +43,8 @@ Type SettingsManager
 			propAndValue[1] = propAndValue[1].Trim()
 
 			Select propAndValue[0]
+				Case "StartMaximizedWindow"
+					g_DefaultMaximizeWindow = Utility.Clamp(propAndValue[1].ToInt(), False, True)
 				Case "BackgroundRed"
 					g_DefaultBackgroundRed = Utility.Clamp(propAndValue[1].ToInt(), 0, 255)
 				Case "BackgroundGreen"
@@ -76,6 +79,7 @@ Type SettingsManager
 	Method WriteSettingsFile(propertyValues:String[])
 		Local outputString:TStringBuilder = New TStringBuilder("// User Settings~n~n")
 
+		outputString.Append("StartMaximizedWindow = " + g_DefaultMaximizeWindow + "~n")
 		outputString.Append("BackgroundRed = " + propertyValues[0] + "~n")
 		outputString.Append("BackgroundGreen = " + propertyValues[1] + "~n")
 		outputString.Append("BackgroundBlue = " + propertyValues[2] + "~n")
