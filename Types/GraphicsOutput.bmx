@@ -182,8 +182,45 @@ Type GraphicsOutput
 					EndIf
 				Next
 			Next
-			Return framesToSave
+			Return CropGrabbedOutputFrames(framesToSave)
 		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method CropGrabbedOutputFrames:TPixmap[,](framesToCrop:TPixmap[,])
+		Local croppedFrames:TPixmap[c_LimbCount, m_FrameCount]
+		Local stackedLimbFrames:TPixmap = CreatePixmap(framesToCrop[0, 0].Width, framesToCrop[0, 0].Height, PF_RGBA8888)
+
+		'This is seemingly inefficient but surprisingly fast garbage but I don't have anything better
+		For Local limb:Int = 0 Until c_LimbCount
+			Cls()
+
+			For Local frame:Int = 0 Until m_FrameCount
+				'Mask the magenta and stack all the frames on top of each other, then grab the stacked frames to a new pixmap
+				DrawImage(LoadImage(MaskPixmap(framesToCrop[limb, frame], m_Magenta[0], m_Magenta[1], m_Magenta[2]), DYNAMICIMAGE | MASKEDIMAGE), 0, 0)
+				stackedLimbFrames = GrabPixmap(0, 0, stackedLimbFrames.Width, stackedLimbFrames.Height)
+			Next
+
+			Local realDimensions:Int[] = Utility.GetPixmapNonMaskedPixelBounds(stackedLimbFrames, -65281) 'God knows why this is the value for magenta here but it is what it is
+
+			For Local frame:Int = 0 Until m_FrameCount
+				'Copy the area that is the real dimensions to a new pixmap
+				Local croppedFrame:TPixmap = CreatePixmap(realDimensions[1] - realDimensions[0] + 1, realDimensions[3] - realDimensions[2] + 1, PF_RGBA8888)
+				Local xCount:Int = 0
+				Local yCount:Int = 0
+				For Local pixelY:Int = realDimensions[2] To realDimensions[3]
+					xCount = 0
+					For Local pixelX:Int = realDimensions[0] To realDimensions[1]
+						WritePixel(croppedFrame, xCount, yCount, ReadPixel(framesToCrop[limb, frame], pixelX, pixelY))
+						xCount :+ 1
+					Next
+					yCount :+ 1
+				Next
+				croppedFrames[limb, frame] = croppedFrame
+			Next
+		Next
+		Return croppedFrames
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

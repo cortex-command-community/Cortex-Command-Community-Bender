@@ -100,6 +100,43 @@ Type Utility
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Function GetPixmapNonMaskedPixelBounds:Int[](sourcePixmap:TPixmap, maskColor:Int)
+		Local bounds:Int[] = [sourcePixmap.Width, 0, sourcePixmap.Height, 0]
+
+		'Scan the pixmap from each direction to find the actual dimensions of the non-mask content. Basically trimming whitespace but with pixels
+		For Local pixelY:Int = 0 Until sourcePixmap.Height
+			For Local pixelX:Int = 0 Until sourcePixmap.Width
+				If ReadPixel(sourcePixmap, pixelX, pixelY) <> maskColor Then
+					bounds[0] = Min(bounds[0], pixelX)
+				EndIf
+			Next
+		Next
+		For Local pixelY:Int = 0 Until sourcePixmap.Height
+			For Local pixelX:Int = sourcePixmap.Width - 1 To 0 Step -1
+				If ReadPixel(sourcePixmap, pixelX, pixelY) <> maskColor Then
+					bounds[1] = Max(bounds[1], pixelX)
+				EndIf
+			Next
+		Next
+		For Local pixelX:Int = 0 Until sourcePixmap.Width
+			For Local pixelY:Int = 0 Until sourcePixmap.Height
+				If ReadPixel(sourcePixmap, pixelX, pixelY) <> maskColor Then
+					bounds[2] = Min(bounds[2], pixelY)
+				EndIf
+			Next
+		Next
+		For Local pixelX:Int = 0 Until sourcePixmap.Width
+			For Local pixelY:Int = sourcePixmap.Height - 1 To 0 Step -1
+				If ReadPixel(sourcePixmap, pixelX, pixelY) <> maskColor Then
+					bounds[3] = Max(bounds[3], pixelY)
+				EndIf
+			Next
+		Next
+		Return bounds
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Function PNGWriteStream(pngPtr:Byte Ptr, buf:Byte Ptr, size:Int)
 		Local outputStream:TStream = TStream(png_get_io_ptr(pngPtr))
 		Return outputStream.WriteBytes(buf, size)
