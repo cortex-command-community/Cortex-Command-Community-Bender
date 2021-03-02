@@ -78,14 +78,14 @@ Type UserInterface
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method New(inputZoomValue:Int, outputZoomValue:Int, framesValue:Int, bgRedValue:Int, bgGreenValue:Int, bgBlueValue:Int)
-		InitializeUserInterface(inputZoomValue, outputZoomValue, framesValue, bgRedValue, bgGreenValue, bgBlueValue)
+	Method New()
+		InitializeUserInterface()
 		InitializeCanvasGraphics()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method InitializeUserInterface(inputZoomValue:Int, outputZoomValue:Int, framesValue:Int, bgRedValue:Int, bgGreenValue:Int, bgBlueValue:Int)
+	Method InitializeUserInterface()
 		m_MainWindow = CreateWindow(AppTitle, (DesktopWidth() / 2) - ((m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0]) / 2), (DesktopHeight() / 2) - (m_CanvasGraphicsSize[1] / 2), m_CanvasGraphicsAnchor[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1], Null, WINDOW_TITLEBAR | WINDOW_MENU | WINDOW_RESIZABLE | WINDOW_CLIENTCOORDS | WINDOW_ACCEPTFILES)
 		SetMinWindowSize(m_MainWindow, m_LeftColumnSize[0] + m_CanvasGraphicsSize[0], m_CanvasGraphicsSize[1])
 
@@ -122,27 +122,21 @@ Type UserInterface
 
 		m_SettingsColorRLabel = CreateLabel("R", GadgetWidth(m_SettingsColorLabel) + 15, GadgetY(m_SettingsColorLabel), 10, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsColorRTextbox = CreateTextField(GadgetX(m_SettingsColorRLabel) + 15, GadgetY(m_SettingsColorRLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsColorRTextbox, bgRedValue)
 
 		m_SettingsColorGLabel = CreateLabel("G", 122, GadgetY(m_SettingsColorLabel), 10, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsColorGTextbox = CreateTextField(137, GadgetY(m_SettingsColorGLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsColorGTextbox, bgGreenValue)
 
 		m_SettingsColorBLabel = CreateLabel("B", 180, GadgetY(m_SettingsColorLabel), 10, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsColorBTextbox = CreateTextField(195, GadgetY(m_SettingsColorBLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsColorBTextbox, bgBlueValue)
 
 		m_SettingsInputZoomLabel = CreateLabel("Input Zoom", horizMargin, GadgetY(m_SettingsColorLabel) + labelVertOffset, 70, labelHeight + 4, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsInputZoomTextbox = CreateTextField(vertMargin + GadgetWidth(m_SettingsInputZoomLabel), GadgetY(m_SettingsInputZoomLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsInputZoomTextbox, inputZoomValue)
 
 		m_SettingsOutputZoomLabel = CreateLabel("Output Zoom", 117, GadgetY(m_SettingsInputZoomLabel), 75, labelHeight + 4, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsOutputZoomTextbox = CreateTextField(horizMargin + GadgetX(m_SettingsOutputZoomLabel) + GadgetWidth(m_SettingsOutputZoomLabel) - 2, GadgetY(m_SettingsOutputZoomLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsOutputZoomTextbox, outputZoomValue)
 
 		m_SettingsFramesLabel = CreateLabel("Frame Count", horizMargin, GadgetY(m_SettingsInputZoomLabel) + labelVertOffset, 70, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsFramesTextbox = CreateTextField(vertMargin + GadgetWidth(m_SettingsFramesLabel), GadgetY(m_SettingsFramesLabel) + textboxVertOffset, textboxSize[0], textboxSize[1], m_SettingsPanel)
-		SetGadgetText(m_SettingsFramesTextbox, framesValue)
 
 		m_SettingsSaveAsFramesLabel = CreateLabel("Save as Frames", horizMargin, GadgetY(m_SettingsFramesLabel) + labelVertOffset, 87, labelHeight, m_SettingsPanel, LABEL_LEFT)
 		m_SettingsSaveAsFramesCheckbox = CreateButton(Null, vertMargin + GadgetWidth(m_SettingsSaveAsFramesLabel), GadgetY(m_SettingsSaveAsFramesLabel), 20, 20, m_SettingsPanel, BUTTON_CHECKBOX)
@@ -240,6 +234,42 @@ Type UserInterface
 
 	Method SetOutputZoomTextboxValue(newValue:Int)
 		SetGadgetText(m_SettingsOutputZoomTextbox, newValue)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GetSaveAsFramesCheckboxValue:Int()
+		Return ButtonState(m_SettingsSaveAsFramesCheckbox)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetSaveAsFramesCheckboxValue:Int(newValue:Int)
+		SetButtonState(m_SettingsSaveAsFramesCheckbox, newValue)
+		Return newValue
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method GetSaveAsIndexedCheckboxValue:Int()
+		Return ButtonState(m_SettingsIndexedCheckbox)
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetSaveAsIndexedCheckboxValue:Int(newValue:Int)
+		SetButtonState(m_SettingsIndexedCheckbox, newValue)
+		Return newValue
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetFileTypeComboBoxSelectedItem(fileType:String)
+		If fileType = "png" Then
+			SelectGadgetItem(m_SettingsIndexedFileTypeComboBox, 0)
+		ElseIf fileType = "bmp" Then
+			SelectGadgetItem(m_SettingsIndexedFileTypeComboBox, 1)
+		EndIf
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -26,19 +26,19 @@ Global g_GraphicsOutput:GraphicsOutput = Null
 
 Repeat
 	g_SettingsManager = New SettingsManager()
-	g_UserInterface = New UserInterface(g_DefaultInputZoom, g_DefaultOutputZoom, g_DefaultFrameCount, g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue)
+	g_UserInterface = New UserInterface()
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
 	EnablePolledInput()
 
-	'Set user settings/defaults
+	'Apply user settings/defaults
+	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
 	g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_DefaultInputZoom))
 	g_UserInterface.SetOutputZoomTextboxValue(g_GraphicsOutput.SetOutputZoom(g_DefaultOutputZoom))
 	g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_DefaultFrameCount))
-	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
-	g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(g_DefaultSaveAsFrames))
-	g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(g_DefaultSaveAsIndexed))
-	g_FileIO.SetIndexedFileType(g_DefaultIndexedFileType)
+	g_UserInterface.SetSaveAsFramesCheckboxValue(g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(g_DefaultSaveAsFrames)))
+	g_UserInterface.SetFileTypeComboBoxVisible(g_UserInterface.SetSaveAsIndexedCheckboxValue(g_FileIO.SetSaveAsIndexed(g_DefaultSaveAsIndexed)))
+	g_UserInterface.SetFileTypeComboBoxSelectedItem(g_FileIO.SetIndexedFileType(g_DefaultIndexedFileType))
 
 	Repeat
 		PollEvent()
@@ -90,10 +90,10 @@ Repeat
 						g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(g_UserInterface.GetColorTextboxValues()))
 					'Save as Frames
 					Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
-						g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(ButtonState(g_UserInterface.m_SettingsSaveAsFramesCheckbox)))
+						g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(g_UserInterface.GetSaveAsFramesCheckboxValue()))
 					'Save as Indexed
 					Case g_UserInterface.m_SettingsIndexedCheckbox
-						g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(ButtonState(g_UserInterface.m_SettingsIndexedCheckbox)))
+						g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(g_UserInterface.GetSaveAsIndexedCheckboxValue()))
 					'Indexed Filetype
 					Case g_UserInterface.m_SettingsIndexedFileTypeComboBox
 						g_FileIO.SetIndexedFileType(GadgetText(g_UserInterface.m_SettingsIndexedFileTypeComboBox))
