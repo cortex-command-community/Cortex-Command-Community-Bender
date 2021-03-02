@@ -151,7 +151,7 @@ Type GraphicsOutput
 			Return Null
 		Else
 			ChangeBackgroundColor(m_Magenta)
-			Draw()
+			Draw(True)
 			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmap, not the canvas), not sure why but whatever
 			Return GrabPixmap(0, 12 + (m_SourceImageSize[1] * m_InputZoom), 100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 200)
 		EndIf
@@ -165,7 +165,7 @@ Type GraphicsOutput
 			Return Null
 		Else
 			ChangeBackgroundColor(m_Magenta)
-			Draw()
+			Draw(True)
 			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmaps, not the canvas), not sure why but whatever
 
 			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
@@ -234,7 +234,7 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method Draw()
+	Method Draw(disableOutputZoom:Int = False)
 		If m_SourceImage = Null Then
 			DrawNoSourceImageScreen()
 		Else
@@ -261,7 +261,7 @@ Type GraphicsOutput
 				Next
 			EndIf
 
-			If m_OutputZoom > 1 Then
+			If Not disableOutputZoom And m_OutputZoom > 1 Then
 				DrawZoomedOutput()
 			EndIf
 
