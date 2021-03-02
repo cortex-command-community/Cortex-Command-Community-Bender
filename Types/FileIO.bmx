@@ -69,6 +69,19 @@ Type FileIO
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method CheckValidExportFileName:Int(filenameToCheck:String)
+		If filenameToCheck = m_ImportedFile Then
+			Notify("Cannot overwrite source image!", True)
+			Return False
+		ElseIf filenameToCheck <> m_ImportedFile And filenameToCheck <> Null Then
+			Return True
+		Else
+			Return False 'On RequestFile cancel.
+		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method SaveFile:Int(pixmapToSave:TPixmap)
 		Local filename:String = RequestFile("Save graphic output", m_FileFilters, True)
 		If pixmapToSave <> Null And CheckValidExportFileName(filename) Then
@@ -91,31 +104,31 @@ Type FileIO
 				Notify("File saved successfully!")
 			EndIf
 		EndIf
-		Return True 'Return something to indicate function finished so workspace can be reverted
+		Return True 'Return something to indicate function finished so workspace can be reverted.
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
-		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions here, we add them later manually otherwise exported file name is messed up
+		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions from filters here, we add them later manually otherwise exported file name is messed up.
 		If pixmapToSave <> Null And CheckValidExportFileName(filename) Then
 			Local saveSuccess:Int = True
-			For Local row:Int = 0 To 3
-				Local rowName:String 'Name the rows - by default: ArmFG, ArmBG, LegFG, LegBG in this order
-				Select row
+			For Local limb:Int = 0 To 3
+				Local limbName:String 'Name the limbs - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
+				Select limb
 					Case 0
-						rowName = "ArmFG"
+						limbName = "ArmFG"
 					Case 1
-						rowName = "ArmBG"
+						limbName = "ArmBG"
 					Case 2
-						rowName = "LegFG"
+						limbName = "LegFG"
 					Case 3
-						rowName = "LegBG"
+						limbName = "LegBG"
 				EndSelect
 
 				For Local frame:Int = 0 To frameCount - 1
 					Local leadingZeros:String = "00"
-					Local fullFilename:String = filename + rowName + leadingZeros + frame
+					Local fullFilename:String = filename + limbName + leadingZeros + frame
 					If frame < 10 Then
 						leadingZeros = "0"
 					EndIf
@@ -123,14 +136,14 @@ Type FileIO
 					If m_SaveAsIndexed Then
 						Select m_IndexedFileType
 							Case "png"
-								saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[row, frame], fullFilename + ".png")
+								saveSuccess = m_IndexedImageWriter.WriteIndexedPNGFromPixmap(pixmapToSave[limb, frame], fullFilename + ".png")
 							Case "bmp"
-								saveSuccess = m_IndexedImageWriter.WriteIndexedBMPFromPixmap(pixmapToSave[row, frame], fullFilename + ".bmp")
+								saveSuccess = m_IndexedImageWriter.WriteIndexedBMPFromPixmap(pixmapToSave[limb, frame], fullFilename + ".bmp")
 							Default
 								saveSuccess = False
 						EndSelect
 					Else
-						saveSuccess = SavePixmapPNG(pixmapToSave[row, frame], fullFilename + ".png")
+						saveSuccess = SavePixmapPNG(pixmapToSave[limb, frame], fullFilename + ".png")
 					EndIf
 
 					If Not saveSuccess Then
@@ -143,19 +156,6 @@ Type FileIO
 				Notify("Files saved successfully!")
 			EndIf
 		EndIf
-		Return True 'Return something to indicate function finished so workspace can be reverted
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method CheckValidExportFileName:Int(filenameToCheck:String)
-		If filenameToCheck = m_ImportedFile Then
-			Notify("Cannot overwrite source image!", True)
-			Return False
-		ElseIf filenameToCheck <> m_ImportedFile And filenameToCheck <> Null Then
-			Return True
-		Else
-			Return False 'On RequestFile cancel
-		EndIf
+		Return True 'Return something to indicate function finished so workspace can be reverted.
 	EndMethod
 EndType

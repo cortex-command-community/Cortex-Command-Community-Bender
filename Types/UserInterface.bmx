@@ -1,7 +1,6 @@
 Import MaxGUI.Drivers
 Import BRL.GLMax2D
 Import BRL.Vector
-Import "Utility.bmx"
 
 '//// USER INTERFACE ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -11,12 +10,12 @@ Type UserInterface
 	Field m_LeftColumn:TGadget = Null
 	Field m_LeftColumnSize:SVec2I = New SVec2I(260, 480)
 
-	'Canvas for graphics output
+	'Canvas for graphics output.
 	Field m_CanvasGraphics:TGadget = Null
 	Field m_CanvasGraphicsAnchor:SVec2I = New SVec2I(m_LeftColumnSize[0], 0)
 	Field m_CanvasGraphicsSize:SVec2I = New SVec2I(768, 480)
 
-	'Title bar buttons
+	'Title bar buttons.
 	Field m_SaveSettingsMenu:TGadget = Null
 	Const c_SaveSettingsMenuTag:Int = 100
 
@@ -180,18 +179,24 @@ Type UserInterface
 		ResizeGadget(m_LeftColumn, GadgetWidth(m_LeftColumn), GadgetHeight(m_MainWindow))
 		MoveGadget(m_LogoImagePanel, 0, GadgetHeight(m_MainWindow) - m_LogoImagePanelSize[1])
 
-		'Have to recreate the canvas because resizing vertically shifts the origin point and no obvious way to reset it
+		'Have to recreate the canvas because the backbuffer doesn't resize with the window.
 		FreeGadget(m_CanvasGraphics)
 		InitializeCanvasGraphics()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	Method GetMaxWorkspaceWidth:Int()
+		Return DesktopWidth() - m_LeftColumnSize[0]
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Method GetColorTextboxValues:Int[]()
-		Return [	.. 'Line continuation
-			Utility.Clamp(GadgetText(m_SettingsColorRTextbox).ToInt(), 0, 255),	..
-			Utility.Clamp(GadgetText(m_SettingsColorGTextbox).ToInt(), 0, 255),	..
-			Utility.Clamp(GadgetText(m_SettingsColorBTextbox).ToInt(), 0, 255)	..
+		Return [	.. 'Line continuation.
+			GadgetText(m_SettingsColorRTextbox).ToInt(),	..
+			GadgetText(m_SettingsColorGTextbox).ToInt(),	..
+			GadgetText(m_SettingsColorBTextbox).ToInt()		..
 		]
 	EndMethod
 
@@ -277,57 +282,45 @@ Type UserInterface
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method GetLayerCheckboxValues:Int[,]()
-		Local checkboxValues:Int[4, 1]
-		checkboxValues[0, 0] = ButtonState(m_LayeringArmFGCheckbox)
-		checkboxValues[1, 0] = ButtonState(m_LayeringArmBGCheckbox)
-		checkboxValues[2, 0] = ButtonState(m_LayeringLegFGCheckbox)
-		checkboxValues[3, 0] = ButtonState(m_LayeringLegBGCheckbox)
-		Return checkboxValues
+	Method GetLayerCheckboxValues:Int[]()
+		Return [	.. 'Line continuation.
+			ButtonState(m_LayeringArmFGCheckbox),	..
+			ButtonState(m_LayeringArmBGCheckbox),	..
+			ButtonState(m_LayeringLegFGCheckbox),	..
+			ButtonState(m_LayeringLegBGCheckbox)	..
+		]
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method SetLayerCheckboxLabels:Int[,](checkboxValues:Int[,])
-		If checkboxValues[0, 0] = False Then
-			SetGadgetText(m_LayeringArmFGCheckbox, " Arm FG  —  Lower Arm on top")
-		Else
+	Method SetLayerCheckboxLabels:Int[](checkboxValues:Int[])
+		If checkboxValues[0] Then
 			SetGadgetText(m_LayeringArmFGCheckbox, " Arm FG  —  Upper Arm on top")
-		EndIf
-		If checkboxValues[1, 0] = False Then
-			SetGadgetText(m_LayeringArmBGCheckbox, " Arm BG  —  Lower Arm on top")
 		Else
+			SetGadgetText(m_LayeringArmFGCheckbox, " Arm FG  —  Lower Arm on top")
+		EndIf
+		If checkboxValues[1] Then
 			SetGadgetText(m_LayeringArmBGCheckbox, " Arm BG  —  Upper Arm on top")
-		EndIf
-		If checkboxValues[2, 0] = False Then
-			SetGadgetText(m_LayeringLegFGCheckbox, " Leg FG  —  Lower Leg on top")
 		Else
+			SetGadgetText(m_LayeringArmBGCheckbox, " Arm BG  —  Lower Arm on top")
+		EndIf
+		If checkboxValues[2] Then
 			SetGadgetText(m_LayeringLegFGCheckbox, " Leg FG  —  Upper Leg on top")
-		EndIf
-		If checkboxValues[3, 0] = False Then
-			SetGadgetText(m_LayeringLegBGCheckbox, " Leg BG  —  Lower Leg on top")
 		Else
+			SetGadgetText(m_LayeringLegFGCheckbox, " Leg FG  —  Lower Leg on top")
+		EndIf
+		If checkboxValues[3] Then
 			SetGadgetText(m_LayeringLegBGCheckbox, " Leg BG  —  Upper Leg on top")
+		Else
+			SetGadgetText(m_LayeringLegBGCheckbox, " Leg BG  —  Lower Leg on top")
 		EndIf
 		Return checkboxValues
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
-		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
-		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method GetMaxWorkspaceWidth:Int()
-		Return DesktopWidth() - m_LeftColumnSize[0]
+	Method GetSaveButtonEnabled:Int()
+		Return Not GadgetDisabled(m_SaveButton)
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -353,7 +346,7 @@ Type UserInterface
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method GetSettingsValuesForSaving:String[]()
-		Return [	.. 'Line continuation
+		Return [	.. 'Line continuation.
 			GadgetText(m_SettingsColorRTextbox),							..
 			GadgetText(m_SettingsColorGTextbox),							..
 			GadgetText(m_SettingsColorBTextbox),							..
@@ -364,5 +357,17 @@ Type UserInterface
 			String.FromInt(ButtonState(m_SettingsIndexedCheckbox)),			..
 			GadgetText(m_SettingsIndexedFileTypeComboBox)					..
 		]
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method MoveGadget(gadgetToMove:TGadget, newPosX:Int, newPosY:Int)
+		SetGadgetShape(gadgetToMove, newPosX, newPosY, GadgetWidth(gadgetToMove), GadgetHeight(gadgetToMove))
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method ResizeGadget(gadgetToResize:TGadget, newWidth:Int, newHeight:Int)
+		SetGadgetShape(gadgetToResize, GadgetX(gadgetToResize), GadgetY(gadgetToResize), newWidth, newHeight)
 	EndMethod
 EndType

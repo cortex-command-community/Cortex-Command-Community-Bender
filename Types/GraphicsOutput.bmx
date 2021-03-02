@@ -4,20 +4,17 @@ Import "LimbManager.bmx"
 '//// GRAPHICS OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type GraphicsOutput
-	Const c_MaxFrameCount:Int = 20
-
-	Field m_MaxZoom:Int = 5 'Assume 1366px is the lowest resolution because it's not 1999. 1366px - 260px (left column) = 1106 / 192 (source image width) = 5 (floored)
-	Field m_Magenta:Int[] = [255, 0, 255]
-
 	Field m_SourceImage:TImage = Null
 	Field m_SourceImageSize:SVec2I = Null
 
+	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
+	Field m_Magenta:Int[] = [255, 0, 255]
+
+	Field m_MaxInputZoom:Int = 5 'Assume 1366px is the lowest resolution because it's not 1999. 1366px - 260px (left column) = 1106 / 192 (source image width) = 5 (floored).
 	Field m_InputZoom:Int = g_DefaultInputZoom
 	Field m_OutputZoom:Int = g_DefaultOutputZoom
 	Field m_TileSize:Int = 24 * m_InputZoom
 	Field m_FrameCount:Int = g_DefaultFrameCount
-	Field m_BackgroundColor:Int[] = [g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]
-	Field m_BentLimbPartDrawOrder:Int[c_LimbCount, 1]
 
 	Field m_DrawOutputFrameBounds:Int = False
 	Field m_FrameBoundingBoxPosX:Int[c_LimbCount, c_MaxFrameCount]
@@ -27,6 +24,8 @@ Type GraphicsOutput
 	Field m_OutputPanOffsetX:Int = 0
 	Field m_OutputPanOffsetY:Int = 0
 
+	Field m_BentLimbPartDrawOrder:Int[c_LimbCount]
+
 	Field m_LimbManager:LimbManager = Null
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +34,7 @@ Type GraphicsOutput
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 
-		m_MaxZoom = Int(FloorF(maxWorkspaceWidth / 192))
+		m_MaxInputZoom = Int(FloorF(maxWorkspaceWidth / 192))
 
 		m_LimbManager = New LimbManager()
 	EndMethod
@@ -49,7 +48,7 @@ Type GraphicsOutput
 			If loadedImage.Width = 192 And loadedImage.Height = 24 Then
 				m_SourceImage = loadedImage
 				m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
-				DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
+				DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created.
 				m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
 				Return True
 			Else
@@ -61,34 +60,10 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method SetInputZoom:Int(newZoom:Int)
-		Local clampedNewZoom:Int = Utility.Clamp(newZoom, 1, m_MaxZoom)
-		If m_InputZoom <> clampedNewZoom Then
-			m_InputZoom = clampedNewZoom
-			m_TileSize = 24 * m_InputZoom
-
-			If m_SourceImage <> Null Then
-				m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
-				DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created
-				m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
-			EndIf
-		EndIf
-		Return m_InputZoom
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	Method SetOutputZoom:Int(newZoom:Int)
-		m_OutputZoom = Utility.Clamp(newZoom, 1, 5)
-		m_OutputPanOffsetX = 0
-		m_OutputPanOffsetY = 0
-		Return m_OutputZoom
-	EndMethod
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	Method SetBackgroundColor:Int[](rgbValue:Int[])
-		m_BackgroundColor = rgbValue
+		m_BackgroundColor[0] = Utility.Clamp(rgbValue[0], 0, 255)
+		m_BackgroundColor[1] = Utility.Clamp(rgbValue[1], 0, 255)
+		m_BackgroundColor[2] = Utility.Clamp(rgbValue[2], 0, 255)
 		ChangeBackgroundColor(m_BackgroundColor)
 		Return m_BackgroundColor
 	EndMethod
@@ -105,6 +80,32 @@ Type GraphicsOutput
 		If revertOrNot Then
 			ChangeBackgroundColor(m_BackgroundColor)
 		EndIf
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetInputZoom:Int(newZoom:Int)
+		Local clampedNewZoom:Int = Utility.Clamp(newZoom, 1, m_MaxInputZoom)
+		If m_InputZoom <> clampedNewZoom Then
+			m_InputZoom = clampedNewZoom
+			m_TileSize = 24 * m_InputZoom
+
+			If m_SourceImage <> Null Then
+				m_SourceImageSize = New SVec2I(m_SourceImage.Width, m_SourceImage.Height)
+				DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom) 'Draw the source image to the backbuffer so limb tiles can be created.
+				m_LimbManager.CreateLimbParts(m_InputZoom, m_TileSize)
+			EndIf
+		EndIf
+		Return m_InputZoom
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetOutputZoom:Int(newZoom:Int)
+		m_OutputZoom = Utility.Clamp(newZoom, 1, 5)
+		m_OutputPanOffsetX = 0
+		m_OutputPanOffsetY = 0
+		Return m_OutputZoom
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +130,7 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method SetBentLimbPartDrawOrder(drawOrder:Int[,])
+	Method SetBentLimbPartDrawOrder(drawOrder:Int[])
 		m_BentLimbPartDrawOrder = drawOrder
 	EndMethod
 
@@ -152,7 +153,7 @@ Type GraphicsOutput
 		Else
 			ChangeBackgroundColor(m_Magenta)
 			Draw(True)
-			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmap, not the canvas), not sure why but whatever
+			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmap, not the canvas), not sure why but whatever.
 			Return GrabPixmap(0, 12 + (m_SourceImageSize[1] * m_InputZoom), 100 + (m_FrameCount * ((m_TileSize / m_InputZoom) + 8)), 200)
 		EndIf
 	EndMethod
@@ -166,19 +167,19 @@ Type GraphicsOutput
 		Else
 			ChangeBackgroundColor(m_Magenta)
 			Draw(True)
-			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmaps, not the canvas), not sure why but whatever
+			Flip(1) 'Have to flip again for background color to actually change (for the grabbed pixmaps, not the canvas), not sure why but whatever.
 
 			Local framesToSave:TPixmap[c_LimbCount, m_FrameCount]
-			For Local row:Int = 0 Until c_LimbCount
+			For Local limb:Int = 0 Until c_LimbCount
 				Local rotationAngle:Int = -90
-				If row >= 2 Then
+				If limb >= 2 Then
 					rotationAngle = 90
 				EndIf
 				For Local frame:Int = 0 Until m_FrameCount
-					framesToSave[row, frame] = Utility.RotatePixmap(GrabPixmap(m_FrameBoundingBoxPosX[row, frame] + 1, m_FrameBoundingBoxPosY[row, frame] + 1, m_FrameBoundingBoxSize[0] - 1, m_FrameBoundingBoxSize[1] - 1), rotationAngle)
-					'HFlip the legs so they're facing the right direction
-					If row >= 2 Then
-						framesToSave[row, frame] = XFlipPixmap(framesToSave[row, frame])
+					framesToSave[limb, frame] = Utility.RotatePixmap(GrabPixmap(m_FrameBoundingBoxPosX[limb, frame] + 1, m_FrameBoundingBoxPosY[limb, frame] + 1, m_FrameBoundingBoxSize[0] - 1, m_FrameBoundingBoxSize[1] - 1), rotationAngle)
+					'HFlip the legs so they're facing the right direction.
+					If limb >= 2 Then
+						framesToSave[limb, frame] = XFlipPixmap(framesToSave[limb, frame])
 					EndIf
 				Next
 			Next
@@ -192,20 +193,20 @@ Type GraphicsOutput
 		Local croppedFrames:TPixmap[c_LimbCount, m_FrameCount]
 		Local stackedLimbFrames:TPixmap = CreatePixmap(framesToCrop[0, 0].Width, framesToCrop[0, 0].Height, PF_RGBA8888)
 
-		'This is seemingly inefficient but surprisingly fast garbage but I don't have anything better
+		'This is seemingly inefficient but surprisingly fast garbage but I don't have anything better.
 		For Local limb:Int = 0 Until c_LimbCount
 			Cls()
 
 			For Local frame:Int = 0 Until m_FrameCount
-				'Mask the magenta and stack all the frames on top of each other, then grab the stacked frames to a new pixmap
+				'Mask the magenta and stack all the frames on top of each other, then grab the stacked frames to a new pixmap.
 				DrawImage(LoadImage(MaskPixmap(framesToCrop[limb, frame], m_Magenta[0], m_Magenta[1], m_Magenta[2]), DYNAMICIMAGE | MASKEDIMAGE), 0, 0)
 				stackedLimbFrames = GrabPixmap(0, 0, stackedLimbFrames.Width, stackedLimbFrames.Height)
 			Next
 
-			Local realDimensions:Int[] = Utility.GetPixmapNonMaskedPixelBounds(stackedLimbFrames, -65281) 'God knows why this is the value for magenta here but it is what it is
+			Local realDimensions:Int[] = Utility.GetPixmapNonMaskedPixelBounds(stackedLimbFrames, -65281) 'God knows why this is the value for magenta here but it is what it is.
 
 			For Local frame:Int = 0 Until m_FrameCount
-				'Copy the area that is the real dimensions to a new pixmap
+				'Copy the area that is the real dimensions to a new pixmap.
 				Local croppedFrame:TPixmap = CreatePixmap(realDimensions[1] - realDimensions[0] + 1, realDimensions[3] - realDimensions[2] + 1, PF_RGBA8888)
 				Local xCount:Int = 0
 				Local yCount:Int = 0
@@ -227,7 +228,7 @@ Type GraphicsOutput
 
 	Method Update()
 		If m_SourceImage <> Null Then
-			'Getting these on mouse click is screwy so get them here
+			'Getting these on mouse click is screwy so get them here.
 			Local mouseMovement:SVec2I = New SVec2I(MouseXSpeed(), MouseYSpeed())
 
 			If MouseDown(1) Then
@@ -260,7 +261,7 @@ Type GraphicsOutput
 		Local outputCopyForZoom:TImage = CreateImage(outputUnzoomedSize[0], outputUnzoomedSize[1], 1, DYNAMICIMAGE)
 		GrabImage(outputCopyForZoom, 0, m_SourceImageSize[1] * m_InputZoom)
 
-		'Hide the unzoomed output
+		'Hide the unzoomed output.
 		SetColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		DrawRect(0, m_SourceImageSize[1] * m_InputZoom, outputUnzoomedSize[0] + 20, outputUnzoomedSize[1] + 20)
 		Utility.ResetDrawColor()
@@ -303,7 +304,7 @@ Type GraphicsOutput
 			EndIf
 
 			SetColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
-			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom
+			DrawRect(0, 0, GraphicsWidth(), (m_SourceImageSize[1] * m_InputZoom) + 1) 'Extend the source image magenta strip all the way to the right and adjust height to input zoom.
 			Utility.ResetDrawColor()
 			DrawImageRect(m_SourceImage, 0, 0, m_SourceImageSize[0] * m_InputZoom, m_SourceImageSize[1] * m_InputZoom)
 

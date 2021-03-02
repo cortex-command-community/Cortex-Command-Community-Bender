@@ -4,16 +4,6 @@ Type Utility
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Function LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
-		Local result:Float[3]
-		result[0] = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
-		result[1] = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
-		result[2] = 180 - (result[0] + result[1])
-		Return result
-	EndFunction
-
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	Function Clamp:Int(valueToClamp:Int, minValue:Int, maxValue:Int)
 		If valueToClamp < minValue Then
 			Return minValue
@@ -21,6 +11,16 @@ Type Utility
 			Return maxValue
 		EndIf
 		Return valueToClamp
+	EndFunction
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Function LawOfCosines:Float[](ab:Float, bc:Float, ca:Float)
+		Local result:Float[3]
+		result[0] = ACos((ca ^ 2 + ab ^ 2 - bc ^ 2) / (2 * ca * ab))
+		result[1] = ACos(( bc ^ 2 + ab ^ 2 - ca ^ 2) / (2 * bc * ab))
+		result[2] = 180 - (result[0] + result[1])
+		Return result
 	EndFunction
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ Type Utility
 	Function RotatePixmap:TPixmap(sourcePixmap:TPixmap, angle:Int)
 		Local outputPixmap:TPixmap = Null
 
-		'This is pretty garbage but BlitzMax life is hard
+		'This is pretty garbage but BlitzMax life is hard.
 		Select angle
 			Case 90
 				outputPixmap = CreatePixmap(sourcePixmap.Height, sourcePixmap.Width, sourcePixmap.Format)
@@ -103,7 +103,7 @@ Type Utility
 	Function GetPixmapNonMaskedPixelBounds:Int[](sourcePixmap:TPixmap, maskColor:Int)
 		Local bounds:Int[] = [sourcePixmap.Width, 0, sourcePixmap.Height, 0]
 
-		'Scan the pixmap from each direction to find the actual dimensions of the non-mask content. Basically trimming whitespace but with pixels
+		'Scan the pixmap from each direction to find the actual dimensions of the non-mask content. Basically trimming whitespace but with pixels.
 		For Local pixelY:Int = 0 Until sourcePixmap.Height
 			For Local pixelX:Int = 0 Until sourcePixmap.Width
 				If ReadPixel(sourcePixmap, pixelX, pixelY) <> maskColor Then

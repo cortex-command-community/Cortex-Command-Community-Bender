@@ -13,7 +13,7 @@ Import "Types/UserInterface.bmx"
 Import "Types/FileIO.bmx"
 Import "Types/GraphicsOutput.bmx"
 
-'//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AppTitle = "CCCP Bender 1.3.0"
 
@@ -22,7 +22,7 @@ Global g_UserInterface:UserInterface = Null
 Global g_FileIO:FileIO = Null
 Global g_GraphicsOutput:GraphicsOutput = Null
 
-'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+'//// MAIN LOOP AND EVENT HANDLING //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Repeat
 	g_SettingsManager = New SettingsManager()
@@ -31,7 +31,7 @@ Repeat
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
 	EnablePolledInput()
 
-	'Apply user settings/defaults
+	'Apply user settings/defaults.
 	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
 	g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_DefaultInputZoom))
 	g_UserInterface.SetOutputZoomTextboxValue(g_GraphicsOutput.SetOutputZoom(g_DefaultOutputZoom))
@@ -44,10 +44,6 @@ Repeat
 		PollEvent()
 
 		Select EventID()
-			'Case EVENT_WINDOWACTIVATE
-			'Case EVENT_GADGETSELECT
-			'Case EVENT_GADGETLOSTFOCUS
-
 			Case EVENT_APPRESUME
 				ActivateWindow(g_UserInterface.m_MainWindow)
 			Case EVENT_WINDOWSIZE
@@ -65,10 +61,10 @@ Repeat
 				EndSelect
 			Case EVENT_GADGETACTION
 				Select EventSource()
-					'Loading
+					'Loading.
 					Case g_UserInterface.m_LoadButton
 						g_UserInterface.SetSaveButtonEnabled(g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad()))
-					'Saving
+					'Saving.
 					Case g_UserInterface.m_SaveButton
 						If g_FileIO.GetSaveAsFrames() Then
 							g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFileAsFrames(g_GraphicsOutput.GrabOutputFramesForSaving(), g_GraphicsOutput.GetFrameCount()))
@@ -76,33 +72,33 @@ Repeat
 							g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFile(g_GraphicsOutput.GrabOutputForSaving()))
 						EndIf
 						Continue
-					'Input Scale
+					'Input Scale.
 					Case g_UserInterface.m_SettingsInputZoomTextbox
 						g_UserInterface.SetInputZoomTextboxValue(g_GraphicsOutput.SetInputZoom(g_UserInterface.GetInputZoomTextboxValue()))
-					'Output Scale
+					'Output Scale.
 					Case g_UserInterface.m_SettingsOutputZoomTextbox
 						g_UserInterface.SetOutputZoomTextboxValue(g_GraphicsOutput.SetOutputZoom(g_UserInterface.GetOutputZoomTextboxValue()))
-					'Frames
+					'Frames.
 					Case g_UserInterface.m_SettingsFramesTextbox
 						g_UserInterface.SetFramesTextboxValue(g_GraphicsOutput.SetFrameCount(g_UserInterface.GetFramesTextboxValue()))
-					'BG Color
+					'BG Color.
 					Case g_UserInterface.m_SettingsColorRTextbox, g_UserInterface.m_SettingsColorGTextbox, g_UserInterface.m_SettingsColorBTextbox
 						g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(g_UserInterface.GetColorTextboxValues()))
-					'Save as Frames
+					'Save as Frames.
 					Case g_UserInterface.m_SettingsSaveAsFramesCheckbox
 						g_GraphicsOutput.SetDrawOutputFrameBounds(g_FileIO.SetSaveAsFrames(g_UserInterface.GetSaveAsFramesCheckboxValue()))
-					'Save as Indexed
+					'Save as Indexed.
 					Case g_UserInterface.m_SettingsIndexedCheckbox
 						g_UserInterface.SetFileTypeComboBoxVisible(g_FileIO.SetSaveAsIndexed(g_UserInterface.GetSaveAsIndexedCheckboxValue()))
-					'Indexed Filetype
+					'Indexed Filetype.
 					Case g_UserInterface.m_SettingsIndexedFileTypeComboBox
 						g_FileIO.SetIndexedFileType(GadgetText(g_UserInterface.m_SettingsIndexedFileTypeComboBox))
-					'Layering Controls
+					'Layering Controls.
 					Case g_UserInterface.m_LayeringArmFGCheckbox, g_UserInterface.m_LayeringArmBGCheckbox, g_UserInterface.m_LayeringLegFGCheckbox, g_UserInterface.m_LayeringLegBGCheckbox
 						g_GraphicsOutput.SetBentLimbPartDrawOrder(g_UserInterface.SetLayerCheckboxLabels(g_UserInterface.GetLayerCheckboxValues()))
 				EndSelect
 			Case EVENT_KEYDOWN
-				If Not GadgetDisabled(g_UserInterface.m_SaveButton) And (KeyDown(KEY_LCONTROL) Or KeyDown(KEY_RCONTROL)) And KeyDown(KEY_S) Then
+				If g_UserInterface.GetSaveButtonEnabled() And (KeyDown(KEY_LCONTROL) Or KeyDown(KEY_RCONTROL)) And KeyDown(KEY_S) Then
 					If g_FileIO.GetSaveAsFrames() Then
 						g_GraphicsOutput.RevertBackgroundColorAfterSave(g_FileIO.SaveFileAsFrames(g_GraphicsOutput.GrabOutputFramesForSaving(), g_GraphicsOutput.GetFrameCount()))
 					Else
