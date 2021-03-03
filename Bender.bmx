@@ -28,7 +28,7 @@ Repeat
 	g_SettingsManager = New SettingsManager()
 	g_UserInterface = New UserInterface(g_DefaultMaximizeWindow)
 	g_FileIO = New FileIO()
-	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
+	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth(), g_UserInterface.GetCanvasVisibleArea())
 
 	'Apply user settings/defaults.
 	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
@@ -56,8 +56,9 @@ Repeat
 				EndSelect
 			Case EVENT_APPRESUME
 				ActivateWindow(g_UserInterface.m_MainWindow)
+				ActivateGadget(g_UserInterface.m_CanvasGraphics)
 			Case EVENT_WINDOWSIZE
-				g_UserInterface.ProcessWindowResize()
+				g_GraphicsOutput.SetCanvasVisibleArea(g_UserInterface.ProcessWindowResize())
 			Case EVENT_WINDOWACCEPT
 				g_GraphicsOutput.LoadFile(g_FileIO.SetFileToLoad(EventExtra().ToString()))
 			Case EVENT_MENUACTION

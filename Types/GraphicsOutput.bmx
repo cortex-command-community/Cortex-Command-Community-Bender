@@ -4,6 +4,8 @@ Import "LimbManager.bmx"
 '//// GRAPHICS OUTPUT ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Type GraphicsOutput
+	Field m_CanvasVisibleArea:SVec2I = Null
+
 	Field m_SourceImage:TImage = Null
 	Field m_SourceImageSize:SVec2I = Null
 
@@ -30,10 +32,11 @@ Type GraphicsOutput
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	Method New(maxWorkspaceWidth:Int)
+	Method New(maxWorkspaceWidth:Int, canvasVisibleArea:SVec2I)
 		SetClsColor(m_BackgroundColor[0], m_BackgroundColor[1], m_BackgroundColor[2])
 		SetMaskColor(m_Magenta[0], m_Magenta[1], m_Magenta[2])
 
+		m_CanvasVisibleArea = canvasVisibleArea
 		m_MaxInputZoom = Int(FloorF(maxWorkspaceWidth / 192))
 
 		m_LimbManager = New LimbManager()
@@ -56,6 +59,12 @@ Type GraphicsOutput
 			EndIf
 		EndIf
 		Return False
+	EndMethod
+
+'////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	Method SetCanvasVisibleArea(visibleArea:SVec2I)
+		m_CanvasVisibleArea = visibleArea
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -249,7 +258,7 @@ Type GraphicsOutput
 		SetScale(2, 2)
 		Local textToDraw:String = "NO IMAGE LOADED!"
 		Local drawColor:Int[] = [255, 230, 80]
-		Utility.DrawTextWithShadow(textToDraw, New SVec2I((GraphicsWidth() / 2) - TextWidth(textToDraw), (GraphicsHeight() / 2) - TextHeight(textToDraw)), drawColor)
+		Utility.DrawTextWithShadow(textToDraw, New SVec2I((m_CanvasVisibleArea[0] / 2) - TextWidth(textToDraw), (m_CanvasVisibleArea[1] / 2) - TextHeight(textToDraw)), drawColor)
 		SetScale(1, 1)
 		Flip(1)
 	EndMethod
