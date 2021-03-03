@@ -15,7 +15,7 @@ Import "Types/GraphicsOutput.bmx"
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AppTitle = "CCCP Bender 1.3.0"
+AppTitle = "CC Bender 2.0.0" '4 Mar 2021
 
 Global g_SettingsManager:SettingsManager = Null
 Global g_UserInterface:UserInterface = Null
