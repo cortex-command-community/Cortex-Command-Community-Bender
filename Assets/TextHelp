@@ -1,54 +1,41 @@
-• Basic Controls
-																
-- LOAD:
-    This loads an image file and starts bending. Supported formats are bmp, png and jpg.
-    The loaded file is being cut to 24x24px tiles internally. For best results, use provided template to create correct input files.
-																
-- SAVE:
-    This saves the bended limbs into a file or creates a new file with specified name.
-    Typing the file extension is not needed. The currently loaded file cannot be overwritten.
-																
-																
-• Adjusting Joints
-																
-    To adjust the joint positing on a limb part, click the upper joint marker on and drag it up/down, or click at desired point to set it there. 
-    Output will update automatically as you adjust the markers.
-
-    Joint markers cannot be adjusted on the X axis, and will adjust equally on the Y axis. 
-    For best results, please position the limb parts as close to dead center as possible for each tile in the input file.
-																
-																
-• Editor Settings
-																
-- ZOOM:
-    This magnifies the source image For easier placement of joint markers. Zooming does Not magnify the output. 
-    Changing zoom level will reset the joint markers to initial positions. Accepts values from 1 To 4.
-																
-- FRAMES:
-    This sets the amount of frames output will generate. Limb bending will automatically adjust to number of frames.
-    Accepts values from 1 to 20.
-																
-- BG COLOR R,G,B:
-    This changes the background color of the output. Accepts values from 0 to 255.	
-    When saving file, the output will automatically set background to magenta, so no manual setting before saving is needed.
-																
-- SAVE AS INDEXED BITMAP:
-    When ticked the output will be saved as a BMP file indexed to the CC palette. When not ticked, output will be saved as a non-indexed PNG.
-	
-  - Warning:
-    THE INDEXING PROCESS IS SLOW!
-    I've done my best to speed it up but it still isn't blazing fast like PNG saving.
-    When saving indexed, the app may hang and appear unresponsive but in fact it's doing what it's supposed to.
-    For best results, DO NOT TOUCH ANYTHING until the background color reverts from magenta to whatever it was before!
-																
-- SAVE AS FRAMES:
-    When ticked each frame of the output will be exported as an individual file.
-    Exported frame size is fixed to 24x24px. A bounding box will be shown around each frame to help user stay within bounds.
-    Anything outside bounds will be cropped.
-																
-  - Warning:
-    WHEN SAVING, DO NOT MANUALLY ADD LIMB NAME OR FRAME NUMBER TO FILE NAME! THIS IS DONE AUTOMATICALLY!
-    DOING SO WILL RESULT IS HORRIBLE HORRIBLE EXPORTED FILE NAMES!
-																
-																
-Saving as frames does not conflict with saving as indexed and can be used together to export indexed individual frames.
+Basic Controls:
+    • Load
+      Loads an image file and starts bending. Supported formats are BMP, PNG and JPG/JPEG. Files can also be loaded by dragging and dropping them into the main window.
+      The loaded file is being cut to 24x24px tiles internally. A file that is not the correct dimensions will be rejected. For best results, use provided template to create correct input files.
+																					
+    • Save
+      Saves the bended limbs into a new file (or multiple files if saving as frames) with the specified name. Typing the file extension is not needed. The currently loaded file cannot be overwritten.
+																					
+Editor Settings:
+    • Background Color (R, G, B)
+      Changes the background color of the output. When saving file, the output will automatically set background color to magenta (255, 0, 255) so no manual setting before saving is needed.  
+																					
+    • Input Zoom
+      Magnifies the source image for easier placement of joint markers. Changing zoom level will reset the joint markers to initial positions.
+      Does not magnify the output. Accepts values from 1 to a maximum value calculated from the desktop width.
+																					
+    • Output Zoom
+      Magnifies the bend limb output for easier examination. Does not affect saved files, they will be saved at original dimensions. Accepts values from 1 to 5.
+      When zoomed, the output area can be panned by clicking and dragging so all the output that does not fit the window can be examined.
+																					
+    • Frame Count
+      Sets the amount of frames output will generate. Limb bending will automatically adjust to number of frames. Accepts values from 1 to 20.
+																					
+    • Save As Indexed
+      Sets the output to be saved as an indexed color file indexed to the CC palette, otherwise the output will be saved as a non-indexed PNG.
+      When ticked, a combobox with the available file formats will appear. The selected item in the box will be the one used for saving (PNG by default).
+																					
+    • Save As Frames
+      Sets each frame in the output to be exported as an individual file. A bounding box will be shown around each frame to help user stay within bounds.
+      The content within the bounds is then cropped to actual dimensions (all empty space will be trimmed).
+      When saving as frames, do not manually add limb name or frame number to the file name! This is done automatically! DOING SO WILL RESULT IS HORRIBLE HORRIBLE EXPORTED FILE NAMES!
+																					
+Adjusting Joints:
+    • To adjust the joint positioning on a limb part, click the joint marker on and drag it, or click at desired point to set it there. Output will update automatically as you adjust the markers.
+      Note that the lower joint marker only adjusts the length of the limb part, not it's position.
+																					
+Layering Controls:
+    • Adjust the draw order of the limb parts in a limb by ticking the checkbox of that limb. Lower parts are drawn on top by default.
+																					
+Saving Settings as User Defaults:
+    • The "Save Settings" button will save the current editor settings to a file. If this file exists, it will be automatically loaded on startup and apply the settings as defaults.

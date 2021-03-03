@@ -1,11 +1,11 @@
-Welcome to the CCCP Bender utility!
+Welcome to the Cortex Command Bender utility!
 
 It's purpose is to make the life of modders easier by automagically generating bent limb frames.
 
 The CC Bender was originally created by Arne Jansson (AndroidArts), the man behind all the Cortex Command artwork.
-The CCCommunityProject Bender, however, is a brand new tool that allows more control and convenience for the modder (hopefully).
+This version, however, is a brand new tool that allows more control and convenience for the modder (hopefully).
 
 Arne's original bend code was used as base for this utility, and has been modified and improved to enable the new features.
 
-Created using BlitzMax 0.128.3.45
+Created using BlitzMax NG 0.129
 Bender logo image by Arne Jansson
