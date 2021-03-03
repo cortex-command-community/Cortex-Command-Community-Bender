@@ -96,7 +96,7 @@ Type FileIO
 						saveSuccess = False
 				EndSelect
 			Else
-				saveSuccess = SavePixmapPNG(pixmapToSave, filename)
+				saveSuccess = SavePixmapPNG(ConvertPixmap(pixmapToSave, PF_RGB888), filename)
 			EndIf
 			If Not saveSuccess Then
 				Notify("Failed to save file: " + filename, True)
@@ -144,7 +144,7 @@ Type FileIO
 								saveSuccess = False
 						EndSelect
 					Else
-						saveSuccess = SavePixmapPNG(pixmapToSave[limb, frame], fullFilename + ".png")
+						saveSuccess = SavePixmapPNG(ConvertPixmap(pixmapToSave[limb, frame], PF_RGB888), fullFilename + ".png")
 					EndIf
 
 					If Not saveSuccess Then
