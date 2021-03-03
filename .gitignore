@@ -1,8 +1,13 @@
 /.bmx
+\.bmx
 *.exe
 *.bak
 *.png
 *.bmp
 
-!test-image.bmp
-!input-template.bmp
+*.code-workspace
+.vscode/
+
+BenderUserSettings.ini
+!TestImage.png
+!InputTemplate.png
