@@ -112,6 +112,7 @@ Type FileIO
 	Method SaveFileAsFrames:Int(pixmapToSave:TPixmap[,], frameCount:Int)
 		Local filename:String = RequestFile("Save graphic output", Null, True) 'No file extensions from filters here, we add them later manually otherwise exported file name is messed up.
 		If pixmapToSave <> Null And CheckValidExportFileName(filename) Then
+			filename = StripExt(filename) 'Remove a file extension that was typed in by the user if any.
 			Local saveSuccess:Int = True
 			For Local limb:Int = 0 To 3
 				Local limbName:String 'Name the limbs - by default: ArmFG, ArmBG, LegFG, LegBG in this order.
