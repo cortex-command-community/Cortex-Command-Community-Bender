@@ -3,6 +3,7 @@ Import "Utility.bmx"
 '//// DEFAULT/USER EDITOR SETTINGS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Global g_DefaultMaximizeWindow:Int = False
+Global g_DefaultOutputRefreshRate:Int = DesktopHertz()
 Global g_DefaultBackgroundRed:Int = 50
 Global g_DefaultBackgroundGreen:Int = 170
 Global g_DefaultBackgroundBlue:Int = 255
@@ -47,6 +48,8 @@ Type SettingsManager
 			Select propAndValue[0]
 				Case "StartMaximizedWindow"
 					g_DefaultMaximizeWindow = Utility.Clamp(propAndValue[1].ToInt(), False, True)
+				Case "OutputRefreshRate"
+					g_DefaultOutputRefreshRate = Utility.Clamp(propAndValue[1].ToInt(), 1, DesktopHertz())
 				Case "BackgroundRed"
 					g_DefaultBackgroundRed = Utility.Clamp(propAndValue[1].ToInt(), 0, 255)
 				Case "BackgroundGreen"
@@ -82,6 +85,7 @@ Type SettingsManager
 		Local outputString:TStringBuilder = New TStringBuilder("// User Settings~n~n")
 
 		outputString.Append("StartMaximizedWindow = " + g_DefaultMaximizeWindow + "~n")
+		outputString.Append("OutputRefreshRate = " + g_DefaultOutputRefreshRate + "~n")
 		outputString.Append("BackgroundRed = " + propertyValues[0] + "~n")
 		outputString.Append("BackgroundGreen = " + propertyValues[1] + "~n")
 		outputString.Append("BackgroundBlue = " + propertyValues[2] + "~n")

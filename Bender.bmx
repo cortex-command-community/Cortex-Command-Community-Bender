@@ -29,7 +29,6 @@ Repeat
 	g_UserInterface = New UserInterface(g_DefaultMaximizeWindow)
 	g_FileIO = New FileIO()
 	g_GraphicsOutput = New GraphicsOutput(g_UserInterface.GetMaxWorkspaceWidth())
-	EnablePolledInput()
 
 	'Apply user settings/defaults.
 	g_UserInterface.SetColorTextboxValues(g_GraphicsOutput.SetBackgroundColor(Int[][g_DefaultBackgroundRed, g_DefaultBackgroundGreen, g_DefaultBackgroundBlue]))
@@ -40,10 +39,21 @@ Repeat
 	g_UserInterface.SetFileTypeComboBoxVisible(g_UserInterface.SetSaveAsIndexedCheckboxValue(g_FileIO.SetSaveAsIndexed(g_DefaultSaveAsIndexed)))
 	g_UserInterface.SetFileTypeComboBoxSelectedItem(g_FileIO.SetIndexedFileType(g_DefaultIndexedFileType))
 
+	Local refreshTimer:TTimer = CreateTimer(g_DefaultOutputRefreshRate)
+	Local refreshOutput:Int = False
+
+	EnablePolledInput()
+
 	Repeat
+		refreshOutput = False
 		PollEvent()
 
 		Select EventID()
+			Case EVENT_TIMERTICK
+				Select EventSource()
+					Case refreshTimer
+						refreshOutput = True
+				EndSelect
 			Case EVENT_APPRESUME
 				ActivateWindow(g_UserInterface.m_MainWindow)
 			Case EVENT_WINDOWSIZE
@@ -112,6 +122,8 @@ Repeat
 		EndSelect
 
 		g_GraphicsOutput.Update()
-		g_GraphicsOutput.Draw()
+		If refreshOutput Then
+			g_GraphicsOutput.Draw()
+		EndIf
 	Forever
 Forever
