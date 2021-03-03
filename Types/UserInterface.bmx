@@ -166,7 +166,10 @@ Type UserInterface
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	Method InitializeCanvasGraphics()
-		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
+		'm_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GadgetWidth(m_MainWindow) - m_CanvasGraphicsAnchor[0], GadgetHeight(m_MainWindow) - m_CanvasGraphicsAnchor[1], m_MainWindow)
+		'Create the canvas as large as it can be to avoid bad output when source image is zoomed beyond canvas width. Everything grabbed outside the visible area is null and the output limbs are back squares.
+		m_CanvasGraphics = CreateCanvas(m_CanvasGraphicsAnchor[0], m_CanvasGraphicsAnchor[1], GetMaxWorkspaceWidth(), DesktopHeight(), m_MainWindow)
+
 		SetGadgetLayout(m_CanvasGraphics, m_CanvasGraphicsAnchor[0], m_CanvasGraphicsSize[0], m_CanvasGraphicsAnchor[1], m_CanvasGraphicsSize[1])
 		SetGraphicsDriver(GLMax2DDriver())
 		SetGraphics(CanvasGraphics(m_CanvasGraphics))
@@ -180,8 +183,8 @@ Type UserInterface
 		MoveGadget(m_LogoImagePanel, 0, GadgetHeight(m_MainWindow) - m_LogoImagePanelSize[1])
 
 		'Have to recreate the canvas because the backbuffer doesn't resize with the window.
-		FreeGadget(m_CanvasGraphics)
-		InitializeCanvasGraphics()
+		'FreeGadget(m_CanvasGraphics)
+		'InitializeCanvasGraphics()
 	EndMethod
 
 '////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
