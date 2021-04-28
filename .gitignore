@@ -8,6 +8,7 @@
 *.code-workspace
 .vscode/
 
+Changelog.md
 BenderUserSettings.ini
 !TestImage.png
 !InputTemplate.png

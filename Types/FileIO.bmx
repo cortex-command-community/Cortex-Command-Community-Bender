@@ -127,12 +127,12 @@ Type FileIO
 						limbName = "LegBG"
 				EndSelect
 
-				For Local frame:Int = 0 To frameCount - 1
+				For Local frame:Int = 0 Until frameCount
 					Local leadingZeros:String = "00"
-					Local fullFilename:String = filename + limbName + leadingZeros + frame
-					If frame < 10 Then
+					If frame >= 10 Then
 						leadingZeros = "0"
 					EndIf
+					Local fullFilename:String = filename + limbName + leadingZeros + frame
 
 					If m_SaveAsIndexed Then
 						Select m_IndexedFileType
